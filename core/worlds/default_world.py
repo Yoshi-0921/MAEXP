@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
+
+"""Source code for the default multi-agent world.
+
+Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
+"""
+
+from core.maps.abstract_map import AbstractMap
+from omegaconf import DictConfig
+
+from .abstract_world import AbstractWorld
+from .entity import Agent, Object
 
 
-world = World()
-num_agents = config.num_agents
-num_landmarks = config.num_landmarks
-world.agents = [Agent() for i in range(num_agents)]
-for i, agent in enumerate(world.agents):
-    agent.name = f"agent {i}"
-    agent.collide = True
-world.landmarks = [Landmark() for i in range(num_landmarks)]
-for i, landmark in enumerate(world.landmarks):
-    landmark.name = f"landmark {i}"
-    landmark.collide = False
-world.map = Exp6_Map(config)
+class DefaultWorld(AbstractWorld):
+    def __init__(self, config: DictConfig, world_map: AbstractMap):
+        super().__init__(config=config, world_map=world_map)
 
-return world
+        self.agents = [Agent(name=f'Agent_{i}') for i in range(config.num_agents)]
+        self.objects = [Object() for _ in range(config.num_objects)]

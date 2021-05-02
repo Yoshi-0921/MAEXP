@@ -4,7 +4,9 @@ defaults:
 
 
 seed: 921
+world: 'default'
 environment: 'default'
+trainer: 'default'
 # ==================================================
 num_agents: 8 #8
 num_objects: 40 #40

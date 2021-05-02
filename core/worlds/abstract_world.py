@@ -9,15 +9,17 @@ from abc import ABC
 from typing import List
 
 import numpy as np
-
+from core.maps.abstract_map import AbstractMap
 from .entity import Agent, Object
+from omegaconf import DictConfig
 
 
 class AbstractWorld(ABC):
-    def __init__(self, **kwargs):
+    def __init__(self, config: DictConfig, world_map: AbstractMap):
+        self.config = config
+        self.map = world_map
         self.agents: List[Agent] = []
         self.objects: List[Object] = []
-        self.map = None
 
     @property
     def entities(self):

@@ -6,9 +6,11 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from core.utils.logging import initialize_logging
+from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
+from .default_environment import DefaultEnvironment
 from .tools.entity import Agent, Object
 from .tools.world import Map, World
 
@@ -17,9 +19,9 @@ logger = initialize_logging(__name__)
 __all__ = ["Agent", "Object", "Map", "World"]
 
 
-def generate_environment(config: DictConfig) -> AbstractEnvironment:
+def generate_environment(config: DictConfig, world: AbstractWorld) -> AbstractEnvironment:
     if config.environment == "default":
-        env = None
+        env = DefaultEnvironment(config=config, world=world)
 
         return env
 

@@ -8,10 +8,12 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from abc import ABC
 
 import numpy as np
+from omegaconf import DictConfig
 
 
 class AbstractMap(ABC):
-    def __init__(self, **kwargs):
+    def __init__(self, config: DictConfig):
+        self.config = config
         self.sizeX = None
         self.sizeY = None
 

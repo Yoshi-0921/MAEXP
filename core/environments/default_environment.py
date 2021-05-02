@@ -10,5 +10,5 @@ from omegaconf import DictConfig
 
 
 class DefaultEnvironment(AbstractEnvironment):
-    def __init__(self, config: DictConfig):
-        self.config = config
+    def __init__(self, config: DictConfig, world):
+        super().__init__(config=config, world=world)

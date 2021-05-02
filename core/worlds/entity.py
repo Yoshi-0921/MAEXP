@@ -43,8 +43,8 @@ class Object(Entity):
 
 
 class Agent(Entity):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str = None):
+        super().__init__(name=name)
         self.collide_walls: bool = False
         self.collide_agents: bool = False
         self.action = np.zeros(2, dtype=np.int8)

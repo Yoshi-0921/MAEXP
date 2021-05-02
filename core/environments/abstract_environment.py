@@ -20,10 +20,6 @@ class AbstractEnvironment(ABC):
         self.num_objects = len(self.objects)
 
     @abstractmethod
-    def generate_world(self):
-        raise NotImplementedError()
-
-    @abstractmethod
     def reset(self):
         raise NotImplementedError()
 
