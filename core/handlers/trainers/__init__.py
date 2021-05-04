@@ -8,7 +8,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
-from .abstract_environment import AbstractEnvironment
+from core.environments.abstract_environment import AbstractEnvironment
 
 logger = initialize_logging(__name__)
 
