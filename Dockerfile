@@ -8,4 +8,4 @@ RUN apt-get update && apt-get upgrade -y \
 
 RUN git clone https://github.com/Yoshi-0921/MAEXP
 
-RUN pip3 install -r MAEXP/requirements.txt
+RUN pip install -r MAEXP/requirements.txt
