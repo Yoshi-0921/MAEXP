@@ -3,6 +3,6 @@
 # .
 gpustat
 hydra-core==1.0.3
-torch==1.5.1+cu101
+torch==1.8.1+cu111
 torchsummary==1.5.1
 torchvision==0.6.1+cu101
