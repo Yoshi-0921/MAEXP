@@ -4,12 +4,16 @@ defaults:
 
 
 seed: 921
+map: 'default'
 world: 'default'
 environment: 'default'
 trainer: 'default'
+SIZE_X: 20
+SIZE_Y: 20
+init_xys: [[0, 1], [-1, 1]]
 # ==================================================
-num_agents: 8 #8
-num_objects: 40 #40
+num_agents: 2 #8
+num_objects: 25 #40
 # ==================================================
 # configure agent
 visible_range: 7

@@ -12,7 +12,7 @@ import numpy as np
 
 Experience = collections.namedtuple(
     'Experience',
-    ield_names=['state', 'action', 'reward', 'done', 'new_state']
+    field_names=['state', 'action', 'reward', 'done', 'new_state']
 )
 
 

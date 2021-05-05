@@ -34,3 +34,19 @@ class AbstractEnvironment(ABC):
     @abstractmethod
     def reward(self):
         raise NotImplementedError()
+
+    @abstractmethod
+    def action_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def reward_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def done_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def observation_ind(self):
+        raise NotImplementedError()

@@ -14,15 +14,17 @@ from omegaconf import DictConfig
 class AbstractMap(ABC):
     def __init__(self, config: DictConfig):
         self.config = config
-        self.sizeX = None
-        self.sizeY = None
+        self.SIZE_X = config.SIZE_X
+        self.SIZE_Y = config.SIZE_Y
 
         self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.aisle = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
-    def reset_all(self):
+        self.locate_walls()
+
+    def reset(self):
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
@@ -32,8 +34,8 @@ class AbstractMap(ABC):
     def reset_objects(self):
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
-    def coord2ind(self, p_pos: np.array, size_x: int = None, size_y: int = None):
-        pos_x, pos_y = p_pos
+    def coord2ind(self, position: np.array, size_x: int = None, size_y: int = None):
+        pos_x, pos_y = position
         size_x = size_x or self.SIZE_X
         size_y = size_y or self.SIZE_Y
 
@@ -43,8 +45,8 @@ class AbstractMap(ABC):
 
         return res_pos
 
-    def ind2coord(self, p_pos: np.array, size_x: int = None, size_y: int = None):
-        pos_x, pos_y = p_pos
+    def ind2coord(self, position: np.array, size_x: int = None, size_y: int = None):
+        pos_x, pos_y = position
         size_x = size_x or self.SIZE_X
         size_y = size_y or self.SIZE_Y
 
