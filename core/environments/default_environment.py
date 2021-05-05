@@ -23,22 +23,22 @@ class DefaultEnvironment(AbstractEnvironment):
         for agent in self.agents:
             self.action_space.append(4)
             self.observation_space.append(self.visible_range)
+        self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
 
     def reset(self):
         self.world.map.reset()
-        for agent in self.agents:
+        for agent_id, agent in enumerate(self.agents):
             agent.collide_agents = False
             agent.collide_walls = False
 
             # Initialize agent position
-            agent.move(np.zeros(2, dtype=np.int8))
+            agent.move(self.init_xys[agent_id])
 
         # Initialize object position
         self.world.reset_objects()
         self.generate_objects()
 
     def generate_objects(self, num_objects: int):
-        # TODO randomly distribute objects in the environment
         num_generated = 0
         while num_generated < num_objects:
             x = 1 + int(random() * (self.world.map.SIZE_X - 1))

@@ -14,13 +14,15 @@ from omegaconf import DictConfig
 class AbstractMap(ABC):
     def __init__(self, config: DictConfig):
         self.config = config
-        self.sizeX = None
-        self.sizeY = None
+        self.sizeX = config.sizeX
+        self.sizeY = config.sizeX
 
         self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.aisle = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
+        self.locate_walls()
 
     def reset(self):
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)

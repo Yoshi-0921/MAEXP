@@ -65,7 +65,7 @@ class AbstractWorld(ABC):
                     break
 
             # Check if there is a collision against wall.
-            next_pos = self.map.coord2ind(next_pos, self.map.SIZE_X, self.map.SIZE_Y)
+            next_pos = self.map.coord2ind(next_pos)
             if self.map.wall_matrix[next_pos] == 1:
                 force[agent_id] = np.zeros(2, dtype=np.int8)
                 agent.collide_walls = True
@@ -73,5 +73,7 @@ class AbstractWorld(ABC):
         return force
 
     def integrate_state(self, force):
+        self.map.reset_agents()
         for agent_id, agent in enumerate(self.agents):
-            agent.pos += force[agent_id]
+            agent.push(force[agent_id])
+            self.map.agents_matrix(self.map.coord2ind(agent.xy))
