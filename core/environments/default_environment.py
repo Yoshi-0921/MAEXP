@@ -19,6 +19,10 @@ class DefaultEnvironment(AbstractEnvironment):
     def __init__(self, config: DictConfig, world):
         super().__init__(config=config, world=world)
         self.visible_range = config.visible_range
+        self.action_space, self.observation_space = [], []
+        for agent in self.agents:
+            self.action_space.append(4)
+            self.observation_space.append(self.visible_range)
 
     def reset(self):
         self.world.map.reset()
