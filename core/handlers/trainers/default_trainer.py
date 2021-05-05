@@ -18,7 +18,7 @@ class DefaultTrainer(AbstractTrainer):
         super().__init__(config=config, environment=environment)
         self.visible_range = self.config.visible_range
         wandb.init(
-            project="MAEXP", entity="yoshi-0921", name="default", config=dict(config)
+            project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
         )
 
     def generate_agents(self):
@@ -90,12 +90,12 @@ class DefaultTrainer(AbstractTrainer):
                 )
                 obs = state.permute(0, 2, 1).numpy() * 255.0
 
-                # agentの情報を追加(Blue)
+                # add agent information (Blue)
                 image[..., 0] += obs[0]
-                # landmarkの情報を追加(Yellow)
+                # add object information (Yellow)
                 image[..., 1] += obs[1]
                 image[..., 2] += obs[1]
-                # invisible areaの情報を追加(White)
+                # add invisible area information (White)
                 image[..., 0] -= obs[2]
                 image[..., 1] -= obs[2]
                 image[..., 2] -= obs[2]
