@@ -54,19 +54,19 @@ class AbstractWorld(ABC):
         for agent_id, agent in enumerate(self.agents):
 
             # Check if there is a collision against other agents.
-            next_pos = agent.pos + force[agent_id]
+            next_pos = agent.xy + force[agent_id]
             for i, a in enumerate(self.agents):
                 if agent_id == i:
                     continue
 
-                if all(next_pos == a.pos):
+                if all(next_pos == a.xy):
                     force[agent_id] = np.zeros(2, dtype=np.int8)
                     agent.collide_agents = True
                     break
 
             # Check if there is a collision against wall.
-            next_pos = self.map.coord2ind(next_pos)
-            if self.map.wall_matrix[next_pos] == 1:
+            next_pos_x, next_pos_y = self.map.coord2ind(next_pos)
+            if self.map.wall_matrix[next_pos_x, next_pos_y] == 1:
                 force[agent_id] = np.zeros(2, dtype=np.int8)
                 agent.collide_walls = True
 
@@ -76,4 +76,5 @@ class AbstractWorld(ABC):
         self.map.reset_agents()
         for agent_id, agent in enumerate(self.agents):
             agent.push(force[agent_id])
-            self.map.agents_matrix(self.map.coord2ind(agent.xy))
+            agent_x, agent_y = self.map.coord2ind(agent.xy)
+            self.map.agents_matrix[agent_x, agent_y]

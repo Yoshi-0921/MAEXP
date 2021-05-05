@@ -5,7 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-import random
+from random import random
 from typing import List
 
 import numpy as np
@@ -36,7 +36,13 @@ class DefaultEnvironment(AbstractEnvironment):
 
         # Initialize object position
         self.world.reset_objects()
-        self.generate_objects()
+        self.generate_objects(self.config.num_objects)
+
+        obs_n = []
+        for agent in self.agents:
+            obs_n.append(self.observation_ind(agent))
+
+        return obs_n
 
     def generate_objects(self, num_objects: int):
         num_generated = 0
@@ -101,6 +107,7 @@ class DefaultEnvironment(AbstractEnvironment):
 
         a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
 
+        reward = 0.0
         for obj_idx, obj in enumerate(self.objects):
             if all(agent.xy == obj.xy):
                 reward = 1.0
@@ -181,19 +188,19 @@ class DefaultEnvironment(AbstractEnvironment):
                         if (
                             j == 0
                             and x == 0
-                            and self.world.map.matrix[pos_x + opr, pos_y, 0] == 0
+                            and self.world.map.wall_matrix[pos_x + opr, pos_y] == 0
                         ):
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             break
                         # セルが角で真ん中に壁があるならbreak
                         if (
                             j == 0
                             and x != 0
-                            and self.world.map.matrix[pos_x - x, pos_y, 0] == 1
+                            and self.world.map.wall_matrix[pos_x - x, pos_y] == 1
                             and opr != x
                         ):
                             break
@@ -228,19 +235,19 @@ class DefaultEnvironment(AbstractEnvironment):
                         if (
                             j == 0
                             and y == 0
-                            and self.world.map.matrix[pos_x, pos_y - opr, 0] == 0
+                            and self.world.map.wall_matrix[pos_x, pos_y - opr] == 0
                         ):
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             break
                         # セルが角で真ん中に壁があるならbreak
                         if (
                             j == 0
                             and y != 0
-                            and self.world.map.matrix[pos_x, pos_y + y, 0] == 1
+                            and self.world.map.wall_matrix[pos_x, pos_y + y] == 1
                             and opr != y
                         ):
                             break
@@ -259,7 +266,7 @@ class DefaultEnvironment(AbstractEnvironment):
                 local_pos_x, local_pos_y = self.world.map.coord2ind(
                     ((x * opr_x), 0), self.visible_range, self.visible_range
                 )
-                if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                     obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                     break
                 for opr_y in [-1, 1]:
@@ -284,7 +291,7 @@ class DefaultEnvironment(AbstractEnvironment):
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             break
                         # 何もないなら0
@@ -299,7 +306,7 @@ class DefaultEnvironment(AbstractEnvironment):
                 local_pos_x, local_pos_y = self.world.map.coord2ind(
                     (0, (y * opr_y)), self.visible_range, self.visible_range
                 )
-                if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                     obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                     break
                 for opr_x in [-1, 1]:
@@ -324,7 +331,7 @@ class DefaultEnvironment(AbstractEnvironment):
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
                             break
                         # 何もないなら0

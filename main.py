@@ -8,7 +8,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 import hydra
 from omegaconf import DictConfig
 
-from configs import config_paths
+from configs import config_names
 from core.environments import generate_environment, generate_test_environment
 from core.handlers.evaluators import generate_evaluator
 from core.handlers.trainers import generate_trainer
@@ -20,7 +20,7 @@ from core.worlds import generate_world
 logger = initialize_logging(__name__)
 
 
-@hydra.main(config_path=config_paths["example"])
+@hydra.main(config_path="configs", config_name=config_names["example"])
 def main(config: DictConfig):
     set_seed(seed=config.seed)
     world_map = generate_map(config=config)

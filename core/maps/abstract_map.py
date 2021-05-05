@@ -14,8 +14,8 @@ from omegaconf import DictConfig
 class AbstractMap(ABC):
     def __init__(self, config: DictConfig):
         self.config = config
-        self.sizeX = config.sizeX
-        self.sizeY = config.sizeX
+        self.SIZE_X = config.SIZE_X
+        self.SIZE_Y = config.SIZE_Y
 
         self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)

@@ -72,7 +72,7 @@ class AbstractTrainer(ABC):
                 self.training_epoch_start(epoch)
                 for step in range(self.config.max_episode_length):
                     self.total_loss_sum = 0.0
-                    self.training_step(step)
+                    self.training_step(step, epoch)
                     self.global_step += 1
                     self.episode_step += 1
                 self.training_epoch_end()

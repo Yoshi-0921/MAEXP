@@ -6,7 +6,6 @@ import wandb
 from core.agents.random_agent import RandomAgent
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
-from core.utils.updates import hard_update
 from omegaconf import DictConfig
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
@@ -33,7 +32,7 @@ class DefaultTrainer(AbstractTrainer):
         return agents
 
     def loss_and_update(self, batch):
-        loss = list()
+        loss = torch.tensor(random.random())
 
         return loss
 
@@ -49,7 +48,7 @@ class DefaultTrainer(AbstractTrainer):
             action = self.agents[agent_id].get_action(states[agent_id], epsilon)
             actions[agent_id] = action
 
-        new_states, rewards, dones = self.env.step(actions)
+        rewards, dones, new_states = self.env.step(actions)
 
         exp = Experience(self.states, actions, rewards, dones, new_states)
 
@@ -66,23 +65,9 @@ class DefaultTrainer(AbstractTrainer):
             dataset=dataset, batch_size=self.config.batch_size, pin_memory=True
         )
 
-        # put models on GPU and change to training mode
-        for agent in self.agents:
-            agent.dqn.to(self.device)
-            agent.dqn_target.to(self.device)
-            agent.dqn.train()
-            agent.dqn_target.eval()
-
         # populate buffer
         self.populate(self.config.populate_steps)
         self.reset()
-
-    def training_epoch_start(self, epoch: int):
-        if epoch % (self.config.max_epochs // 10) == 0:
-            for agent_id, agent in enumerate(self.agents):
-                model_path = f"epoch{epoch}_agent{agent_id}.pth"
-                torch.save(agent.dqn.to("cpu").state_dict(), model_path)
-                agent.dqn.to(self.device)
 
     def training_step(self, step: int, epoch: int):
         # train based on experiments
@@ -100,18 +85,20 @@ class DefaultTrainer(AbstractTrainer):
                 state = F.interpolate(
                     states, size=(self.visible_range * 20, self.visible_range * 20)
                 )[agent_id]
-                image = torch.zeros(
-                    (3, self.visible_range * 20, self.visible_range * 20),
-                    dtype=torch.float,
+                image = np.zeros(
+                    (self.visible_range * 20, self.visible_range * 20, 3), dtype=np.float
                 )
+                obs = state.permute(0, 2, 1).numpy() * 255.0
 
                 # agentの情報を追加(Blue)
-                image[2, ...] += state[0]
+                image[..., 0] += obs[0]
                 # landmarkの情報を追加(Yellow)
-                image[0, ...] += state[1]
-                image[1, ...] += state[1]
+                image[..., 1] += obs[1]
+                image[..., 2] += obs[1]
                 # invisible areaの情報を追加(White)
-                image[:, ...] -= state[2]
+                image[..., 0] -= obs[2]
+                image[..., 1] -= obs[2]
+                image[..., 2] -= obs[2]
 
                 wandb.log(
                     {
@@ -127,26 +114,15 @@ class DefaultTrainer(AbstractTrainer):
 
         wandb.log(
             {
-                'training/epsilon': torch.tensor(self.epsilon),
+                "training/epsilon": torch.tensor(self.epsilon),
                 "training/reward": torch.tensor(rewards).mean(),
-                "training/total_loss": self.total_loss_sum
+                "training/total_loss": self.total_loss_sum,
             },
-            step=self.global_step
+            step=self.global_step,
         )
 
     def training_epoch_end(self):
         self.epsilon *= self.config.epsilon_decay
         self.epsilon = max(self.config.epsilon_end, self.epsilon)
 
-        # update target network
-        for agent in self.agents:
-            hard_update(agent.dqn_target, agent.dqn)
-
         self.reset()
-
-    def endup(self):
-        self.writer.close()
-
-        for agent_id, agent in enumerate(self.agents):
-            model_path = f"agent_{agent_id}.pth"
-            torch.save(agent.dqn.to("cpu").state_dict(), model_path)

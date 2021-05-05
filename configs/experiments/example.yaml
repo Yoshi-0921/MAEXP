@@ -4,11 +4,12 @@ defaults:
 
 
 seed: 921
+map: 'default'
 world: 'default'
 environment: 'default'
 trainer: 'default'
-sizeX: 20
-sizeY: 20
+SIZE_X: 20
+SIZE_Y: 20
 init_xys: [[0, 1], [-1, 1]]
 # ==================================================
 num_agents: 2 #8
