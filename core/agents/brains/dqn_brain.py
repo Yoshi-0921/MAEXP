@@ -30,6 +30,12 @@ class DQNBrain(AbstractBrain):
         return action
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
+        states_ind = states_ind.float().to(self.device)
+        actions_ind = actions_ind.to(self.device)
+        rewards_ind = rewards_ind.to(self.device)
+        dones_ind = dones_ind.to(self.device)
+        next_states_ind = next_states_ind.float().to(self.device)
+
         self.network.eval()
         self.target_network.eval()
         q_values = self.network(states_ind)

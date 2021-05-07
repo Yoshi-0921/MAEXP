@@ -20,3 +20,6 @@ class RandomAgent(AbstractAgent):
 
     def learn(self, state, action, reward, done, next_state):
         pass
+
+    def synchronize_brain(self):
+        pass

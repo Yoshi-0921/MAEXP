@@ -29,6 +29,6 @@ class DefaultAgent(AbstractAgent):
         return action
 
     def learn(self, state, action, reward, done, next_state):
-        loss = self.brain.learn()
+        loss = self.brain.learn(state, action, reward, done, next_state)
 
         return loss

@@ -38,7 +38,8 @@ class AbstractTrainer(ABC):
 
     def reset(self):
         self.states = self.env.reset()
-        self.episode_reward = 0
+        self.episode_reward_sum = 0.0
+        self.episode_reward_agents = np.zeros(self.env.num_agents)
         self.episode_step = 0
 
     @abstractmethod
@@ -74,6 +75,7 @@ class AbstractTrainer(ABC):
                 self.training_epoch_start(epoch)
                 for step in range(self.config.max_episode_length):
                     self.total_loss_sum = 0.0
+                    self.total_loss_agents = torch.zeros(self.env.num_agents)
                     self.training_step(step, epoch)
                     self.global_step += 1
                     self.episode_step += 1
