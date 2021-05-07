@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
 import torch
+from core.agents import generate_agents
+from core.utils.buffer import ReplayBuffer
 from omegaconf import DictConfig
 from tqdm import tqdm
-from core.utils.buffer import ReplayBuffer
-import numpy as np
 
 
 class AbstractTrainer(ABC):
@@ -12,9 +13,8 @@ class AbstractTrainer(ABC):
         self.config = config
         self.env = environment
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.buffer = ReplayBuffer(config.capacity, state_conv=True)
-        self.agents = self.generate_agents()
+        self.agents = generate_agents()
         self.order = np.arange(environment.num_agents)
 
         self.states = self.env.reset()

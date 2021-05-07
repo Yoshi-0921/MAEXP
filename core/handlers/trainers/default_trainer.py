@@ -3,8 +3,6 @@ import random
 import numpy as np
 import torch
 import wandb
-from core.agents.random_agent import RandomAgent
-from core.agents.dqn_agent import DQNAgent
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
@@ -21,16 +19,6 @@ class DefaultTrainer(AbstractTrainer):
         wandb.init(
             project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
         )
-
-    def generate_agents(self):
-        obs_size = self.env.observation_space
-        act_size = self.env.action_space
-        agents = [
-            DQNAgent(self.config, obs_size[agent_id], act_size[agent_id])
-            for agent_id in range(self.env.num_agents)
-        ]
-
-        return agents
 
     def loss_and_update(self, batch):
         loss = torch.tensor(random.random())

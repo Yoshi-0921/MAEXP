@@ -23,6 +23,7 @@ class AbstractBrain(ABC):
         self.target_network = generate_network(config=config, obs_size=obs_size, act_size=act_size)
         self.criterion = generate_criterion(config)
         self.optimizer = generate_optimizer(config, self.network)
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     @abstractmethod
     @torch.no_grad()

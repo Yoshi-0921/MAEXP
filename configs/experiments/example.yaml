@@ -9,6 +9,7 @@ map: 'default'
 world: 'default'
 environment: 'default'
 trainer: 'default'
+agent: 'default'
 brain: 'dqn'
 SIZE_X: 20
 SIZE_Y: 20
