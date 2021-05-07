@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
 import torch
+from core.agents import generate_agents
+from core.utils.buffer import ReplayBuffer
 from omegaconf import DictConfig
 from tqdm import tqdm
-from core.utils.buffer import ReplayBuffer
-import numpy as np
 
 
 class AbstractTrainer(ABC):
@@ -12,10 +13,15 @@ class AbstractTrainer(ABC):
         self.config = config
         self.env = environment
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.buffer = ReplayBuffer(config.capacity, state_conv=True)
-        self.agents = self.generate_agents()
+        self.agents = generate_agents(
+            config=config,
+            observation_space=self.env.observation_space,
+            action_space=self.env.action_space,
+        )
         self.order = np.arange(environment.num_agents)
+        self.buffer = ReplayBuffer(
+            config.capacity, state_conv=config.network == "conv_mlp"
+        )
 
         self.states = self.env.reset()
         self.global_step = 0
@@ -32,12 +38,9 @@ class AbstractTrainer(ABC):
 
     def reset(self):
         self.states = self.env.reset()
-        self.episode_reward = 0
+        self.episode_reward_sum = 0.0
+        self.episode_reward_agents = np.zeros(self.env.num_agents)
         self.episode_step = 0
-
-    @abstractmethod
-    def generate_agents(self):
-        raise NotImplementedError()
 
     @abstractmethod
     def loss_and_update(self, batch):
@@ -72,6 +75,7 @@ class AbstractTrainer(ABC):
                 self.training_epoch_start(epoch)
                 for step in range(self.config.max_episode_length):
                     self.total_loss_sum = 0.0
+                    self.total_loss_agents = torch.zeros(self.env.num_agents)
                     self.training_step(step, epoch)
                     self.global_step += 1
                     self.episode_step += 1

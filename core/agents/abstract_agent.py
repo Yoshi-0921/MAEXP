@@ -6,7 +6,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from abc import ABC, abstractmethod
-import torch
+from random import random
 
 
 class AbstractAgent(ABC):
@@ -17,19 +17,24 @@ class AbstractAgent(ABC):
         replay_buffer: replay buffer storing experiences
     """
 
-    def __init__(self, obs_size, act_size, config) -> None:
-        self.obs_size = obs_size
-        self.act_size = act_size
+    def __init__(self, config, obs_shape, act_size) -> None:
         self.config = config
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.dqn = None
-        self.dqn_target = None
-        self.criterion = None
+        self.obs_shape = obs_shape
+        self.act_size = act_size
+        self.brain = None
+
+    def get_random_action(self) -> int:
+        action = int(random() * self.act_size)
+
+        return action
+
+    def synchronize_brain(self):
+        self.brain.synchronize_network()
 
     @abstractmethod
     def get_action(self, state, epsilon):
         raise NotImplementedError()
 
     @abstractmethod
-    def update(self, state, action, reward, done, next_state):
+    def learn(self, state, action, reward, done, next_state):
         raise NotImplementedError()
