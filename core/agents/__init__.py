@@ -32,4 +32,3 @@ def generate_agents(
         raise ValueError()
 
     return agents
-
