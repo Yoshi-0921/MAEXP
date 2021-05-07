@@ -138,7 +138,7 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
         reward = 0.0
-        for obj_idx, obj in enumerate(self.objects):
+        for obj_idx, obj in enumerate(self.world.objects):
             if all(agent.xy == obj.xy):
                 reward = 1.0
                 self.world.objects.pop(obj_idx)
@@ -165,7 +165,7 @@ class DefaultEnvironment(AbstractEnvironment):
         return reward
 
     def done_ind(self, agent: Agent):
-        for obj in self.objects:
+        for obj in self.world.objects:
             if all(agent.xy == obj.xy):
                 return 1
 
@@ -394,7 +394,7 @@ class DefaultEnvironment(AbstractEnvironment):
         return obs
 
     def fill_obs_object(self, obs, agent, offset_x, offset_y):
-        for obj in self.objects:
+        for obj in self.world.objects:
             if abs(obj.x - agent.x) > 3 or abs(obj.y - agent.y) > 3:
                 continue
 

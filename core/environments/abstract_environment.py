@@ -15,9 +15,7 @@ class AbstractEnvironment(ABC):
         self.config = config
         self.world = world
         self.agents = self.world.agents
-        self.objects = self.world.objects
         self.num_agents = len(self.agents)
-        self.num_objects = len(self.objects)
 
     @abstractmethod
     def reset(self):
