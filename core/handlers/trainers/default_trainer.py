@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import wandb
 from core.agents.random_agent import RandomAgent
+from core.agents.dqn_agent import DQNAgent
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
@@ -25,7 +26,7 @@ class DefaultTrainer(AbstractTrainer):
         obs_size = self.env.observation_space
         act_size = self.env.action_space
         agents = [
-            RandomAgent(obs_size[agent_id], act_size[agent_id], self.config)
+            DQNAgent(self.config, obs_size[agent_id], act_size[agent_id])
             for agent_id in range(self.env.num_agents)
         ]
 

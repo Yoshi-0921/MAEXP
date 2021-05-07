@@ -1,17 +1,22 @@
+# -*- coding: utf-8 -*-
 
-from random import random
+"""Source code for random agent class.
+
+Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
+"""
+
+from omegaconf import DictConfig
 
 from .abstract_agent import AbstractAgent
 
 
 class RandomAgent(AbstractAgent):
-    def __init__(self, obs_size, act_size, config):
+    def __init__(self, config: DictConfig, obs_size: int, act_size: int):
         super().__init__(obs_size=obs_size, act_size=act_size, config=config)
 
     def get_action(self, state, epsilon):
-        action = int(random() * self.act_size)
 
-        return action
+        return super().get_random_action()
 
-    def update(self, state, action, reward, done, next_state):
+    def learn(self, state, action, reward, done, next_state):
         pass

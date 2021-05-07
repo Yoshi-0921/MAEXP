@@ -1,4 +1,5 @@
 defaults:
+  - model: mlp
   - opt: rmsprop
   - job_logging: disabled
 
@@ -8,6 +9,7 @@ map: 'default'
 world: 'default'
 environment: 'default'
 trainer: 'default'
+brain: 'dqn'
 SIZE_X: 20
 SIZE_Y: 20
 init_xys: [[0, 1], [-1, 1]]
@@ -26,7 +28,7 @@ phase: 'training'
      # 'validate'
 # ==================================================
 # configure training
-max_epochs: 20000
+max_epochs: 100
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
