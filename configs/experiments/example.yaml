@@ -11,6 +11,7 @@ environment: 'default'
 trainer: 'default'
 agent: 'default'
 brain: 'dqn'
+network: 'conv_mlp'
 SIZE_X: 20
 SIZE_Y: 20
 init_xys: [[0, 1], [-1, 1]]

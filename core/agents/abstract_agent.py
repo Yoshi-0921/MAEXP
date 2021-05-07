@@ -17,9 +17,9 @@ class AbstractAgent(ABC):
         replay_buffer: replay buffer storing experiences
     """
 
-    def __init__(self, config, obs_size, act_size) -> None:
+    def __init__(self, config, obs_shape, act_size) -> None:
         self.config = config
-        self.obs_size = obs_size
+        self.obs_shape = obs_shape
         self.act_size = act_size
         self.brain = None
 

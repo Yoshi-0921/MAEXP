@@ -5,12 +5,10 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
-from torch.nn import functional as F
 
-logger = initialize_logging(__name__)
+from .activation_functions import add_activation_functions
 
 
 class MLP(nn.Module):
@@ -18,7 +16,7 @@ class MLP(nn.Module):
         super().__init__()
         self.config = config
 
-        self.af_list = self.add_activation_functions()
+        self.af_list = add_activation_functions(self.config.model.activation_functions)
 
         self.fc_list = nn.ModuleList()
         for layer_size in config.model.hidden_layer_sizes:
@@ -34,22 +32,3 @@ class MLP(nn.Module):
         outputs = self.fc_post(x)
 
         return outputs
-
-    def add_activation_functions(self):
-        af_list = []
-        for activation_function in self.config.model.activation_functions:
-            if activation_function == 'relu':
-                af_list.append(F.relu)
-
-            elif activation_function == 'sigmoid':
-                af_list.append(F.sigmoid)
-
-            elif activation_function == 'tanh':
-                af_list.append(F.tanh)
-
-            else:
-                logger.warn(f"Unexpected activation function is given. activation_function: {activation_function}")
-
-                raise ValueError()
-
-        return af_list

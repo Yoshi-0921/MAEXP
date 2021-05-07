@@ -22,12 +22,12 @@ def generate_environment(config: DictConfig, world: AbstractWorld) -> AbstractEn
     if config.environment == "default":
         env = DefaultEnvironment(config=config, world=world)
 
-        return env
-
     else:
         logger.warn(f"Unexpected environment is given. config.environment: {config.environment}")
 
         raise ValueError()
+
+    return env
 
 
 def generate_test_environment(config: DictConfig) -> AbstractEnvironment:

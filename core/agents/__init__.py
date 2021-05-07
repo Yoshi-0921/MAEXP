@@ -18,17 +18,18 @@ __all__ = ["AbstractAgent", "DefaultAgent"]
 
 
 def generate_agents(
-    config: DictConfig, observation_space: List[int], action_space: List[int]
+    config: DictConfig, observation_space: List[List[int]], action_space: List[int]
 ) -> AbstractAgent:
     if config.agents == "default":
         agents = [
-            DefaultAgent(config, obs_size, act_size)
-            for obs_size, act_size in zip(observation_space, action_space)
+            DefaultAgent(config, obs_shape, act_size)
+            for obs_shape, act_size in zip(observation_space, action_space)
         ]
-
-        return agents
 
     else:
         logger.warn(f"Unexpected agent is given. config.agent: {config.agent}")
 
         raise ValueError()
+
+    return agents
+

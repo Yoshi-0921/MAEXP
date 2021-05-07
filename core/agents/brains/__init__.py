@@ -5,20 +5,24 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from typing import List
+
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
-from .dqn_brain import DQNBrain
 from .abstract_brain import AbstractBrain
+from .dqn_brain import DQNBrain
 
 logger = initialize_logging(__name__)
 
 __all__ = ["AbstractBrain", "DQNBrain"]
 
 
-def generate_brain(config: DictConfig, obs_size: int, act_size: int) -> AbstractBrain:
+def generate_brain(
+    config: DictConfig, obs_shape: List[int], act_size: int
+) -> AbstractBrain:
     if config.brain == "dqn":
-        brain = DQNBrain(config=config, obs_size=obs_size, act_size=act_size)
+        brain = DQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
 
         return brain
 

@@ -5,6 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 from abc import ABC, abstractmethod
+from typing import List
 
 import torch
 from core.agents.criterions import generate_criterion
@@ -17,10 +18,10 @@ logger = initialize_logging(__name__)
 
 
 class AbstractBrain(ABC):
-    def __init__(self, config: DictConfig, obs_size: int, act_size: int):
+    def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         self.config = config
-        self.network = generate_network(config=config, obs_size=obs_size, act_size=act_size)
-        self.target_network = generate_network(config=config, obs_size=obs_size, act_size=act_size)
+        self.network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size)
+        self.target_network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size)
         self.criterion = generate_criterion(config)
         self.optimizer = generate_optimizer(config, self.network)
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
