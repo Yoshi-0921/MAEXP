@@ -20,7 +20,7 @@ class AbstractBrain(ABC):
     def __init__(self, config: DictConfig, obs_size: int, act_size: int):
         self.config = config
         self.network = generate_network(config=config, obs_size=obs_size, act_size=act_size)
-        self.target_network = generate_network(config)
+        self.target_network = generate_network(config=config, obs_size=obs_size, act_size=act_size)
         self.criterion = generate_criterion(config)
         self.optimizer = generate_optimizer(config, self.network)
 
