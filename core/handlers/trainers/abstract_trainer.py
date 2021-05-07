@@ -13,9 +13,15 @@ class AbstractTrainer(ABC):
         self.config = config
         self.env = environment
 
-        self.buffer = ReplayBuffer(config.capacity, state_conv=True)
-        self.agents = generate_agents()
+        self.agents = generate_agents(
+            config=config,
+            observation_space=self.env.observation_space,
+            action_space=self.env.action_space,
+        )
         self.order = np.arange(environment.num_agents)
+        self.buffer = ReplayBuffer(
+            config.capacity, state_conv=config.network == "conv_mlp"
+        )
 
         self.states = self.env.reset()
         self.global_step = 0
@@ -34,10 +40,6 @@ class AbstractTrainer(ABC):
         self.states = self.env.reset()
         self.episode_reward = 0
         self.episode_step = 0
-
-    @abstractmethod
-    def generate_agents(self):
-        raise NotImplementedError()
 
     @abstractmethod
     def loss_and_update(self, batch):

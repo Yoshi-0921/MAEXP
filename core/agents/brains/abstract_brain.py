@@ -13,6 +13,7 @@ from core.agents.models import generate_network
 from core.agents.optimizers import generate_optimizer
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
+from core.utils.updates import hard_update
 
 logger = initialize_logging(__name__)
 
@@ -20,11 +21,15 @@ logger = initialize_logging(__name__)
 class AbstractBrain(ABC):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         self.config = config
-        self.network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size)
-        self.target_network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size)
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size).to(self.device)
+        self.target_network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size).to(self.device)
+        hard_update(self.target_network, self.network)
         self.criterion = generate_criterion(config)
         self.optimizer = generate_optimizer(config, self.network)
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+    def synchronize_network(self):
+        hard_update(self.target_network, self.network)
 
     @abstractmethod
     @torch.no_grad()

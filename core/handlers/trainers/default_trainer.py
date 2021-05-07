@@ -114,4 +114,7 @@ class DefaultTrainer(AbstractTrainer):
         self.epsilon *= self.config.epsilon_decay
         self.epsilon = max(self.config.epsilon_end, self.epsilon)
 
+        for agent in self.agents:
+            agent.synchronize_brain()
+
         self.reset()

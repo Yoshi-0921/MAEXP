@@ -22,7 +22,7 @@ class DefaultEnvironment(AbstractEnvironment):
         self.action_space, self.observation_space = [], []
         for agent in self.agents:
             self.action_space.append(4)
-            self.observation_space.append(self.visible_range)
+            self.observation_space.append([3, self.visible_range, self.visible_range])
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
 
     def reset(self):

@@ -17,7 +17,7 @@ logger = initialize_logging(__name__)
 
 def generate_network(config: DictConfig, obs_shape: List[int], act_size: int) -> nn.Module:
     if config.network == 'mlp':
-        network = MLP(config=config, input_size=obs_shape[1], output_size=act_size)
+        network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
     elif config.network == 'conv_mlp':
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)

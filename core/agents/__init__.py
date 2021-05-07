@@ -20,7 +20,7 @@ __all__ = ["AbstractAgent", "DefaultAgent"]
 def generate_agents(
     config: DictConfig, observation_space: List[List[int]], action_space: List[int]
 ) -> AbstractAgent:
-    if config.agents == "default":
+    if config.agent == "default":
         agents = [
             DefaultAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)

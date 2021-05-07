@@ -1,5 +1,5 @@
 defaults:
-  - model: mlp
+  - model: conv_mlp
   - opt: rmsprop
   - job_logging: disabled
 

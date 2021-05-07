@@ -16,7 +16,7 @@ class MLP(nn.Module):
         super().__init__()
         self.config = config
 
-        self.af_list = add_activation_functions(self.config.model.activation_functions)
+        self.af_list = add_activation_functions(self.config.model.fc_afs)
 
         self.fc_list = nn.ModuleList()
         for layer_size in config.model.hidden_layer_sizes:

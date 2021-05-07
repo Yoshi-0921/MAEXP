@@ -5,18 +5,27 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from .abstract_brain import AbstractBrain
+from typing import List
+
 import torch
+from omegaconf import DictConfig
 from torch import nn
+
+from .abstract_brain import AbstractBrain
 
 
 class DQNBrain(AbstractBrain):
+    def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
+        super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
+        self.gamma = config.gamma
+
     @torch.no_grad()
     def get_action(self, state):
         state = state.unsqueeze(0).to(self.device)
 
         q_values = self.network(state)
-        q_value, action = torch.max(q_values, dim=1)
+        _, action = torch.max(q_values, dim=1)
+        action = int(action.item())
 
         return action
 
@@ -30,7 +39,9 @@ class DQNBrain(AbstractBrain):
             next_state_values = out.max(1)[0]
             next_state_values[dones_ind] = 0.0
             next_state_values = next_state_values.detach()
-        expected_state_action_values = rewards_ind + self.gamma * (1 - dones_ind) * next_state_values
+        expected_state_action_values = (
+            rewards_ind + self.gamma * (1 - dones_ind) * next_state_values
+        )
 
         self.network.train()
         self.optimizer.zero_grad()

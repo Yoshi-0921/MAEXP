@@ -28,6 +28,9 @@ class AbstractAgent(ABC):
 
         return action
 
+    def synchronize_brain(self):
+        self.brain.synchronize_network()
+
     @abstractmethod
     def get_action(self, state, epsilon):
         raise NotImplementedError()

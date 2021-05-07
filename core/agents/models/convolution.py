@@ -16,7 +16,7 @@ class Conv(nn.Module):
         super().__init__()
         self.config = config
 
-        self.af_list = add_activation_functions(config.model.activation_functions)
+        self.af_list = add_activation_functions(config.model.conv_afs)
 
         self.conv_list = nn.ModuleList()
         for channel_size, kernel_size, stride in zip(
@@ -42,8 +42,8 @@ class Conv(nn.Module):
         )
 
     def forward(self, x):
-        for af, conv in zip(self.af_list, self.conv_list):
-            x = af(conv(x))
+        for af, kernel_size, stride, conv in zip(self.af_list, self.config.model.af_kernels, self.config.model.af_strides, self.conv_list):
+            x = af(conv(x), kernel_size=kernel_size, stride=stride)
 
         outputs = self.conv_post(x)
 

@@ -20,7 +20,8 @@ logger = initialize_logging(__name__)
 
 class ConvMLP(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
-        self.conv = Conv(config=config, input_channel=input_shape[1], output_channel=config.model.output_channel)
+        super().__init__()
+        self.conv = Conv(config=config, input_channel=input_shape[0], output_channel=config.model.output_channel)
         input_size = self.get_mlp_input_size(input_shape)
         self.mlp = MLP(config=config, input_size=input_size, output_size=output_size)
 
@@ -34,7 +35,7 @@ class ConvMLP(nn.Module):
         return outputs
 
     def get_mlp_input_size(self, input_shape: List[int]):
-        random_input = torch.randn(size=input_shape)
+        random_input = torch.randn(size=input_shape).unsqueeze(0)
         outputs = self.conv(random_input)
 
-        return outputs.shape[2]
+        return outputs.view(-1).shape[0]
