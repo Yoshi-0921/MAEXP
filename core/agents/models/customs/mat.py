@@ -24,11 +24,20 @@ class MAT(nn.Module):
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
-            torch.zeros(1, self.patched_size_x * self.patched_size_y + 1, config.model.embed_dim)
+            torch.zeros(
+                1, self.patched_size_x * self.patched_size_y + 1, config.model.embed_dim
+            )
         )
 
         self.blocks = nn.ModuleList(
-            [Block(dim=config.model.embed_dim, num_heads=4) for _ in range(1)]
+            [
+                Block(
+                    dim=config.model.embed_dim,
+                    num_heads=config.model.num_heads,
+                    mlp_ratio=config.model.mlp_ratio,
+                )
+                for _ in range(config.model.block_loop)
+            ]
         )
 
         self.norm = nn.LayerNorm(config.model.embed_dim)

@@ -23,7 +23,7 @@ warnings.simplefilter("ignore")
 logger = initialize_logging(__name__)
 
 
-@hydra.main(config_path="configs", config_name=config_names["example"])
+@hydra.main(config_path="configs", config_name=config_names["mat"])
 def main(config: DictConfig):
     set_seed(seed=config.seed)
     world_map = generate_map(config=config)

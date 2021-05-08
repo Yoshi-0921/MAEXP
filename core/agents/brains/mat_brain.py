@@ -24,7 +24,6 @@ class MATBrain(AbstractBrain):
         state = state.unsqueeze(0).to(self.device)
 
         q_values, attns = self.network(state)
-        attns = torch.stack(attns)
         _, action = torch.max(q_values, dim=1)
         action = int(action.item())
 

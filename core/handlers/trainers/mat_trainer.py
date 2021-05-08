@@ -1,6 +1,8 @@
 import random
 
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
@@ -11,6 +13,8 @@ from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
+
+sns.set()
 
 
 class MATTrainer(AbstractTrainer):
@@ -86,20 +90,57 @@ class MATTrainer(AbstractTrainer):
         if epoch % 10 == 0 and step % (self.config.max_episode_length // 5) == 0:
             # log attention_maps of agent0
             for agent_id, agent in enumerate(self.agents):
-                attention_map = attention_maps[agent_id].mean(dim=0).sum(dim=1)[:, 0, 1:]
-                attention_map = attention_map.view(-1, agent.patched_size_x, agent.patched_size_y)
+                attention_map = (
+                    attention_maps[agent_id]
+                    .mean(dim=0)[0, :, 0, 1:]
+                    .view(-1, agent.patched_size_x, agent.patched_size_y)
+                    .cpu()
+                    .detach()
+                )
 
-                enlarged_am = F.interpolate(
-                    attention_map.unsqueeze(0),
-                    size=(agent.patched_size_x * 20, agent.patched_size_y * 20),
-                )[0, 0]
-                adjusted_am = enlarged_am / torch.max(enlarged_am)
+                fig = plt.figure()
+                sns.heatmap(
+                    torch.t(attention_map.mean(dim=0)),
+                    vmin=0,
+                    square=True,
+                    annot=True,
+                    fmt=".3f",
+                    vmax=0.25,
+                )
+                wandb.log(
+                    {
+                        f"attentions/agent_{str(agent_id)}/heatmap": [
+                            wandb.Image(
+                                data_or_path=fig,
+                                caption="mean attention heatmap",
+                            )
+                        ]
+                    },
+                    step=self.global_step
+                )
+                plt.close()
 
-                state = F.interpolate(
-                    states, size=(self.visible_range * 20, self.visible_range * 20)
-                )[agent_id]
+                for head_id, am in enumerate(attention_map):
+                    fig = plt.figure()
+                    sns.heatmap(
+                        torch.t(am), vmin=0, square=True, annot=True, fmt=".3f", vmax=0.25
+                    )
+                    wandb.log(
+                        {
+                            f"attentions/agent_{str(agent_id)}/heatmap_{str(head_id)}": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"attention heatmap from head {str(head_id)}",
+                                )
+                            ]
+                        },
+                        step=self.global_step
+                    )
+                    plt.close()
+
+                state = torch.t(states[agent_id])
                 image = np.zeros(
-                    (self.visible_range * 20, self.visible_range * 20, 3),
+                    (self.visible_range, self.visible_range, 3),
                     dtype=np.float,
                 )
                 obs = state.permute(0, 2, 1).numpy() * 255.0
@@ -116,22 +157,10 @@ class MATTrainer(AbstractTrainer):
 
                 wandb.log(
                     {
-                        f"observation_{str(agent_id)}": [
+                        f"attentions/agent_{str(agent_id)}/observation": [
                             wandb.Image(
                                 data_or_path=image[:, :, [2, 1, 0]],
                                 caption="local observation",
-                            )
-                        ],
-                        f"attention_{str(agent_id)}": [
-                            wandb.Image(
-                                data_or_path=enlarged_am[:, :, [2, 1, 0]],
-                                caption="attention heatmap",
-                            )
-                        ],
-                        f"adjusted_attention_{str(agent_id)}": [
-                            wandb.Image(
-                                data_or_path=adjusted_am[:, :, [2, 1, 0]],
-                                caption="adjusted attention heatmap",
                             )
                         ]
                     },
