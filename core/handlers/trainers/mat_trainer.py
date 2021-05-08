@@ -138,12 +138,11 @@ class MATTrainer(AbstractTrainer):
                     )
                     plt.close()
 
-                state = states[agent_id].permute(1, 0)
                 image = np.zeros(
                     (self.visible_range, self.visible_range, 3),
                     dtype=np.float,
                 )
-                obs = state.permute(0, 2, 1).numpy() * 255.0
+                obs = states[agent_id].permute(0, 2, 1).numpy() * 255.0
 
                 # add agent information (Blue)
                 image[..., 0] += obs[0]
