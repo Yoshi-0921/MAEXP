@@ -5,6 +5,8 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+import warnings
+
 import hydra
 from omegaconf import DictConfig
 
@@ -17,6 +19,7 @@ from core.utils.logging import initialize_logging
 from core.utils.seed import set_seed
 from core.worlds import generate_world
 
+warnings.simplefilter("ignore")
 logger = initialize_logging(__name__)
 
 
