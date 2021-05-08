@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
+from PIL import Image
 import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
@@ -107,36 +108,30 @@ class MATTrainer(AbstractTrainer):
                     fmt=".3f",
                     vmax=0.25,
                 )
-                wandb.log(
-                    {
-                        f"attentions/agent_{str(agent_id)}/heatmap": [
-                            wandb.Image(
-                                data_or_path=fig,
-                                caption="mean attention heatmap",
-                            )
-                        ]
-                    },
-                    step=self.global_step
-                )
-                plt.close()
+
+                fig_list = [
+                    wandb.Image(
+                        data_or_path=fig,
+                        caption="mean attention heatmap",
+                    )
+                ]
 
                 for head_id, am in enumerate(attention_map):
                     fig = plt.figure()
                     sns.heatmap(
-                        torch.t(am), vmin=0, square=True, annot=True, fmt=".3f", vmax=0.25
+                        torch.t(am),
+                        vmin=0,
+                        square=True,
+                        annot=True,
+                        fmt=".3f",
+                        vmax=0.25,
                     )
-                    wandb.log(
-                        {
-                            f"attentions/agent_{str(agent_id)}/heatmap_{str(head_id)}": [
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption=f"attention heatmap from head {str(head_id)}",
-                                )
-                            ]
-                        },
-                        step=self.global_step
+                    fig_list.append(
+                        wandb.Image(
+                            data_or_path=fig,
+                            caption=f"attention heatmap from head {str(head_id)}",
+                        )
                     )
-                    plt.close()
 
                 image = np.zeros(
                     (self.visible_range, self.visible_range, 3),
@@ -154,14 +149,19 @@ class MATTrainer(AbstractTrainer):
                 image[..., 1] -= obs[2]
                 image[..., 2] -= obs[2]
 
+                image = np.asarray(
+                    Image.fromarray(np.uint8(image)).resize((640, 480), Image.BOX)
+                )
+
                 wandb.log(
                     {
-                        f"attentions/agent_{str(agent_id)}/observation": [
+                        f"attentions/agent_{str(agent_id)}": [
                             wandb.Image(
                                 data_or_path=image[:, :, [2, 1, 0]],
                                 caption="local observation",
                             )
                         ]
+                        + fig_list
                     },
                     step=self.global_step,
                 )

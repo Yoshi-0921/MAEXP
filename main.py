@@ -20,6 +20,7 @@ from core.utils.seed import set_seed
 from core.worlds import generate_world
 
 warnings.simplefilter("ignore")
+
 logger = initialize_logging(__name__)
 
 
