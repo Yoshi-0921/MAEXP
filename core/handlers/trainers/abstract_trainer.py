@@ -24,6 +24,7 @@ class AbstractTrainer(ABC):
         )
 
         self.states = self.env.reset()
+        self.env.render_world()
         self.global_step = 0
         self.episode_count = 0
         self.epsilon = config.epsilon_initial
