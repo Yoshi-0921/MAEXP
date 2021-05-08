@@ -1,4 +1,4 @@
-
 config_names = {
-    'example': "experiments/example"
+    "example": "experiments/example",
+    "mat": "experiments/mat"
 }

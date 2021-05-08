@@ -1,5 +1,5 @@
 defaults:
-  - model: conv_mlp
+  - model: mat
   - map: simple
   - opt: rmsprop
   - job_logging: disabled
@@ -15,8 +15,8 @@ num_objects: 25
 # ==================================================
 # configure agent
 
-agent: 'default'
-brain: 'dqn'
+agent: 'mat'
+brain: 'mat'
 num_agents: 2
 init_xys: [[0, 1], [-1, 1]]
 visible_range: 7
@@ -24,7 +24,7 @@ phase: 'training'
 # ==================================================
 # configure training
 
-trainer: 'default'
+trainer: 'mat'
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32

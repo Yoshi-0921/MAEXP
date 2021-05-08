@@ -4,8 +4,9 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
-from omegaconf import DictConfig
 import numpy as np
+from omegaconf import DictConfig
+
 from .abstract_map import AbstractMap
 
 
