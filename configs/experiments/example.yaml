@@ -5,42 +5,43 @@ defaults:
   - job_logging: disabled
 
 name: 'example'
-seed: 921
+# ==================================================
+# configure environment
+
 world: 'default'
 environment: 'default'
-trainer: 'default'
+seed: 921
+num_objects: 25
+# ==================================================
+# configure agent
+
 agent: 'default'
 brain: 'dqn'
 network: 'conv_mlp'
+num_agents: 2
 init_xys: [[0, 1], [-1, 1]]
-# ==================================================
-num_agents: 2 #8
-num_objects: 25 #40
-# ==================================================
-# configure agent
 visible_range: 7
-hidden1: 32
-hidden2: 64
-hidden3: 128
-gamma: 0.9
 phase: 'training'
-     # 'training'
-     # 'validate'
 # ==================================================
 # configure training
+
+trainer: 'default'
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
 capacity: 100000
+gamma: 0.9
 epsilon_decay: 0.998
 epsilon_initial: 1.0
 epsilon_end: 0.05
 # ==================================================
 # configre validate
+
 validate_epochs: 3
 load_weight: False
-model_path: '/home/y.motokawa/projects/EXP/outputs/2020-12-15/21-53-34/'
+model_path: False
 # ==================================================
 # Configure test
+
 # ==================================================
