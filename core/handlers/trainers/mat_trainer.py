@@ -138,7 +138,7 @@ class MATTrainer(AbstractTrainer):
                     )
                     plt.close()
 
-                state = torch.t(states[agent_id])
+                state = states[agent_id].permute(1, 0)
                 image = np.zeros(
                     (self.visible_range, self.visible_range, 3),
                     dtype=np.float,
