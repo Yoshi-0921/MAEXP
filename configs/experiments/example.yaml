@@ -1,19 +1,17 @@
 defaults:
   - model: conv_mlp
+  - map: simple
   - opt: rmsprop
   - job_logging: disabled
 
 name: 'example'
 seed: 921
-map: 'default'
 world: 'default'
 environment: 'default'
 trainer: 'default'
 agent: 'default'
 brain: 'dqn'
 network: 'conv_mlp'
-SIZE_X: 30
-SIZE_Y: 20
 init_xys: [[0, 1], [-1, 1]]
 # ==================================================
 num_agents: 2 #8

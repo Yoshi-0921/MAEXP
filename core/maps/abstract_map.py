@@ -12,15 +12,15 @@ from omegaconf import DictConfig
 
 
 class AbstractMap(ABC):
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.config = config
-        self.SIZE_X = config.SIZE_X
-        self.SIZE_Y = config.SIZE_Y
+        self.SIZE_X = size_x
+        self.SIZE_Y = size_y
 
         self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.aisle = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.aisle_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
         self.locate_walls()
 
@@ -59,3 +59,6 @@ class AbstractMap(ABC):
     def locate_walls(self):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
+
+    def locate_aisle(self):
+        raise NotImplementedError()
