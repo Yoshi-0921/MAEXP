@@ -8,10 +8,11 @@ import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
+from thop import clever_format, profile
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-from torchvision.utils import make_grid
 from torchinfo import summary
+from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
 
@@ -25,7 +26,6 @@ class MATTrainer(AbstractTrainer):
         wandb.init(
             project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
         )
-        self.log_models()
 
     def loss_and_update(self, batch):
         loss_list = []
@@ -76,6 +76,9 @@ class MATTrainer(AbstractTrainer):
         # populate buffer
         self.populate(self.config.populate_steps)
         self.reset()
+
+        # log brain networks of agents
+        self.log_models()
 
     def training_step(self, step: int, epoch: int):
         # train based on experiments
@@ -267,13 +270,23 @@ class MATTrainer(AbstractTrainer):
         )
 
     def log_models(self):
+        network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
+
         for agent_id, agent in enumerate(self.agents):
-            print(F"Agent {str(agent_id)}:")
+            print(f"Agent {str(agent_id)}:")
             summary(model=agent.brain.network)
 
             dummy_input = torch.randn(
                 size=(1, *self.states[agent_id].shape), device=agent.brain.device
             )
+            macs, params = clever_format(
+                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
+                "%.3f",
+            )
+            network_table.add_data(
+                f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
+            )
+
             wandb.watch(
                 models=agent.brain.network, log="all", log_freq=10000, idx=agent_id
             )
@@ -281,3 +294,5 @@ class MATTrainer(AbstractTrainer):
                 agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
             )
             wandb.save(f"agent_{str(agent_id)}.onnx")
+
+        wandb.log({"tables/Network description": network_table}, step=0)
