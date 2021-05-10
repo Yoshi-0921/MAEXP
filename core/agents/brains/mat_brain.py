@@ -23,7 +23,7 @@ class MATBrain(AbstractBrain):
     def get_action(self, state):
         state = state.unsqueeze(0).to(self.device)
 
-        q_values, attns = self.network(state)
+        q_values, attns = self.network.forward_attn(state)
         _, action = torch.max(q_values, dim=1)
         action = int(action.item())
 
@@ -38,10 +38,10 @@ class MATBrain(AbstractBrain):
 
         self.network.eval()
         self.target_network.eval()
-        q_values, _ = self.network(states_ind)
+        q_values = self.network(states_ind)
         state_action_values = q_values.gather(1, actions_ind.unsqueeze(-1)).squeeze(-1)
         with torch.no_grad():
-            out, _ = self.target_network(next_states_ind)
+            out = self.target_network(next_states_ind)
             next_state_values = out.max(1)[0]
             next_state_values[dones_ind] = 0.0
             next_state_values = next_state_values.detach()

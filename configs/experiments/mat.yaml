@@ -1,6 +1,6 @@
 defaults:
   - model: mat
-  - map: simple
+  - map: four_rooms
   - opt: rmsprop
   - job_logging: disabled
 

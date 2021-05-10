@@ -50,9 +50,26 @@ class MAT(nn.Module):
         out = torch.cat((cls_tokens, out), dim=1)
         out = out + self.pos_embed
 
+        for blk in self.blocks:
+            out = blk(out)
+
+        out = self.norm(out)
+        out = out[:, 0]
+
+        out = self.fc1(out)
+
+        return out
+
+    def forward_attn(self, x):
+        out = self.patch_embed(x)
+
+        cls_tokens = self.cls_token.expand(out.shape[0], -1, -1)
+        out = torch.cat((cls_tokens, out), dim=1)
+        out = out + self.pos_embed
+
         attns = list()
         for blk in self.blocks:
-            out, attn = blk(out)
+            out, attn = blk.forward_attn(out)
             attns.append(attn)
 
         out = self.norm(out)

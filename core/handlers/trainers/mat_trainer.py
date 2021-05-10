@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
-from PIL import Image
 import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
@@ -12,6 +11,7 @@ from omegaconf import DictConfig
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
+from torchinfo import summary
 
 from .abstract_trainer import AbstractTrainer
 
@@ -25,6 +25,7 @@ class MATTrainer(AbstractTrainer):
         wandb.init(
             project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
         )
+        self.log_models()
 
     def loss_and_update(self, batch):
         loss_list = []
@@ -109,13 +110,19 @@ class MATTrainer(AbstractTrainer):
                     vmax=0.25,
                 )
 
-                fig_list = [
-                    wandb.Image(
-                        data_or_path=fig,
-                        caption="mean attention heatmap",
-                    )
-                ]
+                wandb.log(
+                    {
+                        f"agent_{str(agent_id)}/attention_mean": [
+                            wandb.Image(
+                                data_or_path=fig,
+                                caption="mean attention heatmap",
+                            )
+                        ]
+                    },
+                    step=self.global_step,
+                )
 
+                fig_list = []
                 for head_id, am in enumerate(attention_map):
                     fig = plt.figure()
                     sns.heatmap(
@@ -133,44 +140,38 @@ class MATTrainer(AbstractTrainer):
                         )
                     )
 
-                image = np.zeros(
-                    (self.visible_range, self.visible_range, 3),
-                    dtype=np.float,
+                wandb.log(
+                    {f"agent_{str(agent_id)}/attention_heads": fig_list},
+                    step=self.global_step,
                 )
-                obs = states[agent_id].permute(0, 2, 1).numpy() * 255.0
+
+                image = torch.zeros((3, self.visible_range, self.visible_range))
+                obs = states[agent_id].permute(0, 2, 1)
 
                 # add agent information (Blue)
-                image[..., 0] += obs[0]
+                image[2] += obs[0]
                 # add object information (Yellow)
-                image[..., 1] += obs[1]
-                image[..., 2] += obs[1]
+                image[torch.tensor([0, 1])] += obs[1]
                 # add invisible area information (White)
-                image[..., 0] -= obs[2]
-                image[..., 1] -= obs[2]
-                image[..., 2] -= obs[2]
-
-                image = np.asarray(
-                    Image.fromarray(np.uint8(image)).resize((640, 480), Image.BOX)
-                )
+                image -= obs[2]
 
                 wandb.log(
                     {
-                        f"attentions/agent_{str(agent_id)}": [
+                        f"agent_{str(agent_id)}/observation": [
                             wandb.Image(
-                                data_or_path=image[:, :, [2, 1, 0]],
+                                data_or_path=image,
                                 caption="local observation",
                             )
                         ]
-                        + fig_list
                     },
                     step=self.global_step,
                 )
 
         wandb.log(
             {
-                "training/epsilon": self.epsilon,
-                "training/total_reward": np.sum(rewards),
-                "training/total_loss": self.total_loss_sum,
+                "training_step/epsilon": self.epsilon,
+                "training_step/total_reward": np.sum(rewards),
+                "training_step/total_loss": self.total_loss_sum,
             },
             step=self.global_step,
         )
@@ -178,8 +179,8 @@ class MATTrainer(AbstractTrainer):
         for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
             wandb.log(
                 {
-                    f"training/agents/loss_{str(agent_id)}": loss,
-                    f"training/agents/reward_{str(agent_id)}": reward,
+                    f"agent_{str(agent_id)}/step_loss": loss,
+                    f"agent_{str(agent_id)}/step_reward": reward,
                 },
                 step=self.global_step,
             )
@@ -201,11 +202,11 @@ class MATTrainer(AbstractTrainer):
                 "episode/episode_reward": self.episode_reward_sum,
                 "episode/episode_step": self.episode_step,
                 "episode/global_step": self.global_step,
-                "env/objects_left": self.env.objects_generated
+                "episode/objects_left": self.env.objects_generated
                 - self.env.objects_completed,
-                "env/objects_completed": self.env.objects_completed,
-                "env/agents_collided": self.env.agents_collided,
-                "env/walls_collided": self.env.walls_collided,
+                "episode/objects_completed": self.env.objects_completed,
+                "episode/agents_collided": self.env.agents_collided,
+                "episode/walls_collided": self.env.walls_collided,
             },
             step=self.global_step - 1,
         )
@@ -213,7 +214,7 @@ class MATTrainer(AbstractTrainer):
         for agent_id, reward in enumerate(self.episode_reward_agents):
             wandb.log(
                 {
-                    f"episode/agents/episode_reward_{str(agent_id)}": reward,
+                    f"agent_{str(agent_id)}/episode_reward": reward,
                 },
                 step=self.global_step - 1,
             )
@@ -264,3 +265,19 @@ class MATTrainer(AbstractTrainer):
             },
             step=self.global_step - 1,
         )
+
+    def log_models(self):
+        for agent_id, agent in enumerate(self.agents):
+            print(F"Agent {str(agent_id)}:")
+            summary(model=agent.brain.network)
+
+            dummy_input = torch.randn(
+                size=(1, *self.states[agent_id].shape), device=agent.brain.device
+            )
+            wandb.watch(
+                models=agent.brain.network, log="all", log_freq=10000, idx=agent_id
+            )
+            torch.onnx.export(
+                agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+            )
+            wandb.save(f"agent_{str(agent_id)}.onnx")
