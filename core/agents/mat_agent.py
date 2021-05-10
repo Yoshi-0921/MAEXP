@@ -24,22 +24,14 @@ class MATAgent(AbstractAgent):
         self.patched_size_x = self.brain.network.patched_size_x
         self.patched_size_y = self.brain.network.patched_size_y
 
-        attn_shape = [
-            config.model.num_heads,
-            self.patched_size_x * self.patched_size_y + 1,
-            self.patched_size_x * self.patched_size_y + 1,
-        ]
-        self.attn_shape = [torch.zeros([1, *attn_shape]) for _ in range(self.config.model.block_loop)]
-
     def get_action(self, state, epsilon):
-        if random() < epsilon:
-            action = self.get_random_action()
-            attns = self.attn_shape
-
-        else:
-            action, attns = self.brain.get_action(state)
+        action, attns = self.brain.get_action(state)
 
         attns = torch.stack(attns)
+
+        if random() < epsilon:
+            action = self.get_random_action()
+
         return action, attns
 
     def learn(self, state, action, reward, done, next_state):
