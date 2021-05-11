@@ -12,7 +12,7 @@ from .abstract_map import AbstractMap
 
 class FourRectangleMap(AbstractMap):
     def __init__(self, config: DictConfig):
-        super().__init__(config=config, size_x=24, size_y=40)
+        super().__init__(config=config, size_x=40, size_y=24)
         self.locate_aisle()
 
     def locate_walls(self):
