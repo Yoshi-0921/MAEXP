@@ -1,6 +1,6 @@
 defaults:
   - model: mat
-  - map: four_rooms
+  - map: four_rectangle
   - opt: rmsprop
   - job_logging: disabled
 
@@ -15,7 +15,7 @@ num_objects: 25
 # ==================================================
 # configure agent
 
-agent: 'mat'
+agent_type: 'mat'
 brain: 'mat'
 num_agents: 2
 init_xys: [[0, 1], [-1, 1]]
