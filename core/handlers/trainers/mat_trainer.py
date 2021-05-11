@@ -8,10 +8,8 @@ import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
-from thop import clever_format, profile
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-from torchinfo import summary
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
@@ -23,22 +21,6 @@ class MATTrainer(AbstractTrainer):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config=config, environment=environment)
         self.visible_range = self.config.visible_range
-        wandb.init(
-            project="MAEXP",
-            entity="yoshi-0921",
-            name=config.name,
-            config=dict(config),
-            tags=[
-                config.world + "_world",
-                config.environment + "_environment",
-                config.agent_type + "_agent",
-                config.brain + "_brain",
-                config.phase + "_pahse",
-                config.trainer + "_trainer",
-                config.model.name + "_model",
-                config.map.name + "_map",
-            ],
-        )
 
     def loss_and_update(self, batch):
         loss_list = []
@@ -288,40 +270,3 @@ class MATTrainer(AbstractTrainer):
             },
             step=self.global_step - 1,
         )
-
-    def log_models(self):
-        network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
-
-        for agent_id, agent in enumerate(self.agents):
-            print(f"Agent {str(agent_id)}:")
-            summary(model=agent.brain.network)
-
-            dummy_input = torch.randn(
-                size=(1, *self.states[agent_id].shape), device=agent.brain.device
-            )
-            macs, params = clever_format(
-                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                "%.3f",
-            )
-            network_table.add_data(
-                f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
-            )
-
-            wandb.watch(
-                models=agent.brain.network, log="all", log_freq=10000, idx=agent_id
-            )
-            torch.onnx.export(
-                agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-            )
-            wandb.save(f"agent_{str(agent_id)}.onnx")
-
-        wandb.log({"tables/Network description": network_table}, step=0)
-
-    def save_state_dict(self, epoch: int, endup: bool = False):
-        for agent_id, agent in enumerate(self.agents):
-            model_path = (
-                f"agent{agent_id}.pth" if endup else f"epoch{epoch}_agent{agent_id}.pth"
-            )
-            torch.save(agent.brain.network.to("cpu").state_dict(), model_path)
-            wandb.save(model_path)
-            agent.brain.network.to(agent.brain.device)
