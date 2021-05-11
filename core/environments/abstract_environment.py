@@ -15,9 +15,10 @@ class AbstractEnvironment(ABC):
         self.config = config
         self.world = world
         self.agents = self.world.agents
-        self.objects = self.world.objects
         self.num_agents = len(self.agents)
-        self.num_objects = len(self.objects)
+
+    def render_world(self):
+        self.world.render()
 
     @abstractmethod
     def reset(self):
@@ -33,4 +34,20 @@ class AbstractEnvironment(ABC):
 
     @abstractmethod
     def reward(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def action_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def reward_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def done_ind(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def observation_ind(self):
         raise NotImplementedError()

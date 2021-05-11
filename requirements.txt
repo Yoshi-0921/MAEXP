@@ -2,7 +2,11 @@
 
 # .
 gpustat
-hydra-core==1.0.3
+tqdm
+wandb
+thop
+torchinfo
+hydra-core==1.0.6
 torch==1.8.1+cu111
 torchsummary==1.5.1
 torchvision==0.9.1+cu111

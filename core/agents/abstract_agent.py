@@ -17,22 +17,24 @@ class AbstractAgent(ABC):
         replay_buffer: replay buffer storing experiences
     """
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, config, obs_shape, act_size) -> None:
+        self.config = config
+        self.obs_shape = obs_shape
+        self.act_size = act_size
+        self.brain = None
 
-    @abstractmethod
-    def reset(self) -> None:
-        raise NotImplementedError()
-
-    def random_action(self) -> int:
-        """
-        Returns:
-            random action
-        """
-        action = int(random() * 4)
+    def get_random_action(self) -> int:
+        action = int(random() * self.act_size)
 
         return action
 
+    def synchronize_brain(self):
+        self.brain.synchronize_network()
+
     @abstractmethod
     def get_action(self, state, epsilon):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def learn(self, state, action, reward, done, next_state):
         raise NotImplementedError()

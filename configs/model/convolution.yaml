@@ -1,0 +1,9 @@
+model:
+  name: 'convolution'
+  hidden_channels: [32]
+  output_channel: 64
+  hidden_kernels: [2, 2]
+  hidden_strides: [1, 1]
+  conv_afs: ['max_pool2d', 'max_pool2d']
+  af_kernels: [2, 2]
+  af_strides: [2, 2]

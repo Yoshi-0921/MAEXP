@@ -54,24 +54,54 @@ class AbstractWorld(ABC):
         for agent_id, agent in enumerate(self.agents):
 
             # Check if there is a collision against other agents.
-            next_pos = agent.pos + force[agent_id]
+            next_pos = agent.xy + force[agent_id]
             for i, a in enumerate(self.agents):
                 if agent_id == i:
                     continue
 
-                if all(next_pos == a.pos):
+                if all(next_pos == a.xy):
                     force[agent_id] = np.zeros(2, dtype=np.int8)
                     agent.collide_agents = True
                     break
 
             # Check if there is a collision against wall.
-            next_pos = self.map.coord2ind(next_pos, self.map.SIZE_X, self.map.SIZE_Y)
-            if self.map.wall_matrix[next_pos] == 1:
+            next_pos_x, next_pos_y = self.map.coord2ind(next_pos)
+            if self.map.wall_matrix[next_pos_x, next_pos_y] == 1:
                 force[agent_id] = np.zeros(2, dtype=np.int8)
                 agent.collide_walls = True
 
         return force
 
     def integrate_state(self, force):
+        self.map.reset_agents()
         for agent_id, agent in enumerate(self.agents):
-            agent.pos += force[agent_id]
+            agent.push(force[agent_id])
+            agent_x, agent_y = self.map.coord2ind(agent.xy)
+            self.map.agents_matrix[agent_x, agent_y]
+
+    def render(self):
+        render_list = []
+        for y, ys in enumerate(self.map.wall_matrix.T):
+            render_row = []
+            for x, x_value in enumerate(ys):
+                cx, cy = self.map.ind2coord((x, y))
+                if x_value == 1:
+                    render_row.append('#')
+                elif cx == cy == 0:
+                    render_row.append('+')
+                elif cy == 0:
+                    render_row.append('-')
+                elif cx == 0:
+                    render_row.append('|')
+                else:
+                    render_row.append(' ')
+            render_list.append(render_row)
+
+        for agent_id, agent in enumerate(self.agents):
+            a_pos_x, a_pos_y = self.map.coord2ind(agent.xy)
+            render_list[a_pos_y][a_pos_x] = str(agent_id)
+
+        print(f"Num of Agents: {len(self.agents)}")
+        print(f"SIZE_X: {self.map.SIZE_X}, SIZE_Y: {self.map.SIZE_Y}")
+        for render_row in render_list:
+            print(*render_row)

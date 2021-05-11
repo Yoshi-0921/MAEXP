@@ -11,24 +11,23 @@ from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
 from .default_environment import DefaultEnvironment
-from .tools.entity import Agent, Object
-from .tools.world import Map, World
+
 
 logger = initialize_logging(__name__)
 
-__all__ = ["Agent", "Object", "Map", "World"]
+__all__ = ["AbstractEnvironment", "DefaultEnvironment"]
 
 
 def generate_environment(config: DictConfig, world: AbstractWorld) -> AbstractEnvironment:
     if config.environment == "default":
         env = DefaultEnvironment(config=config, world=world)
 
-        return env
-
     else:
         logger.warn(f"Unexpected environment is given. config.environment: {config.environment}")
 
         raise ValueError()
+
+    return env
 
 
 def generate_test_environment(config: DictConfig) -> AbstractEnvironment:

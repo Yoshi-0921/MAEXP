@@ -1,0 +1,4 @@
+model:
+  name: 'mlp'
+  hidden_layer_sizes: [120]
+  fc_afs: ['relu']

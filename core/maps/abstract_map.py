@@ -12,17 +12,19 @@ from omegaconf import DictConfig
 
 
 class AbstractMap(ABC):
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.config = config
-        self.sizeX = None
-        self.sizeY = None
+        self.SIZE_X = size_x
+        self.SIZE_Y = size_y
 
         self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.aisle = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.aisle_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
-    def reset_all(self):
+        self.locate_walls()
+
+    def reset(self):
         self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
@@ -32,8 +34,8 @@ class AbstractMap(ABC):
     def reset_objects(self):
         self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
-    def coord2ind(self, p_pos: np.array, size_x: int = None, size_y: int = None):
-        pos_x, pos_y = p_pos
+    def coord2ind(self, position: np.array, size_x: int = None, size_y: int = None):
+        pos_x, pos_y = position
         size_x = size_x or self.SIZE_X
         size_y = size_y or self.SIZE_Y
 
@@ -43,8 +45,8 @@ class AbstractMap(ABC):
 
         return res_pos
 
-    def ind2coord(self, p_pos: np.array, size_x: int = None, size_y: int = None):
-        pos_x, pos_y = p_pos
+    def ind2coord(self, position: np.array, size_x: int = None, size_y: int = None):
+        pos_x, pos_y = position
         size_x = size_x or self.SIZE_X
         size_y = size_y or self.SIZE_Y
 
@@ -57,3 +59,6 @@ class AbstractMap(ABC):
     def locate_walls(self):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
+
+    def locate_aisle(self):
+        raise NotImplementedError()
