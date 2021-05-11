@@ -8,10 +8,8 @@ import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
-from thop import clever_format, profile
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-from torchinfo import summary
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
@@ -23,9 +21,6 @@ class MATTrainer(AbstractTrainer):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config=config, environment=environment)
         self.visible_range = self.config.visible_range
-        wandb.init(
-            project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
-        )
 
     def loss_and_update(self, batch):
         loss_list = []
@@ -80,6 +75,10 @@ class MATTrainer(AbstractTrainer):
         # log brain networks of agents
         self.log_models()
 
+    def training_epoch_start(self, epoch: int):
+        if epoch % (self.config.max_epochs // 10) == 0:
+            self.save_state_dict(epoch)
+
     def training_step(self, step: int, epoch: int):
         # train based on experiments
         for batch in self.dataloader:
@@ -98,7 +97,7 @@ class MATTrainer(AbstractTrainer):
                 attention_map = (
                     attention_maps[agent_id]
                     .mean(dim=0)[0, :, 0, 1:]
-                    .view(-1, agent.patched_size_x, agent.patched_size_y)
+                    .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                     .cpu()
                     .detach()
                 )
@@ -199,6 +198,9 @@ class MATTrainer(AbstractTrainer):
         self.log_heatmap()
         self.reset()
 
+    def endup(self):
+        self.save_state_dict(endup=True)
+
     def log_scalar(self):
         wandb.log(
             {
@@ -256,7 +258,7 @@ class MATTrainer(AbstractTrainer):
             size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
         )
         heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=2)
+        heatmap = make_grid(heatmap, nrow=3)
         wandb.log(
             {
                 "episode/heatmap": [
@@ -268,31 +270,3 @@ class MATTrainer(AbstractTrainer):
             },
             step=self.global_step - 1,
         )
-
-    def log_models(self):
-        network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
-
-        for agent_id, agent in enumerate(self.agents):
-            print(f"Agent {str(agent_id)}:")
-            summary(model=agent.brain.network)
-
-            dummy_input = torch.randn(
-                size=(1, *self.states[agent_id].shape), device=agent.brain.device
-            )
-            macs, params = clever_format(
-                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                "%.3f",
-            )
-            network_table.add_data(
-                f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
-            )
-
-            wandb.watch(
-                models=agent.brain.network, log="all", log_freq=10000, idx=agent_id
-            )
-            torch.onnx.export(
-                agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-            )
-            wandb.save(f"agent_{str(agent_id)}.onnx")
-
-        wandb.log({"tables/Network description": network_table}, step=0)

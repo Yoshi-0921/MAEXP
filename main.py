@@ -5,6 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+import os
 import warnings
 
 import hydra
@@ -26,6 +27,7 @@ logger = initialize_logging(__name__)
 
 @hydra.main(config_path="configs", config_name=config_names["mat"])
 def main(config: DictConfig):
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)
     world_map = generate_map(config=config)
     world = generate_world(config=config, world_map=world_map)

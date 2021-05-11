@@ -1,10 +1,11 @@
 defaults:
   - model: mat
-  - map: four_rectangle
+  - map: three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
-name: 'example'
+name: 'mat_exp'
+gpu: 0
 # ==================================================
 # configure environment
 
@@ -17,8 +18,8 @@ num_objects: 25
 
 agent_type: 'mat'
 brain: 'mat'
-num_agents: 2
-init_xys: [[0, 1], [-1, 1]]
+num_agents: 6
+init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7
 phase: 'training'
 # ==================================================

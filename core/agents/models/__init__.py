@@ -20,7 +20,7 @@ def generate_network(config: DictConfig, obs_shape: List[int], act_size: int) ->
     if config.model.name == 'mlp':
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
-    elif config.model.name == 'conv_mlp':
+    elif config.model.name in ['conv_mlp', 'mat_baseline']:
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == 'mat':

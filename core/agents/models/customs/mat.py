@@ -19,13 +19,13 @@ class MAT(nn.Module):
             in_chans=input_shape[0],
             embed_dim=config.model.embed_dim,
         )
-        self.patched_size_x = input_shape[1] // config.model.patch_size
-        self.patched_size_y = input_shape[2] // config.model.patch_size
+        patched_size_x = input_shape[1] // config.model.patch_size
+        patched_size_y = input_shape[2] // config.model.patch_size
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
             torch.zeros(
-                1, self.patched_size_x * self.patched_size_y + 1, config.model.embed_dim
+                1, patched_size_x * patched_size_y + 1, config.model.embed_dim
             )
         )
 
