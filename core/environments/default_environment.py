@@ -78,7 +78,7 @@ class DefaultEnvironment(AbstractEnvironment):
                 self.world.map.wall_matrix[x, y] == 0
                 and self.world.map.agents_matrix[x, y] == 0
                 and self.world.map.objects_matrix[x, y] == 0
-                and self.world.map.aisle[x, y] == 0
+                and self.world.map.aisle_matrix[x, y] == 0
             ):
                 self.world.objects.append(Object())
                 self.world.objects[-1].move(self.world.map.ind2coord((x, y)))

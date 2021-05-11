@@ -17,6 +17,9 @@ class AbstractEnvironment(ABC):
         self.agents = self.world.agents
         self.num_agents = len(self.agents)
 
+    def render_world(self):
+        self.world.render()
+
     @abstractmethod
     def reset(self):
         raise NotImplementedError()

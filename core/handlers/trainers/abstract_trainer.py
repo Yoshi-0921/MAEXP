@@ -20,10 +20,11 @@ class AbstractTrainer(ABC):
         )
         self.order = np.arange(environment.num_agents)
         self.buffer = ReplayBuffer(
-            config.capacity, state_conv=config.network == "conv_mlp"
+            config.capacity, state_conv=config.model.name in ["conv_mlp", "mat"]
         )
 
         self.states = self.env.reset()
+        self.env.render_world()
         self.global_step = 0
         self.episode_count = 0
         self.epsilon = config.epsilon_initial

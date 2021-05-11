@@ -1,0 +1,4 @@
+map:
+  name: 'simple'
+  SIZE_X: 20
+  SIZE_Y: 20

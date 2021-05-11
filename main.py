@@ -5,6 +5,8 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+import warnings
+
 import hydra
 from omegaconf import DictConfig
 
@@ -17,10 +19,12 @@ from core.utils.logging import initialize_logging
 from core.utils.seed import set_seed
 from core.worlds import generate_world
 
+warnings.simplefilter("ignore")
+
 logger = initialize_logging(__name__)
 
 
-@hydra.main(config_path="configs", config_name=config_names["example"])
+@hydra.main(config_path="configs", config_name=config_names["mat"])
 def main(config: DictConfig):
     set_seed(seed=config.seed)
     world_map = generate_map(config=config)

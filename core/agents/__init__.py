@@ -11,10 +11,11 @@ from omegaconf import DictConfig
 
 from .abstract_agent import AbstractAgent
 from .default_agent import DefaultAgent
+from .mat_agent import MATAgent
 
 logger = initialize_logging(__name__)
 
-__all__ = ["AbstractAgent", "DefaultAgent"]
+__all__ = ["AbstractAgent", "DefaultAgent", "MATAgent"]
 
 
 def generate_agents(
@@ -23,6 +24,12 @@ def generate_agents(
     if config.agent == "default":
         agents = [
             DefaultAgent(config, obs_shape, act_size)
+            for obs_shape, act_size in zip(observation_space, action_space)
+        ]
+
+    elif config.agent == "mat":
+        agents = [
+            MATAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 

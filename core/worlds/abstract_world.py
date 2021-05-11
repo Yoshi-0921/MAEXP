@@ -78,3 +78,30 @@ class AbstractWorld(ABC):
             agent.push(force[agent_id])
             agent_x, agent_y = self.map.coord2ind(agent.xy)
             self.map.agents_matrix[agent_x, agent_y]
+
+    def render(self):
+        render_list = []
+        for y, ys in enumerate(self.map.wall_matrix.T):
+            render_row = []
+            for x, x_value in enumerate(ys):
+                cx, cy = self.map.ind2coord((x, y))
+                if x_value == 1:
+                    render_row.append('#')
+                elif cx == cy == 0:
+                    render_row.append('+')
+                elif cy == 0:
+                    render_row.append('-')
+                elif cx == 0:
+                    render_row.append('|')
+                else:
+                    render_row.append(' ')
+            render_list.append(render_row)
+
+        for agent_id, agent in enumerate(self.agents):
+            a_pos_x, a_pos_y = self.map.coord2ind(agent.xy)
+            render_list[a_pos_y][a_pos_x] = str(agent_id)
+
+        print(f"Num of Agents: {len(self.agents)}")
+        print(f"SIZE_X: {self.map.SIZE_X}, SIZE_Y: {self.map.SIZE_Y}")
+        for render_row in render_list:
+            print(*render_row)
