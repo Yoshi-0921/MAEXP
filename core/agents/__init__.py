@@ -21,13 +21,13 @@ __all__ = ["AbstractAgent", "DefaultAgent", "MATAgent"]
 def generate_agents(
     config: DictConfig, observation_space: List[List[int]], action_space: List[int]
 ) -> AbstractAgent:
-    if config.agent == "default":
+    if config.agent_type == "default":
         agents = [
             DefaultAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 
-    elif config.agent == "mat":
+    elif config.agent_type == "mat":
         agents = [
             MATAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
