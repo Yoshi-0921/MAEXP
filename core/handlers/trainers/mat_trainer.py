@@ -24,7 +24,20 @@ class MATTrainer(AbstractTrainer):
         super().__init__(config=config, environment=environment)
         self.visible_range = self.config.visible_range
         wandb.init(
-            project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
+            project="MAEXP",
+            entity="yoshi-0921",
+            name=config.name,
+            config=dict(config),
+            tags=[
+                config.world,
+                config.environment,
+                config.agent_type,
+                config.brain,
+                config.phase,
+                config.trainer,
+                config.model.name,
+                config.map.name,
+            ],
         )
 
     def loss_and_update(self, batch):
@@ -79,6 +92,10 @@ class MATTrainer(AbstractTrainer):
 
         # log brain networks of agents
         self.log_models()
+
+    def training_epoch_start(self, epoch: int):
+        if epoch % (self.config.max_epochs // 10) == 0:
+            self.save_state_dict(epoch)
 
     def training_step(self, step: int, epoch: int):
         # train based on experiments
@@ -199,6 +216,9 @@ class MATTrainer(AbstractTrainer):
         self.log_heatmap()
         self.reset()
 
+    def endup(self):
+        self.save_state_dict(endup=True)
+
     def log_scalar(self):
         wandb.log(
             {
@@ -256,7 +276,7 @@ class MATTrainer(AbstractTrainer):
             size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
         )
         heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=2)
+        heatmap = make_grid(heatmap, nrow=3)
         wandb.log(
             {
                 "episode/heatmap": [
@@ -296,3 +316,12 @@ class MATTrainer(AbstractTrainer):
             wandb.save(f"agent_{str(agent_id)}.onnx")
 
         wandb.log({"tables/Network description": network_table}, step=0)
+
+    def save_state_dict(self, epoch: int, endup: bool = False):
+        for agent_id, agent in enumerate(self.agents):
+            model_path = (
+                f"agent{agent_id}.pth" if endup else f"epoch{epoch}_agent{agent_id}.pth"
+            )
+            torch.save(agent.brain.network.to("cpu").state_dict(), model_path)
+            wandb.save(model_path)
+            agent.brain.network.to(agent.brain.device)
