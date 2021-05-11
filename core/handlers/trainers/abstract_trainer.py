@@ -23,7 +23,7 @@ class AbstractTrainer(ABC):
         )
         self.order = np.arange(environment.num_agents)
         self.buffer = ReplayBuffer(
-            config.capacity, state_conv=config.model.name in ["conv_mlp", "mat"]
+            config.capacity, state_conv=config.model.name in ["conv_mlp", "mat", "mat_baseline"]
         )
 
         self.states = self.env.reset()

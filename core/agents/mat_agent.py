@@ -21,8 +21,6 @@ class MATAgent(AbstractAgent):
         self.brain = generate_brain(
             config=config, obs_shape=obs_shape, act_size=act_size
         )
-        self.patched_size_x = self.brain.network.patched_size_x
-        self.patched_size_y = self.brain.network.patched_size_y
 
     def get_action(self, state, epsilon):
         action, attns = self.brain.get_action(state)

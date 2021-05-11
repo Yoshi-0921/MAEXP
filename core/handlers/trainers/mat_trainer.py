@@ -97,7 +97,7 @@ class MATTrainer(AbstractTrainer):
                 attention_map = (
                     attention_maps[agent_id]
                     .mean(dim=0)[0, :, 0, 1:]
-                    .view(-1, agent.patched_size_x, agent.patched_size_y)
+                    .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                     .cpu()
                     .detach()
                 )
