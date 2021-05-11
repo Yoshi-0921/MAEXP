@@ -29,14 +29,14 @@ class MATTrainer(AbstractTrainer):
             name=config.name,
             config=dict(config),
             tags=[
-                config.world,
-                config.environment,
-                config.agent_type,
-                config.brain,
-                config.phase,
-                config.trainer,
-                config.model.name,
-                config.map.name,
+                config.world + "_world",
+                config.environment + "_environment",
+                config.agent_type + "_agent",
+                config.brain + "_brain",
+                config.phase + "_pahse",
+                config.trainer + "_trainer",
+                config.model.name + "_model",
+                config.map.name + "_map",
             ],
         )
 
