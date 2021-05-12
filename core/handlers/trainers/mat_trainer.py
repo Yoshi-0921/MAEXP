@@ -76,8 +76,8 @@ class MATTrainer(AbstractTrainer):
         self.log_models()
 
     def training_epoch_start(self, epoch: int):
-        if epoch % (self.config.max_epochs // 2) == 0:
-            self.save_state_dict(epoch)
+        if epoch == (self.config.max_epochs // 2):
+            self.save_state_dict(epoch=epoch)
 
     def training_step(self, step: int, epoch: int):
         # train based on experiments
@@ -198,7 +198,7 @@ class MATTrainer(AbstractTrainer):
         self.reset()
 
     def endup(self):
-        self.save_state_dict(endup=True)
+        self.save_state_dict()
 
     def log_scalar(self):
         wandb.log(

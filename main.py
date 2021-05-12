@@ -35,7 +35,12 @@ def main(config: DictConfig):
     if config.phase == "training":
         env = generate_environment(config=config, world=world)
         trainer = generate_trainer(config=config, environment=env)
-        trainer.run()
+
+        try:
+            trainer.run()
+
+        finally:
+            trainer.endup()
 
     # TODO implement evaluation handler for analysis and test.
     elif config.phase == "evaluation":
