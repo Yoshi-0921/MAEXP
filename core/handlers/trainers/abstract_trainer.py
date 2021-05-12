@@ -49,6 +49,8 @@ class AbstractTrainer(ABC):
             ],
         )
 
+        self.weight_artifact = wandb.Artifact('pretrained_weight', type='pth')
+
     def populate(self, steps: int):
         with tqdm(total=steps) as pbar:
             pbar.set_description("Populating buffer")
@@ -112,6 +114,7 @@ class AbstractTrainer(ABC):
 
     def log_models(self):
         network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
+        model_artifact = wandb.Artifact('model_topology', type='onnx')
 
         for agent_id, agent in enumerate(self.agents):
             print(f"Agent {str(agent_id)}:")
@@ -134,9 +137,10 @@ class AbstractTrainer(ABC):
             torch.onnx.export(
                 agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
             )
-            wandb.save(f"agent_{str(agent_id)}.onnx")
+            model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
 
         wandb.log({"tables/Network description": network_table}, step=0)
+        wandb.log_artifact(model_artifact)
 
     def save_state_dict(self, epoch: int, endup: bool = False):
         for agent_id, agent in enumerate(self.agents):
@@ -144,5 +148,7 @@ class AbstractTrainer(ABC):
                 f"agent{agent_id}.pth" if endup else f"epoch{epoch}_agent{agent_id}.pth"
             )
             torch.save(agent.brain.network.to("cpu").state_dict(), model_path)
-            wandb.save(model_path)
+            self.weight_artifact.add_file(model_path)
             agent.brain.network.to(agent.brain.device)
+
+        wandb.log_artifact(self.weight_artifact)

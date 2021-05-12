@@ -76,7 +76,7 @@ class MATTrainer(AbstractTrainer):
         self.log_models()
 
     def training_epoch_start(self, epoch: int):
-        if epoch % (self.config.max_epochs // 10) == 0:
+        if epoch % (self.config.max_epochs // 2) == 0:
             self.save_state_dict(epoch)
 
     def training_step(self, step: int, epoch: int):
@@ -91,8 +91,7 @@ class MATTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % 10 == 0 and step % (self.config.max_episode_length // 5) == 0:
-            # log attention_maps of agent0
+        if epoch % 100 == 0 and step == (self.config.max_episode_length // 2):
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (
                     attention_maps[agent_id]
