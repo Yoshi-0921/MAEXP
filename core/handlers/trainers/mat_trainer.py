@@ -98,7 +98,6 @@ class MATTrainer(AbstractTrainer):
                     .mean(dim=0)[0, :, 0, 1:]
                     .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                     .cpu()
-                    .detach()
                 )
 
                 fig = plt.figure()
