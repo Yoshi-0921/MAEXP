@@ -33,7 +33,7 @@ class MATTrainer(AbstractTrainer):
                 dones[agent_id],
                 next_states[agent_id],
             )
-            loss_list.append(loss)
+            loss_list.append(loss.detach().cpu())
 
         return torch.from_numpy(np.array(loss_list, dtype=np.float))
 
