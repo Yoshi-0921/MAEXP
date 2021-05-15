@@ -29,7 +29,7 @@ class MATBrain(AbstractBrain):
         _, action = torch.max(q_values, dim=1)
         action = int(action.item())
 
-        return action, attns.detach()
+        return action, attns
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         states_ind = states_ind.float().to(self.device)

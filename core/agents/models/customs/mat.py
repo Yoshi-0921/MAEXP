@@ -70,7 +70,7 @@ class MAT(nn.Module):
         attns = list()
         for blk in self.blocks:
             out, attn = blk.forward_attn(out)
-            attns.append(attn)
+            attns.append(attn.detach())
 
         out = self.norm(out)
         out = out[:, 0]
