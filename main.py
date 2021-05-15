@@ -5,7 +5,6 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-import argparse
 import os
 import warnings
 
@@ -25,12 +24,8 @@ warnings.simplefilter("ignore")
 
 logger = initialize_logging(__name__)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--config', default='example', help='name of experiment config')
-args = parser.parse_args()
 
-
-@hydra.main(config_path="configs", config_name=config_names[args])
+@hydra.main(config_path="configs", config_name=config_names["mat"])
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)
