@@ -76,8 +76,8 @@ class MATTrainer(AbstractTrainer):
         self.log_models()
 
     def training_epoch_start(self, epoch: int):
-        if epoch % (self.config.max_epochs // 10) == 0:
-            self.save_state_dict(epoch)
+        if epoch == (self.config.max_epochs // 2):
+            self.save_state_dict(epoch=epoch)
 
     def training_step(self, step: int, epoch: int):
         # train based on experiments
@@ -91,15 +91,13 @@ class MATTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % 10 == 0 and step % (self.config.max_episode_length // 5) == 0:
-            # log attention_maps of agent0
+        if epoch % 100 == 0 and step == (self.config.max_episode_length // 2):
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (
                     attention_maps[agent_id]
                     .mean(dim=0)[0, :, 0, 1:]
                     .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                     .cpu()
-                    .detach()
                 )
 
                 fig = plt.figure()
@@ -199,7 +197,7 @@ class MATTrainer(AbstractTrainer):
         self.reset()
 
     def endup(self):
-        self.save_state_dict(endup=True)
+        self.save_state_dict()
 
     def log_scalar(self):
         wandb.log(

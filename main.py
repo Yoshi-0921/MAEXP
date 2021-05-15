@@ -5,6 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+import argparse
 import os
 import warnings
 
@@ -24,8 +25,12 @@ warnings.simplefilter("ignore")
 
 logger = initialize_logging(__name__)
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--config', default='example', help='name of experiment config')
+args = parser.parse_args()
 
-@hydra.main(config_path="configs", config_name=config_names["mat"])
+
+@hydra.main(config_path="configs", config_name=config_names[args])
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)
@@ -35,7 +40,12 @@ def main(config: DictConfig):
     if config.phase == "training":
         env = generate_environment(config=config, world=world)
         trainer = generate_trainer(config=config, environment=env)
-        trainer.run()
+
+        try:
+            trainer.run()
+
+        finally:
+            trainer.endup()
 
     # TODO implement evaluation handler for analysis and test.
     elif config.phase == "evaluation":

@@ -56,4 +56,4 @@ class DQNBrain(AbstractBrain):
         nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss
+        return loss.detach()

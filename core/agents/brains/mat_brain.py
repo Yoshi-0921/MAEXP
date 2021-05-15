@@ -29,7 +29,7 @@ class MATBrain(AbstractBrain):
         _, action = torch.max(q_values, dim=1)
         action = int(action.item())
 
-        return action, attns
+        return action, attns.detach()
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         states_ind = states_ind.float().to(self.device)
@@ -58,7 +58,7 @@ class MATBrain(AbstractBrain):
         nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss
+        return loss.detach()
 
 
 class MATBaselineBrain(MATBrain):
