@@ -66,7 +66,7 @@ class MATBaselineBrain(MATBrain):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         attn_size = self.patched_size_x * self.patched_size_y + 1
         self.attns = [
-            torch.zeros(config.batch_size, config.model.num_heads, attn_size, attn_size)
+            torch.zeros(config.batch_size, config.model.num_heads, attn_size, attn_size).to(self.device)
         ]
 
     @torch.no_grad()
