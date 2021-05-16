@@ -91,7 +91,7 @@ class MATTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % 100 == 0 and step == (self.config.max_episode_length // 2):
+        if epoch % (self.config.max_epochs // 10) == 0 and step == (self.config.max_episode_length // 2):
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (
                     attention_maps[agent_id]
@@ -193,7 +193,8 @@ class MATTrainer(AbstractTrainer):
             agent.synchronize_brain()
 
         self.log_scalar()
-        self.log_heatmap()
+        if self.episode_count % (self.episode_count // 10) == 0:
+            self.log_heatmap()
         self.reset()
 
     def log_scalar(self):
