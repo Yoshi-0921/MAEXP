@@ -30,7 +30,7 @@ class ThreeRoomsMap(AbstractMap):
         ] = 1
 
     def locate_aisle(self):
-        self.aisle_matrix[:, np.arange(10, 15)] = 1
+        self.aisle_matrix[np.arange(10, 15), :] = 1
         self.aisle_matrix[np.arange(1, 15), 10] = 1
         self.aisle_matrix[np.arange(1, 15), 11] = 1
         self.aisle_matrix[np.arange(1, 15), 12] = 1
