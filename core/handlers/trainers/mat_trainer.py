@@ -193,7 +193,7 @@ class MATTrainer(AbstractTrainer):
             agent.synchronize_brain()
 
         self.log_scalar()
-        if self.episode_count % (self.episode_count // 10) == 0:
+        if self.episode_count % (self.config.max_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 
