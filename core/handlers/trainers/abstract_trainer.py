@@ -136,7 +136,10 @@ class AbstractTrainer(ABC):
             )
 
             wandb.watch(
-                models=agent.brain.network, log="all", log_freq=10000, idx=agent_id
+                models=agent.brain.network,
+                log="all",
+                log_freq=self.config.max_episode_length * (self.config.max_epochs // 5),
+                idx=agent_id,
             )
             torch.onnx.export(
                 agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
