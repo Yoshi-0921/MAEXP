@@ -57,7 +57,7 @@ class AbstractTrainer(ABC):
     def populate(self, steps: int):
         with tqdm(total=steps) as pbar:
             pbar.set_description("Populating buffer")
-            for i in range(steps):
+            for _ in range(steps):
                 self.play_step(epsilon=1.0)
                 pbar.update(1)
             pbar.close()
@@ -112,8 +112,10 @@ class AbstractTrainer(ABC):
                 pbar.set_postfix({"loss": self.total_loss_sum.item()})
                 pbar.update(1)
 
-        pbar.close()
         self.endup()
+
+        pbar.close()
+        wandb.finish()
 
     def log_models(self):
         network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
