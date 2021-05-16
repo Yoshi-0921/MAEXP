@@ -5,6 +5,7 @@ defaults:
   - job_logging: disabled
 
 name: 'example'
+gpu: 0
 # ==================================================
 # configure environment
 
