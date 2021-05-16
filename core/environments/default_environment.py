@@ -20,7 +20,7 @@ class DefaultEnvironment(AbstractEnvironment):
         super().__init__(config=config, world=world)
         self.visible_range = config.visible_range
         self.action_space, self.observation_space = [], []
-        for agent in self.agents:
+        for _ in self.agents:
             self.action_space.append(4)
             self.observation_space.append([3, self.visible_range, self.visible_range])
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
@@ -128,12 +128,6 @@ class DefaultEnvironment(AbstractEnvironment):
             agent.action = np.array([0, -1], dtype=np.int8)
 
     def reward_ind(self, agent_id: int, agent: Agent):
-        def is_collision(agent1: Agent, agent2: Agent):
-            delta_pos = agent1.xy - agent2.xy
-            dist = np.sqrt(np.sum(np.square(delta_pos)))
-
-            return True if dist == 0 else False
-
         a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
