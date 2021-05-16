@@ -11,19 +11,37 @@ from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
 from .default_environment import DefaultEnvironment
-
+from .shared_reward_environment import (
+    SharedMaxRewardEnvironment,
+    SharedMeanRewardEnvironment,
+)
 
 logger = initialize_logging(__name__)
 
-__all__ = ["AbstractEnvironment", "DefaultEnvironment"]
+__all__ = [
+    "AbstractEnvironment",
+    "DefaultEnvironment",
+    "SharedMaxRewardEnvironment",
+    "SharedMeanRewardEnvironment",
+]
 
 
-def generate_environment(config: DictConfig, world: AbstractWorld) -> AbstractEnvironment:
+def generate_environment(
+    config: DictConfig, world: AbstractWorld
+) -> AbstractEnvironment:
     if config.environment == "default":
         env = DefaultEnvironment(config=config, world=world)
 
+    elif config.environment == "shared_mean_reward":
+        env = SharedMeanRewardEnvironment(config=config, world=world)
+
+    elif config.environment == "shared_max_reward":
+        env = SharedMaxRewardEnvironment(config=config, world=world)
+
     else:
-        logger.warn(f"Unexpected environment is given. config.environment: {config.environment}")
+        logger.warn(
+            f"Unexpected environment is given. config.environment: {config.environment}"
+        )
 
         raise ValueError()
 
