@@ -50,10 +50,6 @@ class AbstractTrainer(ABC):
             ],
         )
 
-        self.weight_artifact = wandb.Artifact(
-            name=wandb.run.id + ".pth", type="pretrained_weight", metadata=dict(config)
-        )
-
     def populate(self, steps: int):
         with tqdm(total=steps) as pbar:
             pbar.set_description("Populating buffer")
@@ -115,7 +111,6 @@ class AbstractTrainer(ABC):
         self.endup()
 
         pbar.close()
-        wandb.finish()
 
     def log_models(self):
         network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
@@ -152,12 +147,20 @@ class AbstractTrainer(ABC):
         wandb.log_artifact(model_artifact)
 
     def save_state_dict(self, epoch: int = None):
+        meta_config = dict(self.config)
+        meta_config.update(
+            {"save_state_epoch": epoch}
+            if epoch
+            else {"save_state_epoch": self.config.max_epochs - 1}
+        )
+
+        weight_artifact = wandb.Artifact(
+            name=wandb.run.id + ".pth", type="pretrained_weight", metadata=meta_config
+        )
         for agent_id, agent in enumerate(self.agents):
-            model_path = (
-                f"epoch{epoch}_agent{agent_id}.pth" if epoch else f"agent{agent_id}.pth"
-            )
+            model_path = f"agent{agent_id}.pth"
             torch.save(agent.brain.network.to("cpu").state_dict(), model_path)
-            self.weight_artifact.add_file(model_path)
+            weight_artifact.add_file(model_path)
             agent.brain.network.to(agent.brain.device)
 
-        wandb.log_artifact(self.weight_artifact)
+        wandb.log_artifact(weight_artifact)

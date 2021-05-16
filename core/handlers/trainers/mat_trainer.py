@@ -196,9 +196,6 @@ class MATTrainer(AbstractTrainer):
         self.log_heatmap()
         self.reset()
 
-    def endup(self):
-        self.save_state_dict()
-
     def log_scalar(self):
         wandb.log(
             {

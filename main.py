@@ -40,7 +40,7 @@ def main(config: DictConfig):
             trainer.run()
 
         finally:
-            trainer.endup()
+            trainer.save_state_dict()
 
     # TODO implement evaluation handler for analysis and test.
     elif config.phase == "evaluation":
