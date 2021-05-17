@@ -196,6 +196,8 @@ class RelativeViewObservaton(AbstractObservation):
                         else:
                             obs[3, pos_x, pos_y] = 0
 
+        return obs
+
     def fill_obs_agent(self, obs, agent, offset_x, offset_y):
         obs[0, agent.x, agent.y] = 1
         for a in self.world.agents:
