@@ -7,7 +7,6 @@ import torch
 import wandb
 from core.utils.buffer import Experience
 from core.utils.dataset import RLDataset
-from omegaconf import DictConfig
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
@@ -18,10 +17,6 @@ sns.set()
 
 
 class MATTrainer(AbstractTrainer):
-    def __init__(self, config: DictConfig, environment):
-        super().__init__(config=config, environment=environment)
-        self.visible_range = self.config.visible_range
-
     def loss_and_update(self, batch):
         loss_list = []
         states, actions, rewards, dones, next_states = batch
@@ -145,7 +140,7 @@ class MATTrainer(AbstractTrainer):
                     step=self.global_step,
                 )
 
-                image = torch.zeros((3, self.visible_range, self.visible_range))
+                image = torch.zeros(self.env.observation_space)
                 obs = states[agent_id].permute(0, 2, 1)
 
                 # add agent information (Blue)

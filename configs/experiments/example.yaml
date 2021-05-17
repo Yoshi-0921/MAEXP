@@ -18,6 +18,7 @@ num_objects: 25
 
 agent_type: 'default'
 brain: 'dqn'
+view_method: 'local_view'
 num_agents: 2
 init_xys: [[0, 1], [-1, 1]]
 visible_range: 7
