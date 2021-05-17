@@ -201,7 +201,7 @@ class RelativeViewObservaton(AbstractObservation):
     def fill_obs_agent(self, obs, agent, offset_x, offset_y):
         obs[0, agent.x, agent.y] = 1
         for a in self.world.agents:
-            diff_x, diff_y = a.state.p_pos - agent.state.p_pos
+            diff_x, diff_y = a.xy - agent.xy
             if abs(diff_x) > 3 or abs(diff_y) > 3 or (diff_x == 0 and diff_y == 0):
                 continue
 
@@ -214,7 +214,8 @@ class RelativeViewObservaton(AbstractObservation):
 
     def fill_obs_object(self, obs, agent, offset_x, offset_y):
         for obj in self.world.objects:
-            if abs(obj.x - agent.x) > 3 or abs(obj.y - agent.y) > 3:
+            diff_x, diff_y = obj.xy - agent.xy
+            if abs(diff_x) > 3 or abs(diff_y) > 3:
                 continue
 
             pos_x, pos_y = self.world.map.coord2ind(position=(obj.x, obj.y))

@@ -237,7 +237,8 @@ class LocalViewObservaton(AbstractObservation):
 
     def fill_obs_object(self, obs, agent, offset_x, offset_y):
         for obj in self.world.objects:
-            if abs(obj.x - agent.x) > 3 or abs(obj.y - agent.y) > 3:
+            diff_x, diff_y = obj.xy - agent.xy
+            if abs(diff_x) > 3 or abs(diff_y) > 3:
                 continue
 
             pos_x, pos_y = self.world.map.coord2ind(
