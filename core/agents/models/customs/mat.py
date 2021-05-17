@@ -22,26 +22,11 @@ class MAT(nn.Module):
         patched_size_x = input_shape[1] // config.model.patch_size
         patched_size_y = input_shape[2] // config.model.patch_size
 
-        if config.view_method == "local_view":
-            self.patch_embed = PatchEmbed(
-                patch_size=config.model.patch_size,
-                in_chans=input_shape[0],
-                embed_dim=config.model.embed_dim,
-            )
-
-        elif config.view_method == "relative_view":
-            self.patch_embed = PatchEmbed(
-                patch_size=config.model.patch_size,
-                in_chans=input_shape[0],
-                embed_dim=config.model.embed_dim,
-            )
-
-        else:
-            logger.warn(
-                f"Unexpected view method is given. config.view_method: {config.view_method}"
-            )
-
-            raise ValueError()
+        self.patch_embed = PatchEmbed(
+            patch_size=config.model.patch_size,
+            in_chans=input_shape[0],
+            embed_dim=config.model.embed_dim,
+        )
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
