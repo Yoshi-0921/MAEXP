@@ -1,5 +1,5 @@
 defaults:
-  - model: mat
+  - model: mat_baseline
   - map: three_rooms
   - opt: rmsprop
   - job_logging: disabled
@@ -10,14 +10,15 @@ gpu: 0
 # configure environment
 
 world: 'default'
-environment: 'default'
+environment: 'shared_max_reward'
 seed: 921
-num_objects: 25
+num_objects: 2
 # ==================================================
 # configure agent
 
 agent_type: 'mat'
-brain: 'mat'
+brain: 'mat_baseline'
+view_method: 'local_view'
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7

@@ -4,29 +4,48 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
-from torch import nn
-import torch
-from ..vit import PatchEmbed, Block
-from omegaconf import DictConfig
 from typing import List
+
+import torch
+from core.utils.logging import initialize_logging
+from omegaconf import DictConfig
+from torch import nn
+
+from ..vit import Block, PatchEmbed
+
+logger = initialize_logging(__name__)
 
 
 class MAT(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
-        self.patch_embed = PatchEmbed(
-            patch_size=config.model.patch_size,
-            in_chans=input_shape[0],
-            embed_dim=config.model.embed_dim,
-        )
         patched_size_x = input_shape[1] // config.model.patch_size
         patched_size_y = input_shape[2] // config.model.patch_size
 
+        if config.view_method == "local_view":
+            self.patch_embed = PatchEmbed(
+                patch_size=config.model.patch_size,
+                in_chans=input_shape[0],
+                embed_dim=config.model.embed_dim,
+            )
+
+        elif config.view_method == "relative_view":
+            self.patch_embed = PatchEmbed(
+                patch_size=config.model.patch_size,
+                in_chans=input_shape[0],
+                embed_dim=config.model.embed_dim,
+            )
+
+        else:
+            logger.warn(
+                f"Unexpected view method is given. config.view_method: {config.view_method}"
+            )
+
+            raise ValueError()
+
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
-            torch.zeros(
-                1, patched_size_x * patched_size_y + 1, config.model.embed_dim
-            )
+            torch.zeros(1, patched_size_x * patched_size_y + 1, config.model.embed_dim)
         )
 
         self.blocks = nn.ModuleList(
