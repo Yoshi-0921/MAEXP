@@ -20,10 +20,10 @@ class DefaultEnvironment(AbstractEnvironment):
     def __init__(self, config: DictConfig, world: AbstractWorld):
         super().__init__(config=config, world=world)
         self.observation_handler = generate_observation_handler(config=config, world=world)
-        self.action_space = []
+        self.action_space, self.observation_space = [], []
         for _ in self.agents:
             self.action_space.append(4)
-        self.observation_space = self.observation_handler.get_observation_space
+            self.observation_space.append(self.observation_handler.get_observation_space)
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
 
     def reset(self):

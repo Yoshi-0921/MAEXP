@@ -60,19 +60,19 @@ class RelativeViewObservaton(AbstractObservation):
                         if (
                             j == 0
                             and x == 0
-                            and self.world.map.matrix[pos_x + opr, pos_y, 0] == 0
+                            and self.world.map.wall_matrix[pos_x + opr, pos_y] == 0
                         ):
                             obs[3, pos_x, pos_y] = 0
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[3, pos_x, pos_y] = -1
                             break
                         # セルが角で真ん中に壁があるならbreak
                         if (
                             j == 0
                             and x != 0
-                            and self.world.map.matrix[pos_x - x, pos_y, 0] == 1
+                            and self.world.map.wall_matrix[pos_x - x, pos_y] == 1
                             and opr != x
                         ):
                             break
@@ -104,19 +104,19 @@ class RelativeViewObservaton(AbstractObservation):
                         if (
                             j == 0
                             and y == 0
-                            and self.world.map.matrix[pos_x, pos_y - opr, 0] == 0
+                            and self.world.map.wall_matrix[pos_x, pos_y - opr] == 0
                         ):
                             obs[3, pos_x, pos_y] = 0
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[3, pos_x, pos_y] = -1
                             break
                         # セルが角で真ん中に壁があるならbreak
                         if (
                             j == 0
                             and y != 0
-                            and self.world.map.matrix[pos_x, pos_y + y, 0] == 1
+                            and self.world.map.wall_matrix[pos_x, pos_y + y] == 1
                             and opr != y
                         ):
                             break
@@ -132,7 +132,7 @@ class RelativeViewObservaton(AbstractObservation):
                     agent.y,
                 )
                 pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                     obs[3, pos_x, pos_y] = -1
                     break
                 for opr_y in [-1, 1]:
@@ -152,7 +152,7 @@ class RelativeViewObservaton(AbstractObservation):
                             obs[3, pos_x, pos_y] = -1
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[3, pos_x, pos_y] = -1
                             break
                         # 何もないなら0
@@ -164,7 +164,7 @@ class RelativeViewObservaton(AbstractObservation):
                 # 壁ならbreak
                 pos_x, pos_y = agent.x, agent.y + (y * opr_y)
                 pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                     obs[3, pos_x, pos_y] = -1
                     break
                 for opr_x in [-1, 1]:
@@ -189,7 +189,7 @@ class RelativeViewObservaton(AbstractObservation):
                             obs[3, pos_x, pos_y] = -1
                             continue
                         # 壁なら-1
-                        if self.world.map.matrix[pos_x, pos_y, 0] == 1:
+                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
                             obs[3, pos_x, pos_y] = -1
                             break
                         # 何もないなら0
