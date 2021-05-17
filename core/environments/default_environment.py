@@ -23,7 +23,7 @@ class DefaultEnvironment(AbstractEnvironment):
         self.action_space, self.observation_space = [], []
         for _ in self.agents:
             self.action_space.append(4)
-            self.observation_space.append(self.observation_handler.get_observation_space)
+            self.observation_space.append(self.observation_handler.observation_space)
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
 
     def reset(self):

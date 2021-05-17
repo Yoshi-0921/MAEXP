@@ -5,19 +5,21 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from .abstract_observation import AbstractObservation
-from core.worlds.entity import Agent
 import numpy as np
+import torch
+from core.worlds.entity import Agent
+
+from .abstract_observation import AbstractObservation
 
 
 class LocalViewObservaton(AbstractObservation):
     @property
-    def get_observation_space(self):
+    def observation_space(self):
         return [3, self.visible_range, self.visible_range]
 
     def observation_ind(self, agent: Agent):
         # 0:agents, 1:objects, 2:visible area
-        obs = np.zeros(self.get_observation_space, dtype=np.int8)
+        obs = np.zeros(self.observation_space, dtype=np.int8)
         offset = 0
 
         # input walls and invisible area
@@ -219,7 +221,7 @@ class LocalViewObservaton(AbstractObservation):
 
     def fill_obs_agent(self, obs, agent, offset_x, offset_y):
         obs[0, self.visible_range // 2, self.visible_range // 2] = 1
-        for a in self.agents:
+        for a in self.world.agents:
             diff_x, diff_y = a.xy - agent.xy
             if abs(diff_x) > 3 or abs(diff_y) > 3 or (diff_x == 0 and diff_y == 0):
                 continue
@@ -251,3 +253,16 @@ class LocalViewObservaton(AbstractObservation):
                 obs[1, offset_x + pos_x, offset_y + pos_y] = 1
 
         return obs
+
+    def render(self, state):
+        image = torch.zeros(self.observation_space)
+        obs = state.permute(0, 2, 1)
+
+        # add agent information (Blue)
+        image[2] += obs[0]
+        # add object information (Yellow)
+        image[torch.tensor([0, 1])] += obs[1]
+        # add invisible area information (White)
+        image -= obs[2]
+
+        return image

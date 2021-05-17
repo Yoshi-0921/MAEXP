@@ -20,7 +20,7 @@ class AbstractObservation(ABC):
 
     @property
     @abstractmethod
-    def get_observation_space(self):
+    def observation_space(self):
         raise NotImplementedError()
 
     @abstractmethod
@@ -37,4 +37,8 @@ class AbstractObservation(ABC):
 
     @abstractmethod
     def fill_obs_object(self, obs, agent, offset_x, offset_y):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def render(self, state):
         raise NotImplementedError()

@@ -5,19 +5,21 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from .abstract_observation import AbstractObservation
-from core.worlds.entity import Agent
 import numpy as np
+import torch
+from core.worlds.entity import Agent
+
+from .abstract_observation import AbstractObservation
 
 
 class RelativeViewObservaton(AbstractObservation):
     @property
-    def get_observation_space(self):
+    def observation_space(self):
         return [4, self.world.map.SIZE_X, self.world.map.SIZE_Y]
 
     def observation_ind(self, agent: Agent):
         # 0: me, 1:agents, 2:landmarks, 3:visible area
-        obs = np.zeros(self.get_observation_space, dtype=np.int8)
+        obs = np.zeros(self.observation_space, dtype=np.int8)
         offset = 0
 
         # input walls and invisible area
@@ -34,7 +36,8 @@ class RelativeViewObservaton(AbstractObservation):
     def fill_obs_area(self, obs, agent, offset_x, offset_y):
         obs[3, :, :] -= 1
         # 自分の場所は0
-        obs[3, agent.x, agent.y] = 0
+        pos_x, pos_y = self.world.map.coord2ind(position=(agent.x, agent.y))
+        obs[3, pos_x, pos_y] = 0
 
         for x in range(-1, 2):
             for y in [-1, 1]:
@@ -199,7 +202,8 @@ class RelativeViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_agent(self, obs, agent, offset_x, offset_y):
-        obs[0, agent.x, agent.y] = 1
+        pos_x, pos_y = self.world.map.coord2ind(position=(agent.x, agent.y))
+        obs[0, pos_x, pos_y] = 1
         for a in self.world.agents:
             diff_x, diff_y = a.xy - agent.xy
             if abs(diff_x) > 3 or abs(diff_y) > 3 or (diff_x == 0 and diff_y == 0):
@@ -224,3 +228,17 @@ class RelativeViewObservaton(AbstractObservation):
                 obs[2, offset_x + pos_x, offset_y + pos_y] = 1
 
         return obs
+
+    def render(self, state):
+        image = torch.zeros((3, *self.observation_space[1:]))
+        obs = state.permute(0, 2, 1)
+
+        # add agent information (Blue)
+        image[2] += obs[0]
+        image[2] += obs[1]
+        # add object information (Yellow)
+        image[torch.tensor([0, 1])] += obs[2]
+        # add invisible area information (White)
+        image -= obs[3]
+
+        return image

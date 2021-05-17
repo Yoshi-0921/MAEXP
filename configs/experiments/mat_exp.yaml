@@ -1,5 +1,5 @@
 defaults:
-  - model: mat_baseline
+  - model: mat
   - map: three_rooms
   - opt: rmsprop
   - job_logging: disabled
@@ -17,7 +17,7 @@ num_objects: 2
 # configure agent
 
 agent_type: 'mat'
-brain: 'mat_baseline'
+brain: 'mat'
 view_method: 'local_view'
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]

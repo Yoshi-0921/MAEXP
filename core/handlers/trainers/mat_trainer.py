@@ -140,15 +140,7 @@ class MATTrainer(AbstractTrainer):
                     step=self.global_step,
                 )
 
-                image = torch.zeros(self.env.observation_space)
-                obs = states[agent_id].permute(0, 2, 1)
-
-                # add agent information (Blue)
-                image[2] += obs[0]
-                # add object information (Yellow)
-                image[torch.tensor([0, 1])] += obs[1]
-                # add invisible area information (White)
-                image -= obs[2]
+                image = self.env.observation_handler.render(states[agent_id])
 
                 wandb.log(
                     {
