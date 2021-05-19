@@ -5,8 +5,6 @@ import numpy as np
 import seaborn as sns
 import torch
 import wandb
-from torch.nn import functional as F
-from torchvision.utils import make_grid
 
 from .abstract_evaluator import AbstractEvaluator
 
@@ -171,7 +169,9 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_objects.append(wandb.Image(data_or_path=fig, caption="Objects generated"))
+        heatmap_accumulated_objects.append(
+            wandb.Image(data_or_path=fig, caption="Objects generated")
+        )
         plt.close()
 
         # log heatmap_events_left
@@ -189,7 +189,9 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_objects_left.append(wandb.Image(data_or_path=fig, caption="Objects left"))
+        heatmap_accumulated_objects_left.append(
+            wandb.Image(data_or_path=fig, caption="Objects left")
+        )
         plt.close()
 
         # log heatmap_wall_collision
@@ -207,7 +209,9 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_wall_collision.append(wandb.Image(data_or_path=fig, caption="Wall collision"))
+        heatmap_accumulated_wall_collision.append(
+            wandb.Image(data_or_path=fig, caption="Wall collision")
+        )
         plt.close()
 
         # log heatmap_agents_collision
@@ -225,17 +229,19 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_agents_collision.append(wandb.Image(data_or_path=fig, caption="Agents collision"))
+        heatmap_accumulated_agents_collision.append(
+            wandb.Image(data_or_path=fig, caption="Agents collision")
+        )
         plt.close()
 
         wandb.log(
             {
-                "episode/heatmap_agents": heatmap_accumulated_agents,
-                "episode/heatmap_complete": heatmap_accumulated_complete,
-                "episode/heatmap_objects": heatmap_accumulated_objects,
-                "episode/heatmap_objects_left": heatmap_accumulated_objects_left,
-                "episode/heatmap_wall_collision": heatmap_accumulated_wall_collision,
-                "episode/heatmap_agents_collision": heatmap_accumulated_agents_collision,
+                "heatmaps/agents_path": heatmap_accumulated_agents,
+                "heatmaps/objects_completion": heatmap_accumulated_complete,
+                "heatmaps/objects_generated": heatmap_accumulated_objects,
+                "heatmaps/objects_left": heatmap_accumulated_objects_left,
+                "heatmaps/wall_collision": heatmap_accumulated_wall_collision,
+                "heatmaps/agents_collision": heatmap_accumulated_agents_collision,
             },
             step=self.global_step - 1,
         )
