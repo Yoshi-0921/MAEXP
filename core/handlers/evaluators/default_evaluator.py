@@ -74,7 +74,7 @@ class DefaultEvaluator(AbstractEvaluator):
     def validation_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
-        if self.episode_count % (self.config.max_epochs // 10) == 0:
+        if self.episode_count % (self.config.validate_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 
@@ -181,7 +181,6 @@ class DefaultEvaluator(AbstractEvaluator):
             vmin=0,
             cmap="Blues",
             square=True,
-            cbar_kws={"shrink": 0.65},
             xticklabels=list(
                 str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
             ),
@@ -201,7 +200,6 @@ class DefaultEvaluator(AbstractEvaluator):
             vmin=0,
             cmap="Blues",
             square=True,
-            cbar_kws={"shrink": 0.65},
             xticklabels=list(
                 str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
             ),
@@ -221,7 +219,6 @@ class DefaultEvaluator(AbstractEvaluator):
             vmin=0,
             cmap="Blues",
             square=True,
-            cbar_kws={"shrink": 0.65},
             xticklabels=list(
                 str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
             ),
