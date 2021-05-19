@@ -41,9 +41,4 @@ epsilon_end: 0.05
 # configre validate
 
 validate_epochs: 1000
-load_weight: False
-model_path: False
-# ==================================================
-# Configure test
-
-# ==================================================
+pretrained_weight_path: None

@@ -95,7 +95,7 @@ class AbstractEvaluator(ABC):
 
     def load_state_dict(self):
         weight_artifact = wandb.use_artifact(
-            "yoshi-0921/MAEXP/sy8mkzzu.pth:v1", type="pretrained_weight"
+            self.config.pretrained_weight_path, type="pretrained_weight"
         )
         weight_artifact_dir = weight_artifact.download()
         for agent_id, agent in enumerate(self.agents):

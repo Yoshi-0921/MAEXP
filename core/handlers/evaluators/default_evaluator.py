@@ -74,7 +74,7 @@ class DefaultEvaluator(AbstractEvaluator):
     def validation_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
-        if self.episode_count % (self.config.validate_epochs // 10) == 0:
+        if (self.episode_count + 1) % (self.config.validate_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 
