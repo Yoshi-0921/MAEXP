@@ -77,7 +77,7 @@ class DefaultEvaluator(AbstractEvaluator):
         self.env.accumulate_heatmap()
         self.log_scalar()
         if self.episode_count % (self.config.max_epochs // 10) == 0:
-            self.log_heatmap2()
+            self.log_heatmap()
         self.reset()
 
     def log_scalar(self):
@@ -103,7 +103,7 @@ class DefaultEvaluator(AbstractEvaluator):
                 step=self.global_step - 1,
             )
 
-    def log_heatmap2(self):
+    def log_heatmap(self):
         (
             heatmap_accumulated_agents,
             heatmap_accumulated_complete,
@@ -236,53 +236,6 @@ class DefaultEvaluator(AbstractEvaluator):
                 "episode/heatmap_objects_left": heatmap_accumulated_objects_left,
                 "episode/heatmap_wall_collision": heatmap_accumulated_wall_collision,
                 "episode/heatmap_agents_collision": heatmap_accumulated_agents_collision,
-            },
-            step=self.global_step - 1,
-        )
-
-    def log_heatmap(self):
-        heatmap = torch.zeros(
-            self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
-        )
-
-        for agent_id in range(self.env.num_agents):
-            # add agent path information
-            heatmap_agents = (
-                0.5
-                * self.env.heatmap_agents[agent_id, ...]
-                / np.max(self.env.heatmap_agents[agent_id, ...])
-            )
-            heatmap_agents = np.where(
-                heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
-            )
-            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
-
-        # add wall information
-        heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
-
-        # add objects information
-        heatmap_objects = (
-            0.8 * self.env.heatmap_objects / np.max(self.env.heatmap_objects)
-        )
-        heatmap_objects = np.where(
-            heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
-        )
-        heatmap[:, torch.tensor([0, 1]), ...] += torch.from_numpy(heatmap_objects)
-
-        heatmap = F.interpolate(
-            heatmap,
-            size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
-        )
-        heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=3)
-        wandb.log(
-            {
-                "episode/heatmap": [
-                    wandb.Image(
-                        data_or_path=heatmap,
-                        caption="Episode heatmap",
-                    )
-                ]
             },
             step=self.global_step - 1,
         )
