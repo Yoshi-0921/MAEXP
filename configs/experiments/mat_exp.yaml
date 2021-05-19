@@ -10,9 +10,9 @@ gpu: 0
 # configure environment
 
 world: 'default'
-environment: 'shared_max_reward'
+environment: 'default'
 seed: 921
-num_objects: 2
+num_objects: 25
 # ==================================================
 # configure agent
 
@@ -22,11 +22,12 @@ view_method: 'local_view'
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7
-phase: 'training'
+phase: 'evaluation'
 # ==================================================
 # configure training
 
 trainer: 'mat'
+evaluator: 'default'
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32
@@ -39,7 +40,7 @@ epsilon_end: 0.05
 # ==================================================
 # configre validate
 
-validate_epochs: 3
+validate_epochs: 1000
 load_weight: False
 model_path: False
 # ==================================================

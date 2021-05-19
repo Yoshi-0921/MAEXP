@@ -25,6 +25,26 @@ class DefaultEnvironment(AbstractEnvironment):
             self.action_space.append(4)
             self.observation_space.append(self.observation_handler.observation_space)
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
+        self.heatmap_accumulated_agents = np.zeros(
+            shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int16,
+        )
+        self.heatmap_accumulated_complete = np.zeros(
+            shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int16,
+        )
+        self.heatmap_accumulated_objects = np.zeros(
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+        )
+        self.heatmap_accumulated_objects_left = np.zeros(
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+        )
+        self.heatmap_accumulated_wall_collision = np.zeros(
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+        )
+        self.heatmap_accumulated_agents_collision = np.zeros(
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+        )
 
     def reset(self):
         self.objects_generated = 0
@@ -169,3 +189,11 @@ class DefaultEnvironment(AbstractEnvironment):
     def observation_ind(self, agent: Agent):
 
         return self.observation_handler.observation_ind(agent)
+
+    def accumulate_heatmap(self):
+        self.heatmap_accumulated_agents += self.heatmap_agents
+        self.heatmap_accumulated_complete += self.heatmap_complete
+        self.heatmap_accumulated_objects += self.heatmap_objects
+        self.heatmap_accumulated_objects_left += self.heatmap_objects_left
+        self.heatmap_accumulated_wall_collision += self.heatmap_wall_collision
+        self.heatmap_accumulated_agents_collision += self.heatmap_agents_collision

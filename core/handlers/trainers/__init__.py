@@ -31,7 +31,3 @@ def generate_trainer(
         raise ValueError()
 
     return trainer
-
-
-def generate_evaluator(config: DictConfig):
-    raise NotImplementedError()

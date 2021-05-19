@@ -12,7 +12,7 @@ import hydra
 from omegaconf import DictConfig
 
 from configs import config_names
-from core.environments import generate_environment, generate_test_environment
+from core.environments import generate_environment
 from core.handlers.evaluators import generate_evaluator
 from core.handlers.trainers import generate_trainer
 from core.maps import generate_map
@@ -31,9 +31,9 @@ def main(config: DictConfig):
     set_seed(seed=config.seed)
     world_map = generate_map(config=config)
     world = generate_world(config=config, world_map=world_map)
+    env = generate_environment(config=config, world=world)
 
     if config.phase == "training":
-        env = generate_environment(config=config, world=world)
         trainer = generate_trainer(config=config, environment=env)
 
         try:
@@ -42,9 +42,7 @@ def main(config: DictConfig):
         finally:
             trainer.save_state_dict()
 
-    # TODO implement evaluation handler for analysis and test.
     elif config.phase == "evaluation":
-        env = generate_test_environment(config=config, world=world)
         evaluator = generate_evaluator(config=config, environment=env)
         evaluator.run()
 

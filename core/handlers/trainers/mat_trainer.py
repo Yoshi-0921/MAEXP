@@ -212,17 +212,17 @@ class MATTrainer(AbstractTrainer):
             self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
         )
 
-        for i in range(self.env.num_agents):
+        for agent_id in range(self.env.num_agents):
             # add agent path information
             heatmap_agents = (
                 0.5
-                * self.env.heatmap_agents[i, ...]
-                / np.max(self.env.heatmap_agents[i, ...])
+                * self.env.heatmap_agents[agent_id, ...]
+                / np.max(self.env.heatmap_agents[agent_id, ...])
             )
             heatmap_agents = np.where(
                 heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
             )
-            heatmap[i, 2, ...] += torch.from_numpy(heatmap_agents)
+            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
 
         # add wall information
         heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)

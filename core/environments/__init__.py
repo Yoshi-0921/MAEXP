@@ -46,7 +46,3 @@ def generate_environment(
         raise ValueError()
 
     return env
-
-
-def generate_test_environment(config: DictConfig) -> AbstractEnvironment:
-    raise NotImplementedError()
