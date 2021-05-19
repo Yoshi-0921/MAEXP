@@ -21,7 +21,7 @@ class DefaultEvaluator(AbstractEvaluator):
             # normalize states [0, map.SIZE] -> [0, 1.0]
             states = torch.tensor(self.states).float()
 
-            action, _ = self.agents[agent_id].get_action(states[agent_id], epsilon)
+            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
             actions[agent_id] = action
 
         rewards, _, new_states = self.env.step(actions)

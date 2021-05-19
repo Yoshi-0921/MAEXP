@@ -22,7 +22,7 @@ class MATAgent(AbstractAgent):
             config=config, obs_shape=obs_shape, act_size=act_size
         )
 
-    def get_action(self, state, epsilon):
+    def get_action_attns(self, state, epsilon):
         action, attns = self.brain.get_action(state)
 
         attns = torch.stack(attns)
@@ -31,6 +31,14 @@ class MATAgent(AbstractAgent):
             action = self.get_random_action()
 
         return action, attns
+
+    def get_action(self, state, epsilon):
+        action, _ = self.brain.get_action(state)
+
+        if random() < epsilon:
+            action = self.get_random_action()
+
+        return action
 
     def learn(self, state, action, reward, done, next_state):
         loss = self.brain.learn(state, action, reward, done, next_state)

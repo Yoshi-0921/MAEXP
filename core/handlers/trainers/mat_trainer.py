@@ -42,7 +42,7 @@ class MATTrainer(AbstractTrainer):
             # normalize states [0, map.SIZE] -> [0, 1.0]
             states = torch.tensor(self.states).float()
 
-            action, attns = self.agents[agent_id].get_action(states[agent_id], epsilon)
+            action, attns = self.agents[agent_id].get_action_attns(states[agent_id], epsilon)
             actions[agent_id] = action
             attention_maps[agent_id] = attns
 
