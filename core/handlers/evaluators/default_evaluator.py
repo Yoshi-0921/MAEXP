@@ -77,7 +77,7 @@ class DefaultEvaluator(AbstractEvaluator):
         self.env.accumulate_heatmap()
         self.log_scalar()
         if self.episode_count % (self.config.max_epochs // 10) == 0:
-            self.log_heatmap()
+            self.log_heatmap2()
         self.reset()
 
     def log_scalar(self):
@@ -123,7 +123,7 @@ class DefaultEvaluator(AbstractEvaluator):
                 vmin=0,
                 cmap="Blues",
                 square=True,
-                cbar_kws={"shrink": 0.65},  # 4agents:1.0, 8agents:0.65
+                cbar_kws={"shrink": 1.0},  # 4agents:1.0, 8agents:0.65
                 xticklabels=list(
                     str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
                 ),
@@ -135,7 +135,7 @@ class DefaultEvaluator(AbstractEvaluator):
             heatmap_accumulated_agents.append(
                 wandb.Image(data_or_path=fig, caption=f"Agent {agent_id}")
             )
-            # plt.close()
+            plt.close()
 
             # log heatmap_complete
             fig = plt.figure()
@@ -144,7 +144,6 @@ class DefaultEvaluator(AbstractEvaluator):
                 vmin=0,
                 cmap="Blues",
                 square=True,
-                cbar_kws={"shrink": 0.65},
                 xticklabels=list(
                     str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
                 ),
@@ -156,7 +155,7 @@ class DefaultEvaluator(AbstractEvaluator):
             heatmap_accumulated_complete.append(
                 wandb.Image(data_or_path=fig, caption=f"Agent {agent_id}")
             )
-            # plt.close()
+            plt.close()
 
         # log heatmap_events
         fig = plt.figure()
@@ -165,7 +164,6 @@ class DefaultEvaluator(AbstractEvaluator):
             vmin=0,
             cmap="Blues",
             square=True,
-            cbar_kws={"shrink": 0.65},
             xticklabels=list(
                 str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
             ),
@@ -173,8 +171,8 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_objects.append(fig)
-        # plt.close()
+        heatmap_accumulated_objects.append(wandb.Image(data_or_path=fig, caption="Objects generated"))
+        plt.close()
 
         # log heatmap_events_left
         fig = plt.figure()
@@ -191,8 +189,8 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_objects_left.append(fig)
-        # plt.close()
+        heatmap_accumulated_objects_left.append(wandb.Image(data_or_path=fig, caption="Objects left"))
+        plt.close()
 
         # log heatmap_wall_collision
         fig = plt.figure()
@@ -209,8 +207,8 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_wall_collision.append(fig)
-        # plt.close()
+        heatmap_accumulated_wall_collision.append(wandb.Image(data_or_path=fig, caption="Wall collision"))
+        plt.close()
 
         # log heatmap_agents_collision
         fig = plt.figure()
@@ -227,8 +225,8 @@ class DefaultEvaluator(AbstractEvaluator):
                 str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
             ),
         )
-        heatmap_accumulated_agents_collision.append(fig)
-        # plt.close()
+        heatmap_accumulated_agents_collision.append(wandb.Image(data_or_path=fig, caption="Agents collision"))
+        plt.close()
 
         wandb.log(
             {
