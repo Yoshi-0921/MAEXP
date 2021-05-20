@@ -22,7 +22,7 @@ view_method: 'local_view'
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7
-phase: 'evaluation'
+phase: 'training'
 # ==================================================
 # configure training
 
