@@ -47,6 +47,7 @@ class AbstractTrainer(ABC):
                 config.trainer + "_trainer",
                 config.model.name + "_model",
                 config.map.name + "_map",
+                config.view_method + "_method",
             ],
         )
 
