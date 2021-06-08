@@ -19,7 +19,7 @@ from .abstract_environment import AbstractEnvironment
 class DefaultEnvironment(AbstractEnvironment):
     def __init__(self, config: DictConfig, world: AbstractWorld):
         super().__init__(config=config, world=world)
-        self.observation_handler = generate_observation_handler(config=config, world=world)
+        self.observation_handler = generate_observation_handler(config=config, world=self.world)
         self.action_space, self.observation_space = [], []
         for _ in self.agents:
             self.action_space.append(4)
@@ -79,14 +79,14 @@ class DefaultEnvironment(AbstractEnvironment):
 
             # Initialize agent position
             agent.move(self.init_xys[agent_id])
+            pos_x, pos_y = self.world.map.coord2ind(self.init_xys[agent_id])
+            self.world.map.agents_matrix[pos_x, pos_y] = 1
 
         # Initialize object position
         self.world.reset_objects()
         self.generate_objects(self.config.num_objects)
 
-        obs_n = []
-        for agent in self.agents:
-            obs_n.append(self.observation_ind(agent))
+        obs_n = self.observation_handler.reset(self.agents)
 
         return obs_n
 
@@ -127,6 +127,8 @@ class DefaultEnvironment(AbstractEnvironment):
             reward_n.append(self.reward_ind(agent_id, agent))
             done_n.append(self.done_ind(agent))
             obs_n.append(self.observation_ind(agent))
+
+        self.observation_handler.step()
 
         self.heatmap_objects_left += self.world.map.objects_matrix
 

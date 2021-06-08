@@ -77,7 +77,7 @@ class AbstractWorld(ABC):
         for agent_id, agent in enumerate(self.agents):
             agent.push(force[agent_id])
             agent_x, agent_y = self.map.coord2ind(agent.xy)
-            self.map.agents_matrix[agent_x, agent_y]
+            self.map.agents_matrix[agent_x, agent_y] = 1
 
     def render(self):
         render_list = []
