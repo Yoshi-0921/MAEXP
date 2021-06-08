@@ -19,7 +19,9 @@ from .abstract_environment import AbstractEnvironment
 class DefaultEnvironment(AbstractEnvironment):
     def __init__(self, config: DictConfig, world: AbstractWorld):
         super().__init__(config=config, world=world)
-        self.observation_handler = generate_observation_handler(config=config, world=self.world)
+        self.observation_handler = generate_observation_handler(
+            config=config, world=self.world
+        )
         self.action_space, self.observation_space = [], []
         for _ in self.agents:
             self.action_space.append(4)
@@ -27,23 +29,23 @@ class DefaultEnvironment(AbstractEnvironment):
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
-            dtype=np.int16,
+            dtype=np.int32,
         )
         self.heatmap_accumulated_complete = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
-            dtype=np.int16,
+            dtype=np.int32,
         )
         self.heatmap_accumulated_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_accumulated_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_accumulated_wall_collision = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_accumulated_agents_collision = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
 
     def reset(self):
@@ -54,23 +56,23 @@ class DefaultEnvironment(AbstractEnvironment):
         self.world.map.reset()
         self.heatmap_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
-            dtype=np.int16,
+            dtype=np.int32,
         )
         self.heatmap_complete = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
-            dtype=np.int16,
+            dtype=np.int32,
         )
         self.heatmap_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_wall_collision = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_agents_collision = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int16
+            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
 
         for agent_id, agent in enumerate(self.agents):
