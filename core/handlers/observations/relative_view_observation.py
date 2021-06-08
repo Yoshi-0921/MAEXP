@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Source code for observation handler using the local view method.
+"""Source code for observation handler using the relative view method.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
