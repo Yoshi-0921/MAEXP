@@ -1,6 +1,6 @@
 defaults:
-  - model: mat
-  - map: three_rooms
+  - model: mat # mat, mat_baseline
+  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
@@ -9,25 +9,25 @@ gpu: 0
 # ==================================================
 # configure environment
 
-world: 'default'
-environment: 'default'
+world: 'default' # default
+environment: 'default' # default, shared_mean_reward, shared_max_reward
 seed: 921
 num_objects: 25
 # ==================================================
 # configure agent
 
-agent_type: 'mat'
-brain: 'mat'
-view_method: 'local_view'
+agent_type: 'mat' # default, mat
+brain: 'mat' # default, mat, mat_baseline
+view_method: 'local_view' # local_view, relative_view, local_transition_view
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7
-phase: 'training'
+phase: 'training' # training, evaluation
 # ==================================================
 # configure training
 
-trainer: 'mat'
-evaluator: 'default'
+trainer: 'mat' # default, mat
+evaluator: 'default' # default
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32
