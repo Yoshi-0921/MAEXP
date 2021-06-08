@@ -42,3 +42,13 @@ class AbstractObservation(ABC):
     @abstractmethod
     def render(self, state):
         raise NotImplementedError()
+
+    def reset(self, agents):
+        obs_n = []
+        for agent in agents:
+            obs_n.append(self.observation_ind(agent))
+
+        return obs_n
+
+    def step(self):
+        pass
