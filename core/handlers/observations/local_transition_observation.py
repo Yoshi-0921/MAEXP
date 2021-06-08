@@ -113,4 +113,6 @@ class LocalTransitionObservation(AbstractObservation):
         # add invisible area information (White)
         image -= obs[3]
 
-        return image.clamp(min=0, max=1)
+        image = image.clamp(min=0, max=1)
+
+        return image
