@@ -107,10 +107,10 @@ class LocalTransitionObservation(AbstractObservation):
 
         # add agent information (Blue)
         image[2] += obs[0]
-        image[2] += (obs[1] * 0.3)
+        image[2] += (obs[1] * 0.5)
         # add object information (Yellow)
         image[torch.tensor([0, 1])] += obs[2]
         # add invisible area information (White)
         image -= obs[3]
 
-        return image
+        return image.clamp(min=0, max=1)
