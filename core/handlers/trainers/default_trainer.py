@@ -81,33 +81,16 @@ class DefaultTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % 10 == 0 and step % (self.config.max_episode_length // 5) == 0:
+        if epoch % (self.config.max_epochs // 10) == 0 and step == (self.config.max_episode_length // 2):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
-                state = F.interpolate(
-                    states, size=(self.visible_range * 20, self.visible_range * 20)
-                )[agent_id]
-                image = np.zeros(
-                    (self.visible_range * 20, self.visible_range * 20, 3),
-                    dtype=np.float,
-                )
-                obs = state.permute(0, 2, 1).numpy() * 255.0
-
-                # add agent information (Blue)
-                image[..., 0] += obs[0]
-                # add object information (Yellow)
-                image[..., 1] += obs[1]
-                image[..., 2] += obs[1]
-                # add invisible area information (White)
-                image[..., 0] -= obs[2]
-                image[..., 1] -= obs[2]
-                image[..., 2] -= obs[2]
+                image = self.env.observation_handler.render(states[agent_id])
 
                 wandb.log(
                     {
-                        f"observation_{str(agent_id)}": [
+                        f"agent_{str(agent_id)}/observation": [
                             wandb.Image(
-                                data_or_path=image[:, :, [2, 1, 0]],
+                                data_or_path=image,
                                 caption="local observation",
                             )
                         ]
