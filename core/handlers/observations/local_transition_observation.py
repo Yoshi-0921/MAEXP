@@ -102,7 +102,7 @@ class LocalTransitionObservation(AbstractObservation):
         return obs
 
     def render(self, state):
-        image = torch.zeros(self.observation_space)
+        image = torch.zeros((3, *self.observation_space[1:]))
         obs = state.permute(0, 2, 1)
 
         # add agent information (Blue)
