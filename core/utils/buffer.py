@@ -9,6 +9,7 @@ import collections
 from typing import Tuple
 
 import numpy as np
+import torch
 
 Experience = collections.namedtuple(
     'Experience',
@@ -44,19 +45,19 @@ class ReplayBuffer:
         global_states, global_actions, global_rewards, global_dones, global_next_states = zip(*[self.buffer[idx] for idx in indices])
 
         if self.state_conv:
-            global_states = np.array(global_states).transpose(1, 0, 2, 3, 4)
+            global_states = torch.stack(global_states).permute(1, 0, 2, 3, 4)
         else:
-            global_states = np.array(global_states).transpose(1, 0, 2)
-        global_rewards = np.array(global_rewards, dtype=np.float32).transpose(1, 0)
-        global_dones = np.array(global_dones).transpose(1, 0)
+            global_states = torch.stack(global_states).permute(1, 0, 2)
+        global_rewards = torch.tensor(global_rewards).permute(1, 0).float()
+        global_dones = torch.tensor(global_dones).permute(1, 0)
         if self.state_conv:
-            global_next_states = np.array(global_next_states).transpose(1, 0, 2, 3, 4)
+            global_next_states = torch.stack(global_next_states).permute(1, 0, 2, 3, 4)
         else:
-            global_next_states = np.array(global_next_states).transpose(1, 0, 2)
+            global_next_states = torch.stack(global_next_states).permute(1, 0, 2)
 
         if self.action_onehot:
-            global_actions = np.array(global_actions).transpose(1, 0, 2)
+            global_actions = torch.tensor(global_actions).permute(1, 0, 2)
         else:
-            global_actions = np.array(global_actions).transpose(1, 0)
+            global_actions = torch.tensor(global_actions).permute(1, 0)
 
         return global_states, global_actions, global_rewards, global_dones, global_next_states

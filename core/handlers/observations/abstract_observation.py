@@ -7,9 +7,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from abc import ABC, abstractmethod
 
+import torch
 from core.worlds import AbstractWorld
-from omegaconf import DictConfig
 from core.worlds.entity import Agent
+from omegaconf import DictConfig
 
 
 class AbstractObservation(ABC):
@@ -47,6 +48,8 @@ class AbstractObservation(ABC):
         obs_n = []
         for agent in agents:
             obs_n.append(self.observation_ind(agent))
+
+        obs_n = torch.stack(obs_n)
 
         return obs_n
 
