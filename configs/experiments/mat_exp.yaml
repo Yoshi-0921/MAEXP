@@ -1,6 +1,6 @@
 defaults:
   - model: mat # mat, mat_baseline
-  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
+  - map: four_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
@@ -18,7 +18,8 @@ num_objects: 25
 
 agent_type: 'mat' # default, mat
 brain: 'mat' # default, mat, mat_baseline
-view_method: 'local_view' # local_view, relative_view, local_transition_view
+view_method: 'local_transition_view' # local_view, relative_view, local_transition_view
+past_step: 1
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 visible_range: 7

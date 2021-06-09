@@ -7,25 +7,33 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 import torch
+from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
+from omegaconf import DictConfig
 
 from .abstract_observation import AbstractObservation
 
 
 class LocalTransitionObservation(AbstractObservation):
+    def __init__(self, config: DictConfig, world: AbstractWorld):
+        super().__init__(config=config, world=world)
+        self.past_step = config.past_step
+
     def reset(self, agents):
-        self.step()
+        self.past_global_agents = [self.world.map.agents_matrix.copy() for _ in range(self.past_step)]
         return super().reset(agents)
 
     def step(self):
-        self.past_global_agents = self.world.map.agents_matrix.copy()
+        # past_global_agents: [t-1, t-2, ..., t-n]
+        self.past_global_agents.pop()
+        self.past_global_agents.insert(0, self.world.map.agents_matrix.copy())
 
     @property
     def observation_space(self):
-        return [4, self.visible_range, self.visible_range]
+        return [3 + self.past_step, self.visible_range, self.visible_range]
 
     def observation_ind(self, agent: Agent):
-        # 0:agents, 1:agents(t-1), 2:objects, 3:walls
+        # 0:agents, 1:agents(t-1), 2:agents(t-2), ..., -2:objects, -1:walls
         obs = torch.zeros(self.observation_space)
         offset = 0
 
@@ -55,9 +63,9 @@ class LocalTransitionObservation(AbstractObservation):
         return obs
 
     def fill_obs_area(self, obs, agent, offset_x, offset_y):
-        obs[3] -= 1
+        obs[-1] -= 1
         obs[
-            3,
+            -1,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
         ] *= torch.from_numpy(self.world.map.wall_matrix[
@@ -77,20 +85,21 @@ class LocalTransitionObservation(AbstractObservation):
             self.global_y_min: (self.global_y_max + 1),
         ])
 
-        obs[
-            1,
-            self.obs_x_min: self.obs_x_max,
-            self.obs_y_min: self.obs_y_max,
-        ] += torch.from_numpy(self.past_global_agents[
-            self.global_x_min: (self.global_x_max + 1),
-            self.global_y_min: (self.global_y_max + 1),
-        ])
+        for t in range(self.past_step):
+            obs[
+                t + 1,
+                self.obs_x_min: self.obs_x_max,
+                self.obs_y_min: self.obs_y_max,
+            ] += torch.from_numpy(self.past_global_agents[t][
+                self.global_x_min: (self.global_x_max + 1),
+                self.global_y_min: (self.global_y_max + 1),
+            ])
 
         return obs
 
     def fill_obs_object(self, obs, agent, offset_x, offset_y):
         obs[
-            2,
+            -2,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
         ] += torch.from_numpy(self.world.map.objects_matrix[
@@ -106,11 +115,12 @@ class LocalTransitionObservation(AbstractObservation):
 
         # add agent information (Blue)
         image[2] += obs[0]
-        image[2] += (obs[1] * 0.5)
+        for t in range(1, self.past_step + 1):
+            image[2] += (obs[t] * (0.5 ** t))
         # add object information (Yellow)
-        image[torch.tensor([0, 1])] += obs[2]
+        image[torch.tensor([0, 1])] += obs[-2]
         # add invisible area information (White)
-        image -= obs[3]
+        image -= obs[-1]
 
         image = image.clamp(min=0, max=1)
 
