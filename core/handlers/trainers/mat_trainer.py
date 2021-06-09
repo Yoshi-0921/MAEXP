@@ -30,7 +30,7 @@ class MATTrainer(AbstractTrainer):
             )
             loss_list.append(loss.detach().cpu())
 
-        return torch.from_numpy(np.array(loss_list, dtype=np.float))
+        return torch.stack(loss_list)
 
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
@@ -38,10 +38,8 @@ class MATTrainer(AbstractTrainer):
         attention_maps = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
+        states = self.states.clone()
         for agent_id in self.order:
-            # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
-
             action, attns = self.agents[agent_id].get_action_attns(states[agent_id], epsilon)
             actions[agent_id] = action
             attention_maps[agent_id] = attns
@@ -60,7 +58,7 @@ class MATTrainer(AbstractTrainer):
         # set dataloader
         dataset = RLDataset(self.buffer, self.config.batch_size)
         self.dataloader = DataLoader(
-            dataset=dataset, batch_size=self.config.batch_size, pin_memory=True
+            dataset=dataset, batch_size=self.config.batch_size,
         )
 
         # populate buffer

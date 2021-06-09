@@ -21,7 +21,7 @@ class DQNBrain(AbstractBrain):
 
     @torch.no_grad()
     def get_action(self, state):
-        state = state.unsqueeze(0).to(self.device)
+        state = state.unsqueeze(0).float().to(self.device)
 
         q_values = self.network(state)
         _, action = torch.max(q_values, dim=1)

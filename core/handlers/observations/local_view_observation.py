@@ -5,7 +5,6 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-import numpy as np
 import torch
 from core.worlds.entity import Agent
 
@@ -19,7 +18,7 @@ class LocalViewObservaton(AbstractObservation):
 
     def observation_ind(self, agent: Agent):
         # 0:agents, 1:objects, 2:visible area
-        obs = np.zeros(self.observation_space, dtype=np.int8)
+        obs = torch.zeros(self.observation_space)
         offset = 0
 
         # input walls and invisible area

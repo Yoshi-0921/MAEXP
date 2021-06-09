@@ -6,7 +6,6 @@ This observation method supposes that agents can observe objects behind walls.
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-import numpy as np
 import torch
 from core.worlds.entity import Agent
 
@@ -27,7 +26,7 @@ class LocalTransitionObservation(AbstractObservation):
 
     def observation_ind(self, agent: Agent):
         # 0:agents, 1:agents(t-1), 2:objects, 3:walls
-        obs = np.zeros(self.observation_space, dtype=np.int8)
+        obs = torch.zeros(self.observation_space)
         offset = 0
 
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
@@ -61,10 +60,10 @@ class LocalTransitionObservation(AbstractObservation):
             3,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
-        ] *= self.world.map.wall_matrix[
+        ] *= torch.from_numpy(self.world.map.wall_matrix[
             self.global_x_min: (self.global_x_max + 1),
             self.global_y_min: (self.global_y_max + 1),
-        ]
+        ])
 
         return obs
 
@@ -73,19 +72,19 @@ class LocalTransitionObservation(AbstractObservation):
             0,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
-        ] += self.world.map.agents_matrix[
+        ] += torch.from_numpy(self.world.map.agents_matrix[
             self.global_x_min: (self.global_x_max + 1),
             self.global_y_min: (self.global_y_max + 1),
-        ]
+        ])
 
         obs[
             1,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
-        ] += self.past_global_agents[
+        ] += torch.from_numpy(self.past_global_agents[
             self.global_x_min: (self.global_x_max + 1),
             self.global_y_min: (self.global_y_max + 1),
-        ]
+        ])
 
         return obs
 
@@ -94,10 +93,10 @@ class LocalTransitionObservation(AbstractObservation):
             2,
             self.obs_x_min: self.obs_x_max,
             self.obs_y_min: self.obs_y_max,
-        ] += self.world.map.objects_matrix[
+        ] += torch.from_numpy(self.world.map.objects_matrix[
             self.global_x_min: (self.global_x_max + 1),
             self.global_y_min: (self.global_y_max + 1),
-        ]
+        ])
 
         return obs
 

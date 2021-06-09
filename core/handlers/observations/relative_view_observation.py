@@ -5,7 +5,6 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-import numpy as np
 import torch
 from core.worlds.entity import Agent
 
@@ -19,7 +18,7 @@ class RelativeViewObservaton(AbstractObservation):
 
     def observation_ind(self, agent: Agent):
         # 0: me, 1:agents, 2:landmarks, 3:visible area
-        obs = np.zeros(self.observation_space, dtype=np.int8)
+        obs = torch.zeros(self.observation_space)
         offset = 0
 
         # input walls and invisible area
@@ -36,7 +35,7 @@ class RelativeViewObservaton(AbstractObservation):
     def fill_obs_area(self, obs, agent, offset_x, offset_y):
         obs[3, :, :] -= 1
         # 自分の場所は0
-        pos_x, pos_y = self.world.map.coord2ind(position=(agent.x, agent.y))
+        pos_x, pos_y = self.world.map.coord2ind(position=agent.xy)
         obs[3, pos_x, pos_y] = 0
 
         for x in range(-1, 2):
