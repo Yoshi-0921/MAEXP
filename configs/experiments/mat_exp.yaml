@@ -18,7 +18,7 @@ num_objects: 25
 
 agent_type: 'mat' # default, mat
 brain: 'mat' # default, mat, mat_baseline
-view_method: 'local_transition_view' # local_view, relative_view, local_transition_view
+view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view
 past_step: 1
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
