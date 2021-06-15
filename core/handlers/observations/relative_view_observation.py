@@ -14,25 +14,25 @@ from .abstract_observation import AbstractObservation
 class RelativeViewObservaton(AbstractObservation):
     @property
     def observation_space(self):
+        # 0: me, 1:agents, 2:landmarks, 3:visible area
         return [4, self.world.map.SIZE_X, self.world.map.SIZE_Y]
 
-    def observation_ind(self, agent: Agent):
-        # 0: me, 1:agents, 2:landmarks, 3:visible area
+    def observation_ind(self, agent: Agent, agent_id: int):
         obs = torch.zeros(self.observation_space)
         offset = 0
 
         # input walls and invisible area
-        obs = self.fill_obs_area(obs, agent, offset, offset)
+        obs = self.fill_obs_area(obs, agent, agent_id, offset, offset)
 
         # input objects within sight
-        obs = self.fill_obs_object(obs, agent, offset, offset)
+        obs = self.fill_obs_object(obs, agent, agent_id, offset, offset)
 
         # input agents within sight
-        obs = self.fill_obs_agent(obs, agent, offset, offset)
+        obs = self.fill_obs_agent(obs, agent, agent_id, offset, offset)
 
         return obs
 
-    def fill_obs_area(self, obs, agent, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
         obs[3, :, :] -= 1
         # 自分の場所は0
         pos_x, pos_y = self.world.map.coord2ind(position=agent.xy)
@@ -200,7 +200,7 @@ class RelativeViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
         pos_x, pos_y = self.world.map.coord2ind(position=(agent.x, agent.y))
         obs[0, pos_x, pos_y] = 1
         for a in self.world.agents:
@@ -215,7 +215,7 @@ class RelativeViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
         for obj in self.world.objects:
             diff_x, diff_y = obj.xy - agent.xy
             if abs(diff_x) > 3 or abs(diff_y) > 3:

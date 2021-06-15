@@ -14,25 +14,25 @@ from .abstract_observation import AbstractObservation
 class LocalViewObservaton(AbstractObservation):
     @property
     def observation_space(self):
+        # 0:agents, 1:objects, 2:visible area
         return [3, self.visible_range, self.visible_range]
 
-    def observation_ind(self, agent: Agent):
-        # 0:agents, 1:objects, 2:visible area
+    def observation_ind(self, agent: Agent, agent_id: int):
         obs = torch.zeros(self.observation_space)
         offset = 0
 
         # input walls and invisible area
-        obs = self.fill_obs_area(obs, agent, offset, offset)
+        obs = self.fill_obs_area(obs, agent, agent_id, offset, offset)
 
         # input objects within sight
-        obs = self.fill_obs_object(obs, agent, offset, offset)
+        obs = self.fill_obs_object(obs, agent, agent_id, offset, offset)
 
         # input agents within sight
-        obs = self.fill_obs_agent(obs, agent, offset, offset)
+        obs = self.fill_obs_agent(obs, agent, agent_id, offset, offset)
 
         return obs
 
-    def fill_obs_area(self, obs, agent, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
         obs[2, :, :] -= 1
         # 自分の場所は0
         obs[
@@ -218,7 +218,7 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
         obs[0, self.visible_range // 2, self.visible_range // 2] = 1
         for a in self.world.agents:
             diff_x, diff_y = a.xy - agent.xy
@@ -236,7 +236,7 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
         for obj in self.world.objects:
             diff_x, diff_y = obj.xy - agent.xy
             if abs(diff_x) > 3 or abs(diff_y) > 3:

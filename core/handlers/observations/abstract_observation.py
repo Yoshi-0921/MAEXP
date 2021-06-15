@@ -25,7 +25,7 @@ class AbstractObservation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def observation_ind(self, agent: Agent):
+    def observation_ind(self, agent: Agent, agent_id: int):
         raise NotImplementedError()
 
     @abstractmethod
@@ -46,12 +46,12 @@ class AbstractObservation(ABC):
 
     def reset(self, agents):
         obs_n = []
-        for agent in agents:
-            obs_n.append(self.observation_ind(agent))
+        for agent_id, agent in enumerate(agents):
+            obs_n.append(self.observation_ind(agent, agent_id))
 
         obs_n = torch.stack(obs_n)
 
         return obs_n
 
-    def step(self):
+    def step(self, agents):
         pass
