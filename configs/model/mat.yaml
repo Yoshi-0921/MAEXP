@@ -1,6 +1,6 @@
 model:
   name: 'mat'
-  attention: 'hard'
+  attention: 'normal' # 'normal', 'hard'
   af_lambd: 0.02
   embed_dim: 64
   patch_size: 1
