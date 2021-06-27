@@ -142,10 +142,13 @@ class AbstractTrainer(ABC):
                 log_freq=self.config.max_episode_length * (self.config.max_epochs // 5),
                 idx=agent_id,
             )
-            torch.onnx.export(
-                agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-            )
-            model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
+            try:
+                torch.onnx.export(
+                    agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                )
+                model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
+            except RuntimeError:
+                pass
 
         wandb.log({"tables/Network description": network_table}, step=0)
         wandb.log_artifact(model_artifact)
