@@ -12,14 +12,17 @@ from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
 from .abstract_observation_noise import AbstractObservationNoise
-from .non_observation_noise import NonObservationNoise
 from .dist_observation_noise import DistObservatonNoise
+from .flat_observation_noise import FlatObservatonNoise
+from .non_observation_noise import NonObservationNoise
+
 logger = initialize_logging(__name__)
 
 __all__ = [
     "AbstractObservationNoise",
     "NonObservationNoise",
-    "DistObservatonNoise"
+    "DistObservatonNoise",
+    "FlatObservatonNoise"
 ]
 
 
@@ -29,6 +32,9 @@ def generate_observation_noise(config: DictConfig, world: AbstractWorld, observa
 
     elif config.observation_noise == "sensing_dist":
         noise = DistObservatonNoise(config=config, world=world, observation_space=observation_space)
+    
+    elif config.observation_noise == 'flat':
+        noise = FlatObservatonNoise(config=config, world=world, observation_space=observation_space)
 
     else:
         logger.warn(
