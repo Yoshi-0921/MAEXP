@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+
+"""Builds observation noise handler.
+
+Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
+"""
+
+from typing import List
+
+from core.utils.logging import initialize_logging
+from core.worlds.abstract_world import AbstractWorld
+from omegaconf import DictConfig
+
+from .abstract_observation_noise import AbstractObservationNoise
+from .non_observation_noise import NonObservationNoise
+from .dist_observation_noise import DistObservatonNoise
+logger = initialize_logging(__name__)
+
+__all__ = [
+    "AbstractObservationNoise",
+    "NonObservationNoise",
+    "DistObservatonNoise"
+]
+
+
+def generate_observation_noise(config: DictConfig, world: AbstractWorld, observation_space: List[int]) -> AbstractObservationNoise:
+    if not config.observation_noise:
+        return NonObservationNoise(config=config, world=world, observation_space=observation_space)
+
+    elif config.observation_noise == "sensing_dist":
+        noise = DistObservatonNoise(config=config, world=world, observation_space=observation_space)
+
+    else:
+        logger.warn(
+            f"Unexpected view_method is given. config.view_method: {config.view_method}"
+        )
+
+        raise ValueError()
+
+    return noise

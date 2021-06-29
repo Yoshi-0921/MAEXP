@@ -12,12 +12,15 @@ from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
+from .noise import generate_observation_noise
+
 
 class AbstractObservation(ABC):
     def __init__(self, config: DictConfig, world: AbstractWorld):
         self.config = config
         self.world = world
         self.visible_range = config.visible_range
+        self.observation_noise = generate_observation_noise(config=config, world=world, observation_space=self.observation_space)
 
     @property
     @abstractmethod
@@ -29,22 +32,26 @@ class AbstractObservation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_area(self, obs, agent, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_agent(self, obs, agent, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_object(self, obs, agent, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y):
         raise NotImplementedError()
 
     @abstractmethod
     def render(self, state):
         raise NotImplementedError()
 
-    def reset(self, agents):
+    def reset(self, agents) -> torch.Tensor:
         obs_n = []
         for agent_id, agent in enumerate(agents):
             obs_n.append(self.observation_ind(agent, agent_id))

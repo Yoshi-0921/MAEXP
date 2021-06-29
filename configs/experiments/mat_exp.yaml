@@ -19,6 +19,7 @@ num_objects: 25
 agent_type: 'mat' # default, mat
 brain: 'mat' # default, mat, mat_baseline
 view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view
+observation_noise: False # False, sensing_dist
 past_step: 1
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
@@ -42,4 +43,4 @@ epsilon_end: 0.05
 # configre validate
 
 validate_epochs: 1000
-pretrained_weight_path: None
+pretrained_weight_path: False
