@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Source code for MAT.
+"""Source code for multi-agent transfromer (MAT) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
