@@ -2,6 +2,7 @@
 
 """Source code for observation noise that varies depending on distance from center.
 Furthrer distance, more likely to add noise in the observation.
+Noise is added to each channel.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -24,7 +25,7 @@ class DistObservatonNoise(AbstractObservationNoise):
         noise = torch.zeros(self.observation_space)
         _, x, y = self.observation_space
         for i in range(min(x, y) // 2):
-            noise[:, i:x, i:y] = torch.empty(((x - i), (y - i))).normal_(mean=0, std=0.01 * min(x, y))
+            noise[:, i:x, i:y] = torch.empty((3, (x - i), (y - i))).normal_(mean=0, std=0.01 * min(x, y))
             x -= 1
             y -= 1
 
