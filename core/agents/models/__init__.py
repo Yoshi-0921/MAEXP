@@ -5,13 +5,16 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from typing import List
+
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
-from typing import List
+
 from .customs.conv_mlp import ConvMLP
-from .mlp import MLP
+from .customs.mast import MAST
 from .customs.mat import MAT
+from .mlp import MLP
 
 logger = initialize_logging(__name__)
 
@@ -24,7 +27,10 @@ def generate_network(config: DictConfig, obs_shape: List[int], act_size: int) ->
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == 'mat':
-        network = MAT(config=config, input_shape=obs_shape, output_size=act_size)
+        network = MAST(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == 'mast':
+        network = MAST(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.network: {config.network}")
