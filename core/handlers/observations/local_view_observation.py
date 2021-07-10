@@ -258,9 +258,7 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        obs += self.observation_noise.get_noise(agent, agent_id, offset_x, offset_y)
-
-        return obs
+        return self.observation_noise.add_noise(obs, agent, agent_id, offset_x, offset_y)
 
     def render(self, state) -> torch.Tensor:
         image = torch.zeros(self.observation_space)
