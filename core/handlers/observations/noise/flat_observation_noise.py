@@ -20,8 +20,10 @@ class FlatObservatonNoise(AbstractObservationNoise):
     def __init__(self, config: DictConfig, world: AbstractWorld, observation_space: List[int]):
         super().__init__(config=config, world=world, observation_space=observation_space)
 
-    def get_noise(self, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
         _, x, y = self.observation_space
         noise = torch.empty((3, x, y)).normal_(mean=0, std=0.03)
 
-        return noise
+        obs += noise
+
+        return obs

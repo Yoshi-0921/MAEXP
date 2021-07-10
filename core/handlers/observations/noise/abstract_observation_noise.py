@@ -20,5 +20,5 @@ class AbstractObservationNoise(ABC):
         self.probability_distribution = None
 
     @abstractmethod
-    def get_noise(self, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
         raise NotImplementedError()

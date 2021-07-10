@@ -37,7 +37,7 @@ class ThresholdDistObservationNoise(DistObservatonNoise):
         super().__init__(config=config, world=world, observation_space=observation_space)
         self.threshold_ratio = config.noise_threshold_ratio
 
-    def get_noise(self, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
         noise = torch.zeros(self.observation_space)
         _, x, y = self.observation_space
         for i in range(min(x, y) // 2):
@@ -53,4 +53,6 @@ class ThresholdDistObservationNoise(DistObservatonNoise):
             x -= 1
             y -= 1
 
-        return noise
+        obs += noise
+
+        return obs
