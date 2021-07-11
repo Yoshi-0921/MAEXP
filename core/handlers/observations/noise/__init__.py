@@ -16,6 +16,7 @@ from .dist_observation_noise import (DistObservatonNoise,
                                      ThresholdDistObservationNoise)
 from .flat_observation_noise import FlatObservatonNoise
 from .non_observation_noise import NonObservationNoise
+from .flip_observation_noise import FlipObservatonNoise
 
 logger = initialize_logging(__name__)
 
@@ -24,7 +25,8 @@ __all__ = [
     "NonObservationNoise",
     "DistObservatonNoise",
     "FlatObservatonNoise",
-    "ThresholdDistObservationNoise"
+    "ThresholdDistObservationNoise",
+    "FlipObservatonNoise"
 ]
 
 
@@ -37,6 +39,9 @@ def generate_observation_noise(config: DictConfig, world: AbstractWorld, observa
 
     elif config.observation_noise == "threshold_sensing_dist":
         noise = ThresholdDistObservationNoise(config=config, world=world, observation_space=observation_space)
+
+    elif config.observation_noise == "flip":
+        noise = FlipObservatonNoise(config=config, world=world, observation_space=observation_space)
 
     elif config.observation_noise == 'flat':
         noise = FlatObservatonNoise(config=config, world=world, observation_space=observation_space)
