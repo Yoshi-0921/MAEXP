@@ -13,6 +13,7 @@ from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
 from .noises import generate_observation_noise
+from .masks import generate_observation_mask
 
 
 class AbstractObservation(ABC):
