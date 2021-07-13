@@ -12,7 +12,7 @@ from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
-from .noise import generate_observation_noise
+from .noises import generate_observation_noise
 
 
 class AbstractObservation(ABC):
@@ -20,7 +20,10 @@ class AbstractObservation(ABC):
         self.config = config
         self.world = world
         self.visible_range = config.visible_range
-        self.observation_noise = generate_observation_noise(config=config, world=world, observation_space=self.observation_space)
+        self.observation_noise = generate_observation_noise(
+            config=config, world=world, observation_space=self.observation_space
+        )
+        self.observation_mask = generate_observation_mask(config=config, world=world)
 
     @property
     @abstractmethod
