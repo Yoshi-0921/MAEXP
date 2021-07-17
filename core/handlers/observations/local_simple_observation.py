@@ -82,12 +82,12 @@ class LocalSimpleObservation(AbstractObservation):
     def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
         obs[
             1,
-            self.obs_x_min : self.obs_x_max,
-            self.obs_y_min : self.obs_y_max,
+            self.obs_x_min: self.obs_x_max,
+            self.obs_y_min: self.obs_y_max,
         ] += torch.from_numpy(
             self.world.map.objects_matrix[
-                self.global_x_min : (self.global_x_max + 1),
-                self.global_y_min : (self.global_y_max + 1),
+                self.global_x_min: (self.global_x_max + 1),
+                self.global_y_min: (self.global_y_max + 1),
             ]
         )
 
