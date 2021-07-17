@@ -27,7 +27,7 @@ std_distribution: [0.07, 0.05, 0.03]
 past_step: 1
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
-visible_range: 9 # currently only 5, 7, 9 are suppoeted
+visible_range: 7 # currently only 5, 7, 9 are suppoeted
 phase: 'training' # training, evaluation
 # ==================================================
 # configure training
