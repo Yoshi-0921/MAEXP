@@ -21,6 +21,7 @@ class AbstractObservation(ABC):
         self.config = config
         self.world = world
         self.visible_range = config.visible_range
+        self.visible_radius = config.visible_range // 2
         self.observation_noise = generate_observation_noise(
             config=config, world=world, observation_space=self.observation_space
         )
