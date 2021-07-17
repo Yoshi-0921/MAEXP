@@ -51,14 +51,14 @@ class LocalTransitionObservation(LocalViewObservaton):
 
         return global_agents
 
-    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id):
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
         obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
-        obs = super().fill_obs_agent(obs, agent, agent_id, offset_x, offset_y)
+    def fill_obs_agent(self, obs, agent, agent_id):
+        obs = super().fill_obs_agent(obs, agent, agent_id)
 
         for t in range(self.past_step):
             obs[
@@ -74,7 +74,7 @@ class LocalTransitionObservation(LocalViewObservaton):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id):
         obs[
             -2,
             self.obs_x_min: self.obs_x_max,

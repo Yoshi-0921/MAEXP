@@ -24,7 +24,7 @@ class FlatObservatonNoise(AbstractObservationNoise):
             config=config, world=world, observation_space=observation_space
         )
 
-    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id):
         _, x, y = self.observation_space
         noise = torch.empty((3, x, y)).normal_(mean=0, std=0.03)
 

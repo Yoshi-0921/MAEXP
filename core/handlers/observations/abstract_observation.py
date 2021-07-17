@@ -39,19 +39,19 @@ class AbstractObservation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_noise(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod

@@ -26,7 +26,7 @@ class FlipObservatonNoise(AbstractObservationNoise):
         self.flip_noise_probabilities = config.flip_noise_probabilities
         self.noise_range = 0.5 / (torch.tensor(self.flip_noise_probabilities) - 1)
 
-    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id):
         noised_obs = torch.zeros(self.observation_space)
         _, x, y = self.observation_space
         obs[2, ...] += 1

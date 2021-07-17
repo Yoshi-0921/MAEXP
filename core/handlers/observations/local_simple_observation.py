@@ -35,22 +35,21 @@ class LocalSimpleObservation(AbstractObservation):
 
     def observation_ind(self, agent: Agent, agent_id: int):
         obs = torch.zeros(self.observation_space)
-        offset = 0
 
         self.get_mask_coordinates(agent)
 
         # input walls
-        obs = self.fill_obs_area(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_area(obs, agent, agent_id)
 
         # input objects within sight
-        obs = self.fill_obs_object(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_object(obs, agent, agent_id)
 
         # input agents within sight
-        obs = self.fill_obs_agent(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_agent(obs, agent, agent_id)
 
         return obs
 
-    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id):
         obs[2] -= 1
         obs[
             2,
@@ -65,7 +64,7 @@ class LocalSimpleObservation(AbstractObservation):
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id):
         obs[
             0,
             self.obs_x_min: self.obs_x_max,
@@ -79,7 +78,7 @@ class LocalSimpleObservation(AbstractObservation):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id):
         obs[
             1,
             self.obs_x_min: self.obs_x_max,

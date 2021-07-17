@@ -36,31 +36,30 @@ class LocalViewObservaton(AbstractObservation):
 
     def observation_ind(self, agent: Agent, agent_id: int) -> torch.Tensor:
         obs = torch.zeros(self.observation_space)
-        offset = 0
 
         self.get_mask_coordinates(agent)
 
         # input walls and invisible area
-        obs = self.fill_obs_area(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_area(obs, agent, agent_id)
 
         # input objects within sight
-        obs = self.fill_obs_object(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_object(obs, agent, agent_id)
 
         # input agents within sight
-        obs = self.fill_obs_agent(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_agent(obs, agent, agent_id)
 
         # add observation noise
-        obs = self.fill_obs_noise(obs, agent, agent_id, offset, offset)
+        obs = self.fill_obs_noise(obs, agent, agent_id)
 
         return obs
 
-    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+    def fill_obs_area(self, obs, agent, agent_id) -> torch.Tensor:
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
         obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+    def fill_obs_agent(self, obs, agent, agent_id) -> torch.Tensor:
         obs[
             0,
             self.obs_x_min: self.obs_x_max,
@@ -82,7 +81,7 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+    def fill_obs_object(self, obs, agent, agent_id) -> torch.Tensor:
         obs[
             1,
             self.obs_x_min: self.obs_x_max,
@@ -104,9 +103,9 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+    def fill_obs_noise(self, obs, agent, agent_id) -> torch.Tensor:
         return self.observation_noise.add_noise(
-            obs, agent, agent_id, offset_x, offset_y
+            obs, agent, agent_id
         )
 
     def render(self, state) -> torch.Tensor:
