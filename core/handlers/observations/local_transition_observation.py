@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """Source code for observation handler using the local transition view method.
-This observation method supposes that agents can observe objects behind walls.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -11,15 +10,25 @@ import torch
 from core.worlds import AbstractWorld
 from omegaconf import DictConfig
 
-from .local_simple_observation import LocalSimpleObservation
+from .local_view_observation import LocalViewObservaton
 
 
-class LocalTransitionObservation(LocalSimpleObservation):
+class LocalTransitionObservation(LocalViewObservaton):
     def __init__(self, config: DictConfig, world: AbstractWorld):
-        super().__init__(config=config, world=world)
         self.num_agents = config.num_agents
         self.past_step = config.past_step
-        assert 0 < self.config.past_step
+        assert 0 < self.past_step
+        super().__init__(config=config, world=world)
+
+    @property
+    def observation_space(self):
+        # 0:agents, 1:agents(t-1), 2:agents(t-2), ..., -2:objects, -1:walls
+        return [3 + self.past_step, self.visible_range, self.visible_range]
+
+    def step(self, agents):
+        # past_global_agents: [[t-1], [t-2], ..., [t-n]]
+        self.past_global_agents.pop()
+        self.past_global_agents.insert(0, self.get_past_global_agents(agents))
 
     def reset(self, agents):
         self.past_global_agents = [
@@ -42,28 +51,9 @@ class LocalTransitionObservation(LocalSimpleObservation):
 
         return global_agents
 
-    def step(self, agents):
-        # past_global_agents: [[t-1], [t-2], ..., [t-n]]
-        self.past_global_agents.pop()
-        self.past_global_agents.insert(0, self.get_past_global_agents(agents))
-
-    @property
-    def observation_space(self):
-        # 0:agents, 1:agents(t-1), 2:agents(t-2), ..., -2:objects, -1:walls
-        return [3 + self.past_step, self.visible_range, self.visible_range]
-
     def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
-        obs[-1] -= 1
-        obs[
-            -1,
-            self.obs_x_min: self.obs_x_max,
-            self.obs_y_min: self.obs_y_max,
-        ] *= torch.from_numpy(
-            self.world.map.wall_matrix[
-                self.global_x_min: (self.global_x_max + 1),
-                self.global_y_min: (self.global_y_max + 1),
-            ]
-        )
+        pos_x, pos_y = self.world.map.coord2ind(agent.xy)
+        obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
 
         return obs
 
@@ -88,12 +78,20 @@ class LocalTransitionObservation(LocalSimpleObservation):
         obs[
             -2,
             self.obs_x_min: self.obs_x_max,
-            self.obs_y_min: self.obs_y_max,
-        ] += torch.from_numpy(
-            self.world.map.objects_matrix[
-                self.global_x_min: (self.global_x_max + 1),
-                self.global_y_min: (self.global_y_max + 1),
-            ]
+            self.obs_y_min: self.obs_y_max
+        ] = torch.from_numpy(
+            np.where(
+                obs[
+                    2,
+                    self.obs_x_min: self.obs_x_max,
+                    self.obs_y_min: self.obs_y_max
+                ] != -1,
+                self.world.map.objects_matrix[
+                    self.global_x_min: (self.global_x_max + 1),
+                    self.global_y_min: (self.global_y_max + 1),
+                ],
+                0
+            )
         )
 
         return obs
