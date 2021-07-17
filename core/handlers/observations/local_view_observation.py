@@ -37,203 +37,18 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        pos_x, pos_y = self.world.map.coord2ind((agent.x, agent.y))
+        pos_x, pos_y = self.world.map.coord2ind(agent.xy)
         obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
-        return obs
-
-        obs[2, :, :] -= 1
-        # 自分の場所は0
-        obs[
-            2, offset_x + self.visible_range // 2, offset_y + self.visible_range // 2
-        ] = 0
-
-        for x in range(-1, 2):
-            for y in [-1, 1]:
-                for opr in [-1, 1]:
-                    for j in range(3):
-                        pos_x, pos_y = x + j * opr, y + j * y
-                        local_pos_x, local_pos_y = self.world.map.coord2ind(
-                            (pos_x, pos_y), self.visible_range, self.visible_range
-                        )
-                        pos_x, pos_y = self.world.map.coord2ind(
-                            (
-                                pos_x + agent.x,
-                                pos_y + agent.y,
-                            )
-                        )
-                        # 場外なら-1
-                        if (
-                            pos_x < 0
-                            or self.world.map.SIZE_X <= pos_x
-                            or pos_y < 0
-                            or self.world.map.SIZE_Y <= pos_y
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # セルが真ん中で壁のない角の方向なら続ける
-                        if (
-                            j == 0
-                            and x == 0
-                            and self.world.map.wall_matrix[pos_x + opr, pos_y] == 0
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
-                            continue
-                        # 壁なら-1
-                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # セルが角で真ん中に壁があるならbreak
-                        if (
-                            j == 0
-                            and x != 0
-                            and self.world.map.wall_matrix[pos_x - x, pos_y] == 1
-                            and opr != x
-                        ):
-                            break
-                        # 何もないなら0
-                        else:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
-
-        for y in range(-1, 2):
-            for x in [-1, 1]:
-                for opr in range(-1, 2):
-                    for j in range(3):
-                        pos_x, pos_y = x + j * x, y + j * opr
-                        local_pos_x, local_pos_y = self.world.map.coord2ind(
-                            (pos_x, pos_y), self.visible_range, self.visible_range
-                        )
-                        pos_x, pos_y = self.world.map.coord2ind(
-                            (
-                                pos_x + agent.x,
-                                pos_y + agent.y,
-                            )
-                        )
-                        # 場外なら-1
-                        if (
-                            pos_x < 0
-                            or self.world.map.SIZE_X <= pos_x
-                            or pos_y < 0
-                            or self.world.map.SIZE_Y <= pos_y
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # セルが真ん中で壁のない角の方向なら続ける
-                        if (
-                            j == 0
-                            and y == 0
-                            and self.world.map.wall_matrix[pos_x, pos_y - opr] == 0
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
-                            continue
-                        # 壁なら-1
-                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # セルが角で真ん中に壁があるならbreak
-                        if (
-                            j == 0
-                            and y != 0
-                            and self.world.map.wall_matrix[pos_x, pos_y + y] == 1
-                            and opr != y
-                        ):
-                            break
-                        # 何もないなら0
-                        else:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
-
-        for opr_x in [-1, 1]:
-            for x in range(self.visible_range // 2 + 1):
-                # 壁ならbreak
-                pos_x, pos_y = (
-                    agent.x + (x * opr_x),
-                    agent.y,
-                )
-                pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                local_pos_x, local_pos_y = self.world.map.coord2ind(
-                    ((x * opr_x), 0), self.visible_range, self.visible_range
-                )
-                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                    obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                    break
-                for opr_y in [-1, 1]:
-                    for y in range(2):
-                        pos_x, pos_y = (
-                            agent.x + (x * opr_x),
-                            agent.y + (y * opr_y),
-                        )
-                        pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                        local_pos_x, local_pos_y = self.world.map.coord2ind(
-                            ((x * opr_x), (y * opr_y)),
-                            self.visible_range,
-                            self.visible_range,
-                        )
-                        # 場外なら-1
-                        if (
-                            pos_x < 0
-                            or self.world.map.SIZE_X <= pos_x
-                            or pos_y < 0
-                            or self.world.map.SIZE_Y <= pos_y
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            continue
-                        # 壁なら-1
-                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # 何もないなら0
-                        else:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
-
-        for opr_y in [-1, 1]:
-            for y in range(self.visible_range // 2 + 1):
-                # 壁ならbreak
-                pos_x, pos_y = agent.x, agent.y + (y * opr_y)
-                pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                local_pos_x, local_pos_y = self.world.map.coord2ind(
-                    (0, (y * opr_y)), self.visible_range, self.visible_range
-                )
-                if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                    obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                    break
-                for opr_x in [-1, 1]:
-                    for x in range(2):
-                        pos_x, pos_y = (
-                            agent.x + (x * opr_x),
-                            agent.y + (y * opr_y),
-                        )
-                        pos_x, pos_y = self.world.map.coord2ind((pos_x, pos_y))
-                        local_pos_x, local_pos_y = self.world.map.coord2ind(
-                            ((x * opr_x), (y * opr_y)),
-                            self.visible_range,
-                            self.visible_range,
-                        )
-                        # 場外なら-1
-                        if (
-                            pos_x < 0
-                            or self.world.map.SIZE_X <= pos_x
-                            or pos_y < 0
-                            or self.world.map.SIZE_Y <= pos_y
-                        ):
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            continue
-                        # 壁なら-1
-                        if self.world.map.wall_matrix[pos_x, pos_y] == 1:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = -1
-                            break
-                        # 何もないなら0
-                        else:
-                            obs[2, offset_x + local_pos_x, offset_y + local_pos_y] = 0
 
         return obs
 
     def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        visible_radius = self.visible_range // 2
-        obs[0, visible_radius, visible_radius] = 1
+        obs[0, self.visible_radius, self.visible_radius] = 1
         for a in self.world.agents:
             diff_x, diff_y = a.xy - agent.xy
             if (
-                abs(diff_x) > visible_radius
-                or abs(diff_y) > visible_radius
+                abs(diff_x) > self.visible_radius
+                or abs(diff_y) > self.visible_radius
                 or (diff_x == 0 and diff_y == 0)
             ):
                 continue
@@ -250,10 +65,9 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        visible_radius = self.visible_range // 2
         for obj in self.world.objects:
             diff_x, diff_y = obj.xy - agent.xy
-            if abs(diff_x) > visible_radius or abs(diff_y) > visible_radius:
+            if abs(diff_x) > self.visible_radius or abs(diff_y) > self.visible_radius:
                 continue
 
             pos_x, pos_y = self.world.map.coord2ind(
