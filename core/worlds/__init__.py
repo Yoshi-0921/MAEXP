@@ -16,7 +16,7 @@ logger = initialize_logging(__name__)
 
 
 def generate_world(config: DictConfig, world_map: AbstractMap) -> AbstractWorld:
-    if config.world == 'default':
+    if config.world == "default":
         world = DefaultWorld(config=config, world_map=world_map)
 
         return world

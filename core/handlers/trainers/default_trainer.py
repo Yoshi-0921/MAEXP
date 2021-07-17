@@ -81,7 +81,9 @@ class DefaultTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (self.config.max_episode_length // 2):
+        if epoch % (self.config.max_epochs // 10) == 0 and step == (
+            self.config.max_episode_length // 2
+        ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
                 image = self.env.observation_handler.render(states[agent_id])

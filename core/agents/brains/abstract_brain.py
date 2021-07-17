@@ -21,9 +21,13 @@ logger = initialize_logging(__name__)
 class AbstractBrain(ABC):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         self.config = config
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size).to(self.device)
-        self.target_network = generate_network(config=config, obs_shape=obs_shape, act_size=act_size).to(self.device)
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.network = generate_network(
+            config=config, obs_shape=obs_shape, act_size=act_size
+        ).to(self.device)
+        self.target_network = generate_network(
+            config=config, obs_shape=obs_shape, act_size=act_size
+        ).to(self.device)
         hard_update(self.target_network, self.network)
         self.criterion = generate_criterion(config)
         self.optimizer = generate_optimizer(config, self.network)

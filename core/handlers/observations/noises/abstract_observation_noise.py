@@ -13,12 +13,14 @@ from omegaconf import DictConfig
 
 
 class AbstractObservationNoise(ABC):
-    def __init__(self, config: DictConfig, world: AbstractWorld, observation_space: List[int]):
+    def __init__(
+        self, config: DictConfig, world: AbstractWorld, observation_space: List[int]
+    ):
         self.config = config
         self.world = world
         self.observation_space = observation_space
         self.probability_distribution = None
 
     @abstractmethod
-    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id):
         raise NotImplementedError()

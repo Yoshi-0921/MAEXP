@@ -12,7 +12,8 @@ from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
-from .noise import generate_observation_noise
+from .noises import generate_observation_noise
+from .masks import generate_observation_area_mask
 
 
 class AbstractObservation(ABC):
@@ -20,7 +21,13 @@ class AbstractObservation(ABC):
         self.config = config
         self.world = world
         self.visible_range = config.visible_range
-        self.observation_noise = generate_observation_noise(config=config, world=world, observation_space=self.observation_space)
+        self.visible_radius = config.visible_range // 2
+        self.observation_noise = generate_observation_noise(
+            config=config, world=world, observation_space=self.observation_space
+        )
+        self.observation_area_mask = generate_observation_area_mask(
+            config=config, world=world
+        )
 
     @property
     @abstractmethod
@@ -32,19 +39,19 @@ class AbstractObservation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_area(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_agent(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_object(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod
-    def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def fill_obs_noise(self, obs, agent, agent_id):
         raise NotImplementedError()
 
     @abstractmethod

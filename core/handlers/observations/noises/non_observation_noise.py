@@ -10,5 +10,5 @@ from .abstract_observation_noise import AbstractObservationNoise
 
 
 class NonObservationNoise(AbstractObservationNoise):
-    def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
+    def add_noise(self, obs, agent, agent_id):
         return obs

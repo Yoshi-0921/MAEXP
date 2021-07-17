@@ -34,14 +34,14 @@ class MAT(nn.Module):
             torch.zeros(1, patched_size_x * patched_size_y + 1, config.model.embed_dim)
         )
 
-        block = HardShrinkBlock if config.model.attention == 'hard' else Block
+        block = HardShrinkBlock if config.model.attention == "hard" else Block
         self.blocks = nn.ModuleList(
             [
                 block(
                     dim=config.model.embed_dim,
                     num_heads=config.model.num_heads,
                     mlp_ratio=config.model.mlp_ratio,
-                    **{'af_lambd': config.model.af_lambd}
+                    **{"af_lambd": config.model.af_lambd}
                 )
                 for _ in range(config.model.block_loop)
             ]
