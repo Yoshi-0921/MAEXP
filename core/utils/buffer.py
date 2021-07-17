@@ -12,8 +12,7 @@ import numpy as np
 import torch
 
 Experience = collections.namedtuple(
-    'Experience',
-    field_names=['state', 'action', 'reward', 'done', 'new_state']
+    "Experience", field_names=["state", "action", "reward", "done", "new_state"]
 )
 
 
@@ -42,7 +41,13 @@ class ReplayBuffer:
 
     def sample(self, batch_size: int) -> Tuple:
         indices = np.random.choice(len(self.buffer), batch_size, replace=False)
-        global_states, global_actions, global_rewards, global_dones, global_next_states = zip(*[self.buffer[idx] for idx in indices])
+        (
+            global_states,
+            global_actions,
+            global_rewards,
+            global_dones,
+            global_next_states,
+        ) = zip(*[self.buffer[idx] for idx in indices])
 
         if self.state_conv:
             global_states = torch.stack(global_states).permute(1, 0, 2, 3, 4)
@@ -60,4 +65,10 @@ class ReplayBuffer:
         else:
             global_actions = torch.tensor(global_actions).permute(1, 0)
 
-        return global_states, global_actions, global_rewards, global_dones, global_next_states
+        return (
+            global_states,
+            global_actions,
+            global_rewards,
+            global_dones,
+            global_next_states,
+        )

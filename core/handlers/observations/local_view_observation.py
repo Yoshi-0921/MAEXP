@@ -37,6 +37,10 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_area(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+        pos_x, pos_y = self.world.map.coord2ind((agent.x, agent.y))
+        obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
+        return obs
+
         obs[2, :, :] -= 1
         # 自分の場所は0
         obs[
@@ -223,10 +227,15 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_agent(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        obs[0, self.visible_range // 2, self.visible_range // 2] = 1
+        visible_radius = self.visible_range // 2
+        obs[0, visible_radius, visible_radius] = 1
         for a in self.world.agents:
             diff_x, diff_y = a.xy - agent.xy
-            if abs(diff_x) > 3 or abs(diff_y) > 3 or (diff_x == 0 and diff_y == 0):
+            if (
+                abs(diff_x) > visible_radius
+                or abs(diff_y) > visible_radius
+                or (diff_x == 0 and diff_y == 0)
+            ):
                 continue
 
             pos_x, pos_y = self.world.map.coord2ind(
@@ -241,9 +250,10 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
+        visible_radius = self.visible_range // 2
         for obj in self.world.objects:
             diff_x, diff_y = obj.xy - agent.xy
-            if abs(diff_x) > 3 or abs(diff_y) > 3:
+            if abs(diff_x) > visible_radius or abs(diff_y) > visible_radius:
                 continue
 
             pos_x, pos_y = self.world.map.coord2ind(
@@ -258,7 +268,9 @@ class LocalViewObservaton(AbstractObservation):
         return obs
 
     def fill_obs_noise(self, obs, agent, agent_id, offset_x, offset_y) -> torch.Tensor:
-        return self.observation_noise.add_noise(obs, agent, agent_id, offset_x, offset_y)
+        return self.observation_noise.add_noise(
+            obs, agent, agent_id, offset_x, offset_y
+        )
 
     def render(self, state) -> torch.Tensor:
         image = torch.zeros(self.observation_space)

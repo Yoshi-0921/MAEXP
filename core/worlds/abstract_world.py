@@ -86,15 +86,15 @@ class AbstractWorld(ABC):
             for x, x_value in enumerate(ys):
                 cx, cy = self.map.ind2coord((x, y))
                 if x_value == 1:
-                    render_row.append('#')
+                    render_row.append("#")
                 elif cx == cy == 0:
-                    render_row.append('+')
+                    render_row.append("+")
                 elif cy == 0:
-                    render_row.append('-')
+                    render_row.append("-")
                 elif cx == 0:
-                    render_row.append('|')
+                    render_row.append("|")
                 else:
-                    render_row.append(' ')
+                    render_row.append(" ")
             render_list.append(render_row)
 
         for agent_id, agent in enumerate(self.agents):

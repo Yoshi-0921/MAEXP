@@ -40,7 +40,9 @@ class MATTrainer(AbstractTrainer):
 
         states = self.states.clone()
         for agent_id in self.order:
-            action, attns = self.agents[agent_id].get_action_attns(states[agent_id], epsilon)
+            action, attns = self.agents[agent_id].get_action_attns(
+                states[agent_id], epsilon
+            )
             actions[agent_id] = action
             attention_maps[agent_id] = attns
 
@@ -58,7 +60,8 @@ class MATTrainer(AbstractTrainer):
         # set dataloader
         dataset = RLDataset(self.buffer, self.config.batch_size)
         self.dataloader = DataLoader(
-            dataset=dataset, batch_size=self.config.batch_size,
+            dataset=dataset,
+            batch_size=self.config.batch_size,
         )
 
         # populate buffer
@@ -84,7 +87,9 @@ class MATTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (self.config.max_episode_length // 2):
+        if epoch % (self.config.max_epochs // 10) == 0 and step == (
+            self.config.max_episode_length // 2
+        ):
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (
                     attention_maps[agent_id]

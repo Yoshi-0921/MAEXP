@@ -8,21 +8,23 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from core.utils.logging import initialize_logging
 from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
-
-from .default_mask import generate_default_mask
+import torch
+from .default_area_mask import generate_default_area_mask
 
 logger = initialize_logging(__name__)
 
 
-def generate_observation_mask(config: DictConfig, world: AbstractWorld):
-    if config.observation_mask == 'default':
-        mask = generate_default_mask(config=config, world=world)
+def generate_observation_area_mask(
+    config: DictConfig, world: AbstractWorld
+) -> torch.Tensor:
+    if config.observation_area_mask == "default":
+        area_mask = generate_default_area_mask(config=config, world=world)
 
     else:
         logger.warn(
-            f"Unexpected mask generator is given. config.observation_mask: {config.observation_mask}"
+            f"Unexpected area mask generator is given. config.observation_area_mask: {config.observation_area_mask}"
         )
 
         raise ValueError()
 
-    return mask
+    return area_mask

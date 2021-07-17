@@ -11,4 +11,6 @@ from .abstract_map import AbstractMap
 
 class SimpleMap(AbstractMap):
     def __init__(self, config: DictConfig):
-        super().__init__(config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y)
+        super().__init__(
+            config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y
+        )

@@ -17,7 +17,9 @@ from typing import List
 class DefaultAgent(AbstractAgent):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(obs_shape=obs_shape, act_size=act_size, config=config)
-        self.brain = generate_brain(config=config, obs_shape=obs_shape, act_size=act_size)
+        self.brain = generate_brain(
+            config=config, obs_shape=obs_shape, act_size=act_size
+        )
 
     def get_action(self, state, epsilon):
         if random() < epsilon:

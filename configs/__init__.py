@@ -1,4 +1,1 @@
-config_names = {
-    "example": "experiments/example",
-    "mat": "experiments/mat_exp"
-}
+config_names = {"example": "experiments/example", "mat": "experiments/mat_exp"}

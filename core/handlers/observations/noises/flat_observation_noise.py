@@ -17,8 +17,12 @@ from .abstract_observation_noise import AbstractObservationNoise
 
 
 class FlatObservatonNoise(AbstractObservationNoise):
-    def __init__(self, config: DictConfig, world: AbstractWorld, observation_space: List[int]):
-        super().__init__(config=config, world=world, observation_space=observation_space)
+    def __init__(
+        self, config: DictConfig, world: AbstractWorld, observation_space: List[int]
+    ):
+        super().__init__(
+            config=config, world=world, observation_space=observation_space
+        )
 
     def add_noise(self, obs, agent, agent_id, offset_x, offset_y):
         _, x, y = self.observation_space

@@ -16,14 +16,16 @@ from .customs.mat import MAT
 logger = initialize_logging(__name__)
 
 
-def generate_network(config: DictConfig, obs_shape: List[int], act_size: int) -> nn.Module:
-    if config.model.name == 'mlp':
+def generate_network(
+    config: DictConfig, obs_shape: List[int], act_size: int
+) -> nn.Module:
+    if config.model.name == "mlp":
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
-    elif config.model.name in ['conv_mlp', 'mat_baseline']:
+    elif config.model.name in ["conv_mlp", "mat_baseline"]:
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
 
-    elif config.model.name == 'mat':
+    elif config.model.name == "mat":
         network = MAT(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:

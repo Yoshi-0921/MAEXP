@@ -42,7 +42,12 @@ class Conv(nn.Module):
         )
 
     def forward(self, x):
-        for af, kernel_size, stride, conv in zip(self.af_list, self.config.model.af_kernels, self.config.model.af_strides, self.conv_list):
+        for af, kernel_size, stride, conv in zip(
+            self.af_list,
+            self.config.model.af_kernels,
+            self.config.model.af_strides,
+            self.conv_list,
+        ):
             x = af(conv(x), kernel_size=kernel_size, stride=stride)
 
         outputs = self.conv_post(x)
