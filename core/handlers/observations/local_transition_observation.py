@@ -35,8 +35,8 @@ class LocalTransitionObservation(LocalSimpleObservation):
             self.get_mask_coordinates(agent)
             mask = np.zeros_like(self.world.map.agents_matrix)
             mask[
-                self.global_x_min : (self.global_x_max + 1),
-                self.global_y_min : (self.global_y_max + 1),
+                self.global_x_min: (self.global_x_max + 1),
+                self.global_y_min: (self.global_y_max + 1),
             ] += 1
             global_agents[agent_id] *= mask
 
@@ -56,12 +56,12 @@ class LocalTransitionObservation(LocalSimpleObservation):
         obs[-1] -= 1
         obs[
             -1,
-            self.obs_x_min : self.obs_x_max,
-            self.obs_y_min : self.obs_y_max,
+            self.obs_x_min: self.obs_x_max,
+            self.obs_y_min: self.obs_y_max,
         ] *= torch.from_numpy(
             self.world.map.wall_matrix[
-                self.global_x_min : (self.global_x_max + 1),
-                self.global_y_min : (self.global_y_max + 1),
+                self.global_x_min: (self.global_x_max + 1),
+                self.global_y_min: (self.global_y_max + 1),
             ]
         )
 
@@ -73,12 +73,12 @@ class LocalTransitionObservation(LocalSimpleObservation):
         for t in range(self.past_step):
             obs[
                 t + 1,
-                self.obs_x_min : self.obs_x_max,
-                self.obs_y_min : self.obs_y_max,
+                self.obs_x_min: self.obs_x_max,
+                self.obs_y_min: self.obs_y_max,
             ] += torch.from_numpy(
                 self.past_global_agents[t][agent_id][
-                    self.global_x_min : (self.global_x_max + 1),
-                    self.global_y_min : (self.global_y_max + 1),
+                    self.global_x_min: (self.global_x_max + 1),
+                    self.global_y_min: (self.global_y_max + 1),
                 ]
             )
 
@@ -87,12 +87,12 @@ class LocalTransitionObservation(LocalSimpleObservation):
     def fill_obs_object(self, obs, agent, agent_id, offset_x, offset_y):
         obs[
             -2,
-            self.obs_x_min : self.obs_x_max,
-            self.obs_y_min : self.obs_y_max,
+            self.obs_x_min: self.obs_x_max,
+            self.obs_y_min: self.obs_y_max,
         ] += torch.from_numpy(
             self.world.map.objects_matrix[
-                self.global_x_min : (self.global_x_max + 1),
-                self.global_y_min : (self.global_y_max + 1),
+                self.global_x_min: (self.global_x_max + 1),
+                self.global_y_min: (self.global_y_max + 1),
             ]
         )
 
