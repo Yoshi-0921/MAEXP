@@ -49,8 +49,8 @@ class MATTrainer(DefaultTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (
-            self.config.max_episode_length // 2
+        if epoch % (self.max_epochs // 10) == 0 and step == (
+            self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (

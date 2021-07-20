@@ -10,7 +10,7 @@ from .abstract_trainer import AbstractTrainer
 
 class DefaultTrainer(AbstractTrainer):
     def loop_epoch_start(self, epoch: int):
-        if epoch == (self.config.max_epochs // 2):
+        if epoch == (self.max_epochs // 2):
             self.save_state_dict(epoch=epoch)
 
     def loop_step(self, step: int, epoch: int):
@@ -25,8 +25,8 @@ class DefaultTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (
-            self.config.max_episode_length // 2
+        if epoch % (self.max_epochs // 10) == 0 and step == (
+            self.max_episode_length // 2
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
@@ -70,7 +70,7 @@ class DefaultTrainer(AbstractTrainer):
             agent.synchronize_brain()
 
         self.log_scalar()
-        if self.episode_count % (self.config.max_epochs // 10) == 0:
+        if self.episode_count % (self.max_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 
