@@ -1,9 +1,7 @@
-import random
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import torch
 import wandb
 
 from .abstract_evaluator import AbstractEvaluator
@@ -12,39 +10,14 @@ sns.set()
 
 
 class DefaultEvaluator(AbstractEvaluator):
-    @torch.no_grad()
-    def play_step(self, epsilon: float = 0.0):
-        actions = [[] for _ in range(self.env.num_agents)]
-        random.shuffle(self.order)
-
-        for agent_id in self.order:
-            # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
-
-            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
-            actions[agent_id] = action
-
-        rewards, _, new_states = self.env.step(actions)
-
-        self.states = new_states
-
-        return states, rewards
-
-    def setup(self):
-        self.reset()
-
-        # load brain networks and weights
-        self.load_state_dict()
-
-    def validation_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int):
         # execute in environment
         states, rewards = self.play_step()
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (
-            self.config.max_episode_length // 2
-        ):
+        log_step = self.max_episode_length // 2
+        if epoch % (self.max_epochs // 10) == 0 and step in [log_step - 1, log_step, log_step + 1]:
             for agent_id in range(self.env.num_agents):
                 image = self.env.observation_handler.render(states[agent_id])
 
@@ -71,10 +44,10 @@ class DefaultEvaluator(AbstractEvaluator):
                 step=self.global_step,
             )
 
-    def validation_epoch_end(self):
+    def loop_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
-        if (self.episode_count + 1) % (self.config.validate_epochs // 10) == 0:
+        if (self.episode_count + 1) % (self.max_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 

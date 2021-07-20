@@ -172,6 +172,33 @@ def generate_each_mask(x, y, world_map, visible_range) -> np.ndarray:
                     else:
                         mask[local_pos_x, local_pos_y] = 0
 
+        for opr_y in [-1, 1]:
+            for dx in range(visible_radius + 1):
+                # 壁ならbreak
+                pos_x, pos_y = (
+                    x_coord + (dx * opr_x),
+                    y_coord + opr_y,
+                )
+                pos_x, pos_y = world_map.coord2ind((pos_x, pos_y))
+                local_pos_x, local_pos_y = world_map.coord2ind(
+                    ((dx * opr_x), opr_y), visible_range, visible_range
+                )
+                if (
+                    pos_x < 0
+                    or world_map.SIZE_X <= pos_x
+                    or pos_y < 0
+                    or world_map.SIZE_Y <= pos_y
+                ):
+                    mask[local_pos_x, local_pos_y] = -1
+                    continue
+                # 壁なら-1
+                if world_map.wall_matrix[pos_x, pos_y] == 1:
+                    mask[local_pos_x, local_pos_y] = -1
+                    break
+                # 何もないなら0
+                else:
+                    mask[local_pos_x, local_pos_y] = 0
+
     for opr_y in [-1, 1]:
         for dy in range(visible_radius + 1):
             # 壁ならbreak
@@ -211,5 +238,34 @@ def generate_each_mask(x, y, world_map, visible_range) -> np.ndarray:
                     # 何もないなら0
                     else:
                         mask[local_pos_x, local_pos_y] = 0
+
+        for opr_x in [-1, 1]:
+            for dy in range(visible_radius + 1):
+                pos_x, pos_y = (
+                    x_coord + opr_x,
+                    y_coord + (dy * opr_y),
+                )
+                pos_x, pos_y = world_map.coord2ind((pos_x, pos_y))
+                local_pos_x, local_pos_y = world_map.coord2ind(
+                    (opr_x, (dy * opr_y)),
+                    visible_range,
+                    visible_range,
+                )
+                # 場外なら-1
+                if (
+                    pos_x < 0
+                    or world_map.SIZE_X <= pos_x
+                    or pos_y < 0
+                    or world_map.SIZE_Y <= pos_y
+                ):
+                    mask[local_pos_x, local_pos_y] = -1
+                    continue
+                # 壁なら-1
+                if world_map.wall_matrix[pos_x, pos_y] == 1:
+                    mask[local_pos_x, local_pos_y] = -1
+                    break
+                # 何もないなら0
+                else:
+                    mask[local_pos_x, local_pos_y] = 0
 
     return mask

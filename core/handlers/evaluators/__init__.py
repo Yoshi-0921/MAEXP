@@ -11,6 +11,7 @@ from omegaconf import DictConfig
 
 from .abstract_evaluator import AbstractEvaluator
 from .default_evaluator import DefaultEvaluator
+from .mat_evaluator import MATEvaluator
 
 logger = initialize_logging(__name__)
 
@@ -20,6 +21,9 @@ def generate_evaluator(
 ) -> AbstractEvaluator:
     if config.evaluator == "default":
         evaluator = DefaultEvaluator(config=config, environment=environment)
+
+    elif config.trainer == "mat":
+        evaluator = MATEvaluator(config=config, environment=environment)
 
     else:
         logger.warn(

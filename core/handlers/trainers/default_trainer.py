@@ -1,79 +1,23 @@
-import random
 
 import numpy as np
 import torch
 import wandb
-from core.utils.buffer import Experience
-from core.utils.dataset import RLDataset
-from omegaconf import DictConfig
 from torch.nn import functional as F
-from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
 
 
 class DefaultTrainer(AbstractTrainer):
-    def __init__(self, config: DictConfig, environment):
-        super().__init__(config=config, environment=environment)
-        self.visible_range = self.config.visible_range
-        wandb.init(
-            project="MAEXP", entity="yoshi-0921", name=config.name, config=dict(config)
-        )
+    def loop_epoch_start(self, epoch: int):
+        if epoch == (self.max_epochs // 2):
+            self.save_state_dict(epoch=epoch)
 
-    def loss_and_update(self, batch):
-        loss_list = []
-        states, actions, rewards, dones, next_states = batch
-        for agent_id, agent in enumerate(self.agents):
-            loss = agent.learn(
-                states[agent_id],
-                actions[agent_id],
-                rewards[agent_id],
-                dones[agent_id],
-                next_states[agent_id],
-            )
-            loss_list.append(loss)
-
-        return torch.from_numpy(np.array(loss_list, dtype=np.float))
-
-    @torch.no_grad()
-    def play_step(self, epsilon: float = 0.0):
-        actions = [[] for _ in range(self.env.num_agents)]
-        random.shuffle(self.order)
-
-        for agent_id in self.order:
-            # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
-
-            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
-            actions[agent_id] = action
-
-        rewards, dones, new_states = self.env.step(actions)
-
-        exp = Experience(self.states, actions, rewards, dones, new_states)
-
-        self.buffer.append(exp)
-
-        self.states = new_states
-
-        return states, rewards
-
-    def setup(self):
-        # set dataloader
-        dataset = RLDataset(self.buffer, self.config.batch_size)
-        self.dataloader = DataLoader(
-            dataset=dataset, batch_size=self.config.batch_size, pin_memory=True
-        )
-
-        # populate buffer
-        self.populate(self.config.populate_steps)
-        self.reset()
-
-    def training_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int):
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list)
+            self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
         # execute in environment
@@ -81,8 +25,8 @@ class DefaultTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (
-            self.config.max_episode_length // 2
+        if epoch % (self.max_epochs // 10) == 0 and step == (
+            self.max_episode_length // 2
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
@@ -112,13 +56,13 @@ class DefaultTrainer(AbstractTrainer):
         for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
             wandb.log(
                 {
-                    f"training/agents/loss_{str(agent_id)}": loss,
-                    f"training/agents/reward_{str(agent_id)}": reward,
+                    f"agent_{str(agent_id)}/step_loss": loss,
+                    f"agent_{str(agent_id)}/step_reward": reward,
                 },
                 step=self.global_step,
             )
 
-    def training_epoch_end(self):
+    def loop_epoch_end(self):
         self.epsilon *= self.config.epsilon_decay
         self.epsilon = max(self.config.epsilon_end, self.epsilon)
 
@@ -126,7 +70,8 @@ class DefaultTrainer(AbstractTrainer):
             agent.synchronize_brain()
 
         self.log_scalar()
-        self.log_heatmap()
+        if self.episode_count % (self.max_epochs // 10) == 0:
+            self.log_heatmap()
         self.reset()
 
     def log_scalar(self):
@@ -135,11 +80,11 @@ class DefaultTrainer(AbstractTrainer):
                 "episode/episode_reward": self.episode_reward_sum,
                 "episode/episode_step": self.episode_step,
                 "episode/global_step": self.global_step,
-                "env/objects_left": self.env.objects_generated
+                "episode/objects_left": self.env.objects_generated
                 - self.env.objects_completed,
-                "env/objects_completed": self.env.objects_completed,
-                "env/agents_collided": self.env.agents_collided,
-                "env/walls_collided": self.env.walls_collided,
+                "episode/objects_completed": self.env.objects_completed,
+                "episode/agents_collided": self.env.agents_collided,
+                "episode/walls_collided": self.env.walls_collided,
             },
             step=self.global_step - 1,
         )
@@ -147,7 +92,7 @@ class DefaultTrainer(AbstractTrainer):
         for agent_id, reward in enumerate(self.episode_reward_agents):
             wandb.log(
                 {
-                    f"episode/agents/episode_reward_{str(agent_id)}": reward,
+                    f"agent_{str(agent_id)}/episode_reward": reward,
                 },
                 step=self.global_step - 1,
             )
@@ -157,17 +102,17 @@ class DefaultTrainer(AbstractTrainer):
             self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
         )
 
-        for i in range(self.env.num_agents):
+        for agent_id in range(self.env.num_agents):
             # add agent path information
             heatmap_agents = (
                 0.5
-                * self.env.heatmap_agents[i, ...]
-                / np.max(self.env.heatmap_agents[i, ...])
+                * self.env.heatmap_agents[agent_id, ...]
+                / np.max(self.env.heatmap_agents[agent_id, ...])
             )
             heatmap_agents = np.where(
                 heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
             )
-            heatmap[i, 2, ...] += torch.from_numpy(heatmap_agents)
+            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
 
         # add wall information
         heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
@@ -186,7 +131,7 @@ class DefaultTrainer(AbstractTrainer):
             size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
         )
         heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=2)
+        heatmap = make_grid(heatmap, nrow=3)
         wandb.log(
             {
                 "episode/heatmap": [

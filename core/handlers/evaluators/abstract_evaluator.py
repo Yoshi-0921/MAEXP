@@ -1,36 +1,22 @@
-from abc import ABC, abstractmethod
+import random
+from abc import ABC
 
-import numpy as np
 import torch
 import wandb
-from core.agents import generate_agents
 from omegaconf import DictConfig
-from tqdm import tqdm
-from collections import OrderedDict
+
+from ..abstract_loop_handler import AbstractLoopHandler
 
 
-class AbstractEvaluator(ABC):
+class AbstractEvaluator(AbstractLoopHandler, ABC):
     def __init__(self, config: DictConfig, environment):
-        self.config = config
-        self.env = environment
-
-        self.agents = generate_agents(
-            config=config,
-            observation_space=self.env.observation_space,
-            action_space=self.env.action_space,
-        )
-        self.order = np.arange(environment.num_agents)
-
-        self.states = self.env.reset()
-        self.env.render_world()
-        self.global_step = 0
-        self.episode_count = 0
-        self.epsilon = 0
+        super().__init__(config=config, environment=environment)
+        self.max_epochs = config.validate_epochs
 
         wandb.init(
             project="MAEXP",
             entity="yoshi-0921",
-            name=config.name + "_test",
+            name=config.name + "_evaluation",
             config=dict(config),
             tags=[
                 config.world + "_world",
@@ -41,68 +27,29 @@ class AbstractEvaluator(ABC):
                 config.evaluator + "_evaluator",
                 config.model.name + "_model",
                 config.map.name + "_map",
+                config.view_method + "_method",
             ],
         )
 
-    def reset(self):
-        self.states = self.env.reset()
-        self.episode_reward_sum = 0.0
-        self.episode_reward_agents = np.zeros(self.env.num_agents)
-        self.episode_step = 0
-
-    @abstractmethod
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
-        raise NotImplementedError()
+        actions = [[] for _ in range(self.env.num_agents)]
+        random.shuffle(self.order)
+
+        for agent_id in self.order:
+            # normalize states [0, map.SIZE] -> [0, 1.0]
+            states = torch.tensor(self.states).float()
+
+            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
+            actions[agent_id] = action
+
+        rewards, _, new_states = self.env.step(actions)
+
+        self.states = new_states
+
+        return states, rewards
 
     def setup(self):
-        pass
-
-    def endup(self):
-        pass
-
-    def validation_epoch_start(self, epoch: int):
-        pass
-
-    def validation_epoch_end(self):
-        pass
-
-    @abstractmethod
-    def validation_step(self, step: int):
-        raise NotImplementedError()
-
-    def run(self):
-        self.setup()
-
-        with tqdm(total=self.config.validate_epochs) as pbar:
-            for epoch in range(self.config.validate_epochs):
-                self.validation_epoch_start(epoch)
-                for step in range(self.config.max_episode_length):
-                    self.total_loss_sum = 0.0
-                    self.total_loss_agents = torch.zeros(self.env.num_agents)
-                    self.validation_step(step, epoch)
-                    self.global_step += 1
-                    self.episode_step += 1
-                self.validation_epoch_end()
-                self.episode_count += 1
-
-                pbar.set_description(f"[Step {self.global_step}]")
-                pbar.update(1)
-
-        self.endup()
-
-        pbar.close()
-
-    def load_state_dict(self):
-        weight_artifact = wandb.use_artifact(
-            self.config.pretrained_weight_path, type="pretrained_weight"
-        )
-        weight_artifact_dir = weight_artifact.download()
-        for agent_id, agent in enumerate(self.agents):
-            new_state_dict = OrderedDict()
-            state_dict = torch.load(weight_artifact_dir + f"/agent{agent_id}.pth")
-            for key, value in state_dict.items():
-                if key in agent.brain.network.state_dict().keys():
-                    new_state_dict[key] = value
-
-            agent.brain.network.load_state_dict(new_state_dict)
+        self.reset()
+        # load brain networks and weights
+        self.load_state_dict()
