@@ -16,9 +16,8 @@ class DefaultEvaluator(AbstractEvaluator):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.config.max_epochs // 10) == 0 and step == (
-            self.config.max_episode_length // 2
-        ):
+        log_step = self.max_episode_length // 2
+        if epoch % (self.max_epochs // 10) == 0 and step in [log_step - 1, log_step, log_step + 1]:
             for agent_id in range(self.env.num_agents):
                 image = self.env.observation_handler.render(states[agent_id])
 
@@ -48,7 +47,7 @@ class DefaultEvaluator(AbstractEvaluator):
     def loop_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
-        if (self.episode_count + 1) % (self.config.validate_epochs // 10) == 0:
+        if (self.episode_count + 1) % (self.max_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
 
