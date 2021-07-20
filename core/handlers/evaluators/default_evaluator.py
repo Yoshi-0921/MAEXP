@@ -1,9 +1,7 @@
-import random
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import torch
 import wandb
 
 from .abstract_evaluator import AbstractEvaluator
@@ -12,31 +10,7 @@ sns.set()
 
 
 class DefaultEvaluator(AbstractEvaluator):
-    @torch.no_grad()
-    def play_step(self, epsilon: float = 0.0):
-        actions = [[] for _ in range(self.env.num_agents)]
-        random.shuffle(self.order)
-
-        for agent_id in self.order:
-            # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
-
-            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
-            actions[agent_id] = action
-
-        rewards, _, new_states = self.env.step(actions)
-
-        self.states = new_states
-
-        return states, rewards
-
-    def setup(self):
-        self.reset()
-
-        # load brain networks and weights
-        self.load_state_dict()
-
-    def validation_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int):
         # execute in environment
         states, rewards = self.play_step()
         self.episode_reward_sum += np.sum(rewards)
@@ -71,7 +45,7 @@ class DefaultEvaluator(AbstractEvaluator):
                 step=self.global_step,
             )
 
-    def validation_epoch_end(self):
+    def loop_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
         if (self.episode_count + 1) % (self.config.validate_epochs // 10) == 0:
