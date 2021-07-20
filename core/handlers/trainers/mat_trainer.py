@@ -6,32 +6,13 @@ import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
-from core.utils.dataset import RLDataset
-from torch.nn import functional as F
-from torch.utils.data import DataLoader
-from torchvision.utils import make_grid
 
-from .abstract_trainer import AbstractTrainer
+from .default_trainer import DefaultTrainer
 
 sns.set()
 
 
-class MATTrainer(AbstractTrainer):
-    def loss_and_update(self, batch):
-        loss_list = []
-        states, actions, rewards, dones, next_states = batch
-        for agent_id, agent in enumerate(self.agents):
-            loss = agent.learn(
-                states[agent_id],
-                actions[agent_id],
-                rewards[agent_id],
-                dones[agent_id],
-                next_states[agent_id],
-            )
-            loss_list.append(loss.detach().cpu())
-
-        return torch.stack(loss_list)
-
+class MATTrainer(DefaultTrainer):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]
@@ -56,30 +37,11 @@ class MATTrainer(AbstractTrainer):
 
         return states, rewards, attention_maps
 
-    def setup(self):
-        # set dataloader
-        dataset = RLDataset(self.buffer, self.config.batch_size)
-        self.dataloader = DataLoader(
-            dataset=dataset,
-            batch_size=self.config.batch_size,
-        )
-
-        # populate buffer
-        self.populate(self.config.populate_steps)
-        self.reset()
-
-        # log brain networks of agents
-        self.log_models()
-
-    def training_epoch_start(self, epoch: int):
-        if epoch == (self.config.max_epochs // 2):
-            self.save_state_dict(epoch=epoch)
-
-    def training_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int):
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list)
+            self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
         # execute in environment
@@ -174,85 +136,3 @@ class MATTrainer(AbstractTrainer):
                 },
                 step=self.global_step,
             )
-
-    def training_epoch_end(self):
-        self.epsilon *= self.config.epsilon_decay
-        self.epsilon = max(self.config.epsilon_end, self.epsilon)
-
-        for agent in self.agents:
-            agent.synchronize_brain()
-
-        self.log_scalar()
-        if self.episode_count % (self.config.max_epochs // 10) == 0:
-            self.log_heatmap()
-        self.reset()
-
-    def log_scalar(self):
-        wandb.log(
-            {
-                "episode/episode_reward": self.episode_reward_sum,
-                "episode/episode_step": self.episode_step,
-                "episode/global_step": self.global_step,
-                "episode/objects_left": self.env.objects_generated
-                - self.env.objects_completed,
-                "episode/objects_completed": self.env.objects_completed,
-                "episode/agents_collided": self.env.agents_collided,
-                "episode/walls_collided": self.env.walls_collided,
-            },
-            step=self.global_step - 1,
-        )
-
-        for agent_id, reward in enumerate(self.episode_reward_agents):
-            wandb.log(
-                {
-                    f"agent_{str(agent_id)}/episode_reward": reward,
-                },
-                step=self.global_step - 1,
-            )
-
-    def log_heatmap(self):
-        heatmap = torch.zeros(
-            self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
-        )
-
-        for agent_id in range(self.env.num_agents):
-            # add agent path information
-            heatmap_agents = (
-                0.5
-                * self.env.heatmap_agents[agent_id, ...]
-                / np.max(self.env.heatmap_agents[agent_id, ...])
-            )
-            heatmap_agents = np.where(
-                heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
-            )
-            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
-
-        # add wall information
-        heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
-
-        # add objects information
-        heatmap_objects = (
-            0.8 * self.env.heatmap_objects / np.max(self.env.heatmap_objects)
-        )
-        heatmap_objects = np.where(
-            heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
-        )
-        heatmap[:, torch.tensor([0, 1]), ...] += torch.from_numpy(heatmap_objects)
-
-        heatmap = F.interpolate(
-            heatmap,
-            size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
-        )
-        heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=3)
-        wandb.log(
-            {
-                "episode/heatmap": [
-                    wandb.Image(
-                        data_or_path=heatmap,
-                        caption="Episode heatmap",
-                    )
-                ]
-            },
-            step=self.global_step - 1,
-        )
