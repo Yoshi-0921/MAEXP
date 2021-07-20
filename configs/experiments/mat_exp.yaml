@@ -1,5 +1,5 @@
 defaults:
-  - model: mat # mat, mat_baseline
+  - model: mat # mlp, conv_mlp, mat, mat_baseline
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
@@ -16,8 +16,8 @@ num_objects: 25
 # ==================================================
 # configure agent
 
-agent_type: 'mat' # default, mat
-brain: 'mat' # default, mat, mat_baseline
+agent_type: 'default' # default, mat
+brain: 'mat' # dqn, mat, mat_baseline
 view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view
 observation_area_mask: 'default'
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
@@ -44,7 +44,7 @@ epsilon_decay: 0.998
 epsilon_initial: 1.0
 epsilon_end: 0.05
 # ==================================================
-# configre validate
+# configre evaluation
 
 validate_epochs: 1000
 pretrained_weight_path: False
