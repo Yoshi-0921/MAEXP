@@ -14,7 +14,7 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
         self.max_epochs = config.validate_epochs
 
         wandb.init(
-            project="MAEXP",
+            project="MAT-evaluation",
             entity="yoshi-0921",
             name=config.name + "_evaluation",
             config=dict(config),
@@ -32,7 +32,7 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
         )
 
     @torch.no_grad()
-    def play_step(self, epsilon: float = 0.0):
+    def play_step(self, epsilon: float = 0.00):
         actions = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
