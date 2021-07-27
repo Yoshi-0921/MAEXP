@@ -39,7 +39,7 @@ class MATEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         log_step = self.max_episode_length // 2
-        if epoch % (self.max_epochs // 10) == 0 and step in [log_step - 1, log_step, log_step + 1]:
+        if epoch % (self.max_epochs // 3) == 0 and step in [log_step - 1, log_step, log_step + 1]:
             for agent_id, agent in enumerate(self.agents):
                 attention_map = (
                     attention_maps[agent_id]

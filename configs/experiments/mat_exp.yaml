@@ -16,7 +16,7 @@ num_objects: 25
 # ==================================================
 # configure agent
 
-agent_type: 'default' # default, mat
+agent_type: 'mat' # default, mat
 brain: 'mat' # dqn, mat, mat_baseline
 view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view
 observation_area_mask: 'default'
