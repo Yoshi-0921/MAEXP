@@ -14,7 +14,7 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
         self.max_epochs = config.validate_epochs
 
         wandb.init(
-            project="MAT-evaluation",
+            project=config.project_name + "-evaluation",
             entity="yoshi-0921",
             name=config.name + "_evaluation",
             config=dict(config),

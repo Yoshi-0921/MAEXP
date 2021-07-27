@@ -21,7 +21,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         self.epsilon = config.epsilon_initial
 
         wandb.init(
-            project="MAEXP",
+            project=config.project_name,
             entity="yoshi-0921",
             name=config.name,
             config=dict(config),

@@ -4,6 +4,7 @@ defaults:
   - opt: rmsprop
   - job_logging: disabled
 
+project_name: 'MAEXP'
 name: 'mat_exp'
 gpu: 0
 # ==================================================
