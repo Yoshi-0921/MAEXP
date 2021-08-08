@@ -12,6 +12,7 @@ from omegaconf import DictConfig
 from .abstract_observation import AbstractObservation
 from .local_simple_observation import LocalSimpleObservation
 from .local_transition_observation import LocalTransitionObservation
+from .local_types_observation import LocalTypesObservation
 from .local_view_observation import LocalViewObservaton
 from .relative_view_observation import RelativeViewObservaton
 
@@ -23,6 +24,7 @@ __all__ = [
     "RelativeViewObservation",
     "LocalTransitionObservation",
     "LocalSimpleObservation",
+    "LocalTypesObservation"
 ]
 
 
@@ -40,6 +42,9 @@ def generate_observation_handler(
 
     elif config.view_method == "local_simple_view":
         obs = LocalSimpleObservation(config=config, world=world)
+
+    elif config.view_method == "local_types_view":
+        obs = LocalTypesObservation(config=config, world=world)
 
     else:
         logger.warn(
