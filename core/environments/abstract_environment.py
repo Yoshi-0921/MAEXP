@@ -6,8 +6,12 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from abc import ABC, abstractmethod
-from omegaconf import DictConfig
+from typing import List
+
+import numpy as np
 from core.worlds.abstract_world import AbstractWorld
+from core.worlds.entity import Agent
+from omegaconf import DictConfig
 
 
 class AbstractEnvironment(ABC):
@@ -29,7 +33,7 @@ class AbstractEnvironment(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def step(self):
+    def step(self, action_n: List[np.array]):
         raise NotImplementedError()
 
     @abstractmethod
@@ -37,17 +41,17 @@ class AbstractEnvironment(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def action_ind(self):
+    def action_ind(self, action: int, agent: Agent):
         raise NotImplementedError()
 
     @abstractmethod
-    def reward_ind(self):
+    def reward_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         raise NotImplementedError()
 
     @abstractmethod
-    def done_ind(self):
+    def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         raise NotImplementedError()
 
     @abstractmethod
-    def observation_ind(self):
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         raise NotImplementedError()

@@ -12,6 +12,7 @@ from omegaconf import DictConfig
 from .abstract_trainer import AbstractTrainer
 from .default_trainer import DefaultTrainer
 from .mat_trainer import MATTrainer
+from .mat_types_trainer import MATTypesTrainer
 
 logger = initialize_logging(__name__)
 
@@ -24,6 +25,9 @@ def generate_trainer(
 
     elif config.trainer == "mat":
         trainer = MATTrainer(config=config, environment=environment)
+
+    elif config.trainer == "mat_types":
+        trainer = MATTypesTrainer(config=config, environment=environment)
 
     else:
         logger.warn(f"Unexpected trainer is given. config.trainer: {config.trainer}")

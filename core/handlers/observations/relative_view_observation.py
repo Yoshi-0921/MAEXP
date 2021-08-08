@@ -5,9 +5,12 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from typing import List
+
+import numpy as np
 import torch
 from core.worlds.entity import Agent
-import numpy as np
+
 from .abstract_observation import AbstractObservation
 
 
@@ -32,7 +35,7 @@ class RelativeViewObservaton(AbstractObservation):
         self.obs_y_min = max(0, pos_y - self.visible_radius)
         self.obs_y_max = min(self.world.map.SIZE_Y - 1, pos_y + self.visible_radius)
 
-    def observation_ind(self, agent: Agent, agent_id: int):
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         obs = torch.zeros(self.observation_space)
 
         self.get_mask_coordinates(agent)

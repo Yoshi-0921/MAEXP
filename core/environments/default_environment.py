@@ -127,9 +127,9 @@ class DefaultEnvironment(AbstractEnvironment):
 
         # obtain the outcome from the environment for each agent
         for agent_id, agent in enumerate(self.agents):
-            reward_n.append(self.reward_ind(agent, agent_id))
-            done_n.append(self.done_ind(agent, agent_id))
-            obs_n.append(self.observation_ind(agent, agent_id))
+            reward_n.append(self.reward_ind(self.agents, agent, agent_id))
+            done_n.append(self.done_ind(self.agents, agent, agent_id))
+            obs_n.append(self.observation_ind(self.agents, agent, agent_id))
 
         self.observation_handler.step(self.agents)
 
@@ -155,7 +155,7 @@ class DefaultEnvironment(AbstractEnvironment):
         elif action == 3:
             agent.action = np.array([0, -1], dtype=np.int8)
 
-    def reward_ind(self, agent: Agent, agent_id: int):
+    def reward_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
@@ -186,16 +186,16 @@ class DefaultEnvironment(AbstractEnvironment):
 
         return reward
 
-    def done_ind(self, agent: Agent, agent_id: int):
+    def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         for obj in self.world.objects:
             if all(agent.xy == obj.xy):
                 return 1
 
         return 0
 
-    def observation_ind(self, agent: Agent, agent_id: int):
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
 
-        return self.observation_handler.observation_ind(agent, agent_id)
+        return self.observation_handler.observation_ind(agents, agent, agent_id)
 
     def accumulate_heatmap(self):
         self.heatmap_accumulated_agents += self.heatmap_agents

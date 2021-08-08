@@ -5,10 +5,11 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from typing import List
+
+import numpy as np
 import torch
 from core.worlds.entity import Agent
-from typing import List
-import numpy as np
 
 from .abstract_observation import AbstractObservation
 
@@ -34,32 +35,32 @@ class LocalViewObservaton(AbstractObservation):
         self.global_y_min = max(0, pos_y - self.visible_radius)
         self.global_y_max = min(self.world.map.SIZE_Y - 1, pos_y + self.visible_radius)
 
-    def observation_ind(self, agent: Agent, agent_id: int) -> torch.Tensor:
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int) -> torch.Tensor:
         obs = torch.zeros(self.observation_space)
 
         self.get_mask_coordinates(agent)
 
         # input walls and invisible area
-        obs = self.fill_obs_area(obs, agent, agent_id)
+        obs = self.fill_obs_area(obs, agents, agent, agent_id)
 
         # input objects within sight
-        obs = self.fill_obs_object(obs, agent, agent_id)
+        obs = self.fill_obs_object(obs, agents, agent, agent_id)
 
         # input agents within sight
-        obs = self.fill_obs_agent(obs, agent, agent_id)
+        obs = self.fill_obs_agent(obs, agents, agent, agent_id)
 
         # add observation noise
-        obs = self.fill_obs_noise(obs, agent, agent_id)
+        obs = self.fill_obs_noise(obs, agents, agent, agent_id)
 
         return obs
 
-    def fill_obs_area(self, obs, agent, agent_id) -> torch.Tensor:
+    def fill_obs_area(self, obs, agents, agent, agent_id) -> torch.Tensor:
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
         obs[2, :, :] = self.observation_area_mask[pos_x, pos_y]
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, agent_id) -> torch.Tensor:
+    def fill_obs_agent(self, obs, agents, agent, agent_id) -> torch.Tensor:
         obs[
             0,
             self.obs_x_min: self.obs_x_max,
@@ -103,7 +104,7 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_noise(self, obs, agent, agent_id) -> torch.Tensor:
+    def fill_obs_noise(self, obs, agents, agent, agent_id) -> torch.Tensor:
         return self.observation_noise.add_noise(
             obs, agent, agent_id
         )

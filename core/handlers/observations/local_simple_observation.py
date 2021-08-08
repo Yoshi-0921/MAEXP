@@ -6,6 +6,8 @@ This observation method supposes that agents can observe objects behind walls.
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from typing import List
+
 import torch
 from core.worlds.entity import Agent
 
@@ -33,7 +35,7 @@ class LocalSimpleObservation(AbstractObservation):
         self.global_y_min = max(0, pos_y - self.visible_radius)
         self.global_y_max = min(self.world.map.SIZE_Y - 1, pos_y + self.visible_radius)
 
-    def observation_ind(self, agent: Agent, agent_id: int):
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         obs = torch.zeros(self.observation_space)
 
         self.get_mask_coordinates(agent)
