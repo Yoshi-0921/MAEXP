@@ -24,7 +24,7 @@ class LocalTypesObservation(LocalViewObservaton):
         return obs
 
     def fill_obs_agent(self, obs, agents, agent, agent_id):
-        if agent_id in [0, 2]:
+        if agent_id in [4, 5]:
             obs[1, self.visible_range // 2, self.visible_range // 2] = 1
         else:
             obs[0, self.visible_range // 2, self.visible_range // 2] = 1
@@ -41,7 +41,7 @@ class LocalTypesObservation(LocalViewObservaton):
             )
 
             if obs[3, pos_x, pos_y] != -1:
-                if i in [0, 2]:
+                if i in [4, 5]:
                     obs[1, pos_x, pos_y] = 1
                 else:
                     obs[0, pos_x, pos_y] = 1
