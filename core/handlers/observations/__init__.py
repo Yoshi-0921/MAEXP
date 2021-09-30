@@ -15,6 +15,7 @@ from .local_transition_observation import LocalTransitionObservation
 from .local_types_observation import LocalTypesObservation
 from .local_view_observation import LocalViewObservaton
 from .relative_view_observation import RelativeViewObservaton
+from .local_ind_types_observation import LocalIndTypesObservation
 
 logger = initialize_logging(__name__)
 
@@ -24,7 +25,8 @@ __all__ = [
     "RelativeViewObservation",
     "LocalTransitionObservation",
     "LocalSimpleObservation",
-    "LocalTypesObservation"
+    "LocalTypesObservation",
+    "LocalIndTypesObservation"
 ]
 
 
@@ -45,6 +47,9 @@ def generate_observation_handler(
 
     elif config.view_method == "local_types_view":
         obs = LocalTypesObservation(config=config, world=world)
+
+    elif config.view_method == "local_ind_types_view":
+        obs = LocalIndTypesObservation(config=config, world=world)
 
     else:
         logger.warn(

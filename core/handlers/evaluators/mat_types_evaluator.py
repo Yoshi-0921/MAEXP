@@ -1,18 +1,16 @@
 import random
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
 import wandb
-from core.utils.buffer import Experience
 
-from .default_trainer import DefaultTrainer
+from .default_evaluator import DefaultEvaluator
 
 sns.set()
 
 
-class MATTypesTrainer(DefaultTrainer):
+class MATTypesEvaluator(DefaultEvaluator):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]
@@ -31,31 +29,29 @@ class MATTypesTrainer(DefaultTrainer):
             actions[agent_id] = action
             attention_maps[agent_id] = attns
 
-        rewards, dones, new_states = self.env.step(actions)
-
-        exp = Experience(self.states, actions, rewards, dones, new_states)
-
-        self.buffer.append(exp)
+        rewards, _, new_states = self.env.step(actions)
 
         self.states = new_states
 
         return states, rewards, attention_maps
 
     def loop_step(self, step: int, epoch: int):
-        # train based on experiments
-        for batch in self.dataloader:
-            loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list).item()
-            self.total_loss_agents += loss_list
-
         # execute in environment
-        states, rewards, attention_maps = self.play_step(self.epsilon)
+        states, rewards, attention_maps = self.play_step()
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.max_epochs // 10) == 0 and step == (
-            self.max_episode_length // 2
-        ):
+        """log_step = self.max_episode_length // 2
+        if epoch % (self.max_epochs // 5) == 0 and step in [
+            log_step - 3,
+            log_step - 2,
+            log_step - 1,
+            log_step,
+            log_step + 1,
+            log_step + 2,
+            log_step + 3,
+        ]:"""
+        if 1:
             for agent_id, agent in enumerate(self.agents):
                 if agent_id in [4, 5]:
                     continue
@@ -66,7 +62,6 @@ class MATTypesTrainer(DefaultTrainer):
                     .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                     .cpu()
                 )
-
                 fig = plt.figure()
                 sns.heatmap(
                     torch.t(attention_map.mean(dim=0)),
@@ -75,7 +70,7 @@ class MATTypesTrainer(DefaultTrainer):
                     annot=True,
                     fmt=".3f",
                     vmax=0.25,
-                    annot_kws={"fontsize": 8}
+                    annot_kws={"fontsize": 8},
                 )
 
                 wandb.log(
@@ -100,7 +95,7 @@ class MATTypesTrainer(DefaultTrainer):
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
-                        annot_kws={"fontsize": 8}
+                        annot_kws={"fontsize": 8},
                     )
                     fig_list.append(
                         wandb.Image(
@@ -129,19 +124,12 @@ class MATTypesTrainer(DefaultTrainer):
                 )
 
         wandb.log(
-            {
-                "training_step/epsilon": self.epsilon,
-                "training_step/total_reward": np.sum(rewards),
-                "training_step/total_loss": self.total_loss_sum,
-            },
+            {"training_step/total_reward": np.sum(rewards)},
             step=self.global_step,
         )
 
-        for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
+        for agent_id, reward in enumerate(rewards):
             wandb.log(
-                {
-                    f"agent_{str(agent_id)}/step_loss": loss,
-                    f"agent_{str(agent_id)}/step_reward": reward,
-                },
+                {f"agent_{str(agent_id)}/step_reward": reward},
                 step=self.global_step,
             )

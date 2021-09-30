@@ -55,6 +55,7 @@ class MATEvaluator(DefaultEvaluator):
                     annot=True,
                     fmt=".3f",
                     vmax=0.25,
+                    annot_kws={"fontsize": 8}
                 )
 
                 wandb.log(
@@ -79,6 +80,7 @@ class MATEvaluator(DefaultEvaluator):
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
+                        annot_kws={"fontsize": 8}
                     )
                     fig_list.append(
                         wandb.Image(

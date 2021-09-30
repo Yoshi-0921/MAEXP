@@ -82,7 +82,7 @@ class LocalViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_object(self, obs, agent, agent_id) -> torch.Tensor:
+    def fill_obs_object(self, obs, agents, agent, agent_id) -> torch.Tensor:
         obs[
             1,
             self.obs_x_min: self.obs_x_max,
