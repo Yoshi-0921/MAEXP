@@ -34,7 +34,7 @@ phase: 'training' # training, evaluation
 # configure training
 
 trainer: 'mat' # default, mat
-evaluator: 'default' # default
+evaluator: 'default' # default, mat, mat_types, mat_video, mat_types_video
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32

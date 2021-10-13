@@ -4,14 +4,14 @@ defaults:
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'MAT-noise-exp'
+project_name: 'MAT-noise-types-exp'
 name: 'mat_types_exp'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward
+environment: 'mat_types' # default, shared_mean_reward, shared_max_reward, mat_types, mat_types_test
 seed: 921
 num_objects: 25
 # ==================================================
@@ -19,7 +19,7 @@ num_objects: 25
 
 agent_type: 'mat' # default, mat
 brain: 'mat' # dqn, mat, mat_baseline
-view_method: 'local_types_view' # local_view, relative_view, local_transition_view, local_simple_view, local_types_view
+view_method: 'local_ind_types_view' # local_view, relative_view, local_transition_view, local_simple_view, local_types_view, local_ind_types_view
 observation_area_mask: 'default'
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
@@ -27,13 +27,13 @@ std_distribution: [0.07, 0.05, 0.03]
 past_step: 1
 num_agents: 6
 init_xys: [[0, 5], [-5, 0], [-2, 0], [2, 0], [0, -5], [5, 0]]
-visible_range: 9 # currently only 5, 7, 9 are suppoeted
+visible_range: 7 # currently only 5, 7, 9 are suppoeted
 phase: 'training' # training, evaluation
 # ==================================================
 # configure training
 
 trainer: 'mat_types' # default, mat, mat_types
-evaluator: 'default' # default
+evaluator: 'mat_types' # default, mat, mat_types, mat_video, mat_types_video
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32

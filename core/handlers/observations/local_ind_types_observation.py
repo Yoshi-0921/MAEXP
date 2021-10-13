@@ -71,12 +71,16 @@ class LocalIndTypesObservation(LocalViewObservaton):
         # add agent information (Blue)
         for i in range(4):
             image[2] += obs[i]
-        image[2] += obs[4] * 0.5
-        image[2] += obs[5] * 0.5
+        # add observing agent (Green)
+        image[2, self.visible_range // 2, self.visible_range // 2] = 0
+        image[1, self.visible_range // 2, self.visible_range // 2] = 1
+        # add wandering agent information (Red)
+        image[0] += obs[4]
+        image[0] += obs[5]
         # add object information (Yellow)
         image[torch.tensor([0, 1])] += obs[6]
         # add invisible area information (White)
-        image -= obs[7]
+        image -= (obs[7])
 
         image = image.clamp(min=0, max=1)
 

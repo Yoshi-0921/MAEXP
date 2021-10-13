@@ -115,6 +115,9 @@ class LocalViewObservaton(AbstractObservation):
 
         # add agent information (Blue)
         image[2] += obs[0]
+        # add observing agent (Green)
+        image[2, self.visible_range // 2, self.visible_range // 2] = 0
+        image[1, self.visible_range // 2, self.visible_range // 2] = 1
         # add object information (Yellow)
         image[torch.tensor([0, 1])] += obs[1]
         # add invisible area information (White)
