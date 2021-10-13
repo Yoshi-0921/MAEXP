@@ -1,4 +1,3 @@
-
 import random
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +10,7 @@ from .default_evaluator import DefaultEvaluator
 sns.set()
 
 
-class MATEvaluator(DefaultEvaluator):
+class MATTypesEvaluator(DefaultEvaluator):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]
@@ -20,6 +19,10 @@ class MATEvaluator(DefaultEvaluator):
 
         states = self.states.clone()
         for agent_id in self.order:
+            if agent_id in [4, 5]:
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             action, attns = self.agents[agent_id].get_action_attns(
                 states[agent_id], epsilon
             )
@@ -38,9 +41,21 @@ class MATEvaluator(DefaultEvaluator):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        log_step = self.max_episode_length // 2
-        if epoch % (self.max_epochs // 3) == 0 and step in [log_step - 1, log_step, log_step + 1]:
+        """log_step = self.max_episode_length // 2
+        if epoch % (self.max_epochs // 5) == 0 and step in [
+            log_step - 3,
+            log_step - 2,
+            log_step - 1,
+            log_step,
+            log_step + 1,
+            log_step + 2,
+            log_step + 3,
+        ]:"""
+        if 1:
             for agent_id, agent in enumerate(self.agents):
+                if agent_id in [4, 5]:
+                    continue
+
                 attention_map = (
                     attention_maps[agent_id]
                     .mean(dim=0)[0, :, 0, 1:]
@@ -55,7 +70,7 @@ class MATEvaluator(DefaultEvaluator):
                     annot=True,
                     fmt=".3f",
                     vmax=0.25,
-                    annot_kws={"fontsize": 8}
+                    annot_kws={"fontsize": 8},
                 )
 
                 wandb.log(
@@ -80,7 +95,7 @@ class MATEvaluator(DefaultEvaluator):
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
-                        annot_kws={"fontsize": 8}
+                        annot_kws={"fontsize": 8},
                     )
                     fig_list.append(
                         wandb.Image(

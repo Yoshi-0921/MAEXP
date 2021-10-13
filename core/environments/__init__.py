@@ -15,6 +15,8 @@ from .shared_reward_environment import (
     SharedMaxRewardEnvironment,
     SharedMeanRewardEnvironment,
 )
+from .types_environment import TypesEnvironment
+from .types_test_environment import TypesTestEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -23,6 +25,7 @@ __all__ = [
     "DefaultEnvironment",
     "SharedMaxRewardEnvironment",
     "SharedMeanRewardEnvironment",
+    "TypesEnvironment"
 ]
 
 
@@ -37,6 +40,12 @@ def generate_environment(
 
     elif config.environment == "shared_max_reward":
         env = SharedMaxRewardEnvironment(config=config, world=world)
+
+    elif config.environment == 'mat_types':
+        env = TypesEnvironment(config=config, world=world)
+
+    elif config.environment == 'mat_types_test':
+        env = TypesTestEnvironment(config=config, world=world)
 
     else:
         logger.warn(

@@ -42,40 +42,39 @@ class AbstractWorld(ABC):
     def step(self):
         force = [None] * len(self.agents)
         force = self.apply_action_force(force)
-        force = self.apply_environment_force(force)
-        self.integrate_state(force)
+        for agent_id, agent in enumerate(self.agents):
+            force = self.apply_environment_force(agent_id, agent, force)
+            agent.push(force[agent_id])
+        self.integrate_state()
 
     def apply_action_force(self, force):
         for agent_id, agent in enumerate(self.agents):
             force[agent_id] = agent.action
         return force
 
-    def apply_environment_force(self, force):
-        for agent_id, agent in enumerate(self.agents):
+    def apply_environment_force(self, agent_id, agent, force):
+        # Check if there is a collision against other agents.
+        next_pos = agent.xy + force[agent_id]
+        for i, a in enumerate(self.agents):
+            if agent_id == i:
+                continue
 
-            # Check if there is a collision against other agents.
-            next_pos = agent.xy + force[agent_id]
-            for i, a in enumerate(self.agents):
-                if agent_id == i:
-                    continue
-
-                if all(next_pos == a.xy):
-                    force[agent_id] = np.zeros(2, dtype=np.int8)
-                    agent.collide_agents = True
-                    break
-
-            # Check if there is a collision against wall.
-            next_pos_x, next_pos_y = self.map.coord2ind(next_pos)
-            if self.map.wall_matrix[next_pos_x, next_pos_y] == 1:
+            if all(next_pos == a.xy):
                 force[agent_id] = np.zeros(2, dtype=np.int8)
-                agent.collide_walls = True
+                agent.collide_agents = True
+                break
+
+        # Check if there is a collision against wall.
+        next_pos_x, next_pos_y = self.map.coord2ind(next_pos)
+        if self.map.wall_matrix[next_pos_x, next_pos_y] == 1:
+            force[agent_id] = np.zeros(2, dtype=np.int8)
+            agent.collide_walls = True
 
         return force
 
-    def integrate_state(self, force):
+    def integrate_state(self):
         self.map.reset_agents()
-        for agent_id, agent in enumerate(self.agents):
-            agent.push(force[agent_id])
+        for agent in self.agents:
             agent_x, agent_y = self.map.coord2ind(agent.xy)
             self.map.agents_matrix[agent_x, agent_y] = 1
 

@@ -107,7 +107,7 @@ class DefaultTrainer(AbstractTrainer):
             heatmap_agents = (
                 0.5
                 * self.env.heatmap_agents[agent_id, ...]
-                / np.max(self.env.heatmap_agents[agent_id, ...])
+                / max(np.max(self.env.heatmap_agents[agent_id, ...]), 1)
             )
             heatmap_agents = np.where(
                 heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents

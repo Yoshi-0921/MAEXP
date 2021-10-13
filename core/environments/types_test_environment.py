@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""Source code for default multi-agent environment.
-
-Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
-"""
 
 from random import random
 from typing import List
@@ -17,7 +11,7 @@ from core.handlers.observations import generate_observation_handler
 from .abstract_environment import AbstractEnvironment
 
 
-class DefaultEnvironment(AbstractEnvironment):
+class TypesTestEnvironment(AbstractEnvironment):
     def __init__(self, config: DictConfig, world: AbstractWorld):
         super().__init__(config=config, world=world)
         self.observation_handler = generate_observation_handler(
@@ -27,7 +21,9 @@ class DefaultEnvironment(AbstractEnvironment):
         for _ in self.agents:
             self.action_space.append(4)
             self.observation_space.append(self.observation_handler.observation_space)
-        self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
+        # self.init_xys = np.asarray([[3, 3], [-8, -8], [-8, -7], [-7, -8], [6, 4], [-7, -7]], dtype=np.int8)
+        # self.init_xys = np.asarray([[3, 3], [6, 4], [-8, -7], [-7, -8], [-8, -8], [-7, -7]], dtype=np.int8)
+        self.init_xys = np.asarray([[3, 3], [-6, -6], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8)
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
             dtype=np.int32,
@@ -87,29 +83,40 @@ class DefaultEnvironment(AbstractEnvironment):
 
         # Initialize object position
         self.world.reset_objects()
-        self.generate_objects(self.config.num_objects)
+        self.generate_test_objects()
 
         obs_n = self.observation_handler.reset(self.agents)
 
         return obs_n
 
-    def generate_objects(self, num_objects: int):
-        num_generated = 0
-        while num_generated < num_objects:
-            x = 1 + int(random() * (self.world.map.SIZE_X - 1))
-            y = 1 + int(random() * (self.world.map.SIZE_Y - 1))
-            if (
-                self.world.map.wall_matrix[x, y] == 0
-                and self.world.map.agents_matrix[x, y] == 0
-                and self.world.map.objects_matrix[x, y] == 0
-                and self.world.map.aisle_matrix[x, y] == 0
-            ):
-                self.world.objects.append(Object())
-                self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
-                self.world.map.objects_matrix[x, y] = 1
-                self.heatmap_objects[x, y] += 1
-                num_generated += 1
-                self.objects_generated += 1
+    def generate_test_objects(self):
+        x = 11
+        y = 10  # 10
+        if (
+            self.world.map.wall_matrix[x, y] == 0
+            and self.world.map.agents_matrix[x, y] == 0
+            and self.world.map.objects_matrix[x, y] == 0
+            and self.world.map.aisle_matrix[x, y] == 0
+        ):
+            self.world.objects.append(Object())
+            self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
+            self.world.map.objects_matrix[x, y] = 1
+            self.heatmap_objects[x, y] += 1
+            self.objects_generated += 1
+
+        x = 15
+        y = 5
+        if (
+            self.world.map.wall_matrix[x, y] == 0
+            and self.world.map.agents_matrix[x, y] == 0
+            and self.world.map.objects_matrix[x, y] == 0
+            and self.world.map.aisle_matrix[x, y] == 0
+        ):
+            self.world.objects.append(Object())
+            self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
+            self.world.map.objects_matrix[x, y] = 1
+            self.heatmap_objects[x, y] += 1
+            self.objects_generated += 1
 
     def observation(self):
         raise NotImplementedError()
@@ -156,35 +163,38 @@ class DefaultEnvironment(AbstractEnvironment):
             agent.action = np.array([0, -1], dtype=np.int8)
 
     def reward_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
-        a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
-        self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
+        if agent_id in [4, 5]:
+            return 0.0
+        else:
+            a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
+            self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
-        reward = 0.0
-        for obj_idx, obj in enumerate(self.world.objects):
-            if all(agent.xy == obj.xy):
-                reward = 1.0
-                self.world.objects.pop(obj_idx)
-                obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
-                self.world.map.objects_matrix[obj_pos_x, obj_pos_y] = 0
-                self.objects_completed += 1
-                self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
-                self.generate_objects(1)
+            reward = 0.0
+            for obj_idx, obj in enumerate(self.world.objects):
+                if all(agent.xy == obj.xy):
+                    reward = 1.0
+                    self.world.objects.pop(obj_idx)
+                    obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
+                    self.world.map.objects_matrix[obj_pos_x, obj_pos_y] = 0
+                    self.objects_completed += 1
+                    self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
+                    # self.generate_objects(1)
 
-        # negative reward for collision with other agents
-        if agent.collide_agents:
-            reward = -1.0
-            agent.collide_agents = False
-            self.heatmap_agents_collision[a_pos_x, a_pos_y] += 1
-            self.agents_collided += 1
+            # negative reward for collision with other agents
+            if agent.collide_agents:
+                reward = -1.0
+                agent.collide_agents = False
+                self.heatmap_agents_collision[a_pos_x, a_pos_y] += 1
+                self.agents_collided += 1
 
-        # negative reward for collision against walls
-        if agent.collide_walls:
-            reward = -1.0
-            agent.collide_walls = False
-            self.heatmap_wall_collision[a_pos_x, a_pos_y] += 1
-            self.walls_collided += 1
+            # negative reward for collision against walls
+            if agent.collide_walls:
+                reward = -1.0
+                agent.collide_walls = False
+                self.heatmap_wall_collision[a_pos_x, a_pos_y] += 1
+                self.walls_collided += 1
 
-        return reward
+            return reward
 
     def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         for obj in self.world.objects:
