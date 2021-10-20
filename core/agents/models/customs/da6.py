@@ -94,7 +94,7 @@ class DA6(nn.Module):
 
         out = self.norm(out)
         saliency_vector = out[:, 0]
-        #saliency_vector = self.fc1(saliency_vector)
+        saliency_vector = self.fc1(saliency_vector)
 
         out = self.local_patch_embed(local_x)
         saliency_vector = saliency_vector.unsqueeze(1)
@@ -125,7 +125,7 @@ class DA6(nn.Module):
 
         out = self.norm(out)
         saliency_vector = out[:, 0]
-        #saliency_vector = self.fc1(saliency_vector)
+        saliency_vector = self.fc1(saliency_vector)
 
         out = self.local_patch_embed(local_x)
         saliency_vector = saliency_vector.unsqueeze(1)
