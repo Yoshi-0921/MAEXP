@@ -39,19 +39,15 @@ class AbstractObservation(ABC):
     def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         raise NotImplementedError()
 
-    @abstractmethod
     def fill_obs_area(self, obs, agent, agent_id):
         raise NotImplementedError()
 
-    @abstractmethod
     def fill_obs_agent(self, obs, agent, agent_id):
         raise NotImplementedError()
 
-    @abstractmethod
     def fill_obs_object(self, obs, agent, agent_id):
         raise NotImplementedError()
 
-    @abstractmethod
     def fill_obs_noise(self, obs, agent, agent_id):
         raise NotImplementedError()
 
@@ -63,8 +59,6 @@ class AbstractObservation(ABC):
         obs_n = []
         for agent_id, agent in enumerate(agents):
             obs_n.append(self.observation_ind(agents, agent, agent_id))
-
-        obs_n = torch.stack(obs_n)
 
         return obs_n
 

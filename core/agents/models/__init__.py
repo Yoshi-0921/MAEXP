@@ -12,6 +12,7 @@ from typing import List
 from .customs.conv_mlp import ConvMLP
 from .mlp import MLP
 from .customs.mat import MAT
+from .customs.da6 import DA6
 
 logger = initialize_logging(__name__)
 
@@ -27,6 +28,9 @@ def generate_network(
 
     elif config.model.name == "mat":
         network = MAT(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "da6":
+        network = DA6(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.network: {config.network}")
