@@ -36,7 +36,7 @@ class MATTypesVideoEvaluator(DefaultEvaluator):
         attention_maps = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
-        states = self.states.clone()
+        states = self.states
         for agent_id in self.order:
             if agent_id in [4, 5]:
                 actions[agent_id] = self.agents[agent_id].get_random_action()

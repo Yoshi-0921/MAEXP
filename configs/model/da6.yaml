@@ -1,0 +1,11 @@
+model:
+  name: 'da6'
+  attention: 'normal' # 'normal', 'hard'
+  af_lambd: 0.02
+  embed_dim: 64
+  relative_patch_size: 4
+  local_patch_size: 1
+  patch_size: 1 # required for initialization but not used
+  block_loop: 1
+  num_heads: 4
+  mlp_ratio: 4

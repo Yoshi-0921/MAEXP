@@ -9,7 +9,6 @@ from random import random
 from typing import List
 
 import numpy as np
-import torch
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent, Object
 from omegaconf import DictConfig
@@ -134,8 +133,6 @@ class DefaultEnvironment(AbstractEnvironment):
         self.observation_handler.step(self.agents)
 
         self.heatmap_objects_left += self.world.map.objects_matrix
-
-        obs_n = torch.stack(obs_n)
 
         return reward_n, done_n, obs_n
 

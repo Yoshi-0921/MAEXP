@@ -18,7 +18,7 @@ class RelativeViewObservaton(AbstractObservation):
     @property
     def observation_space(self):
         # 0: me, 1:agents, 2:landmarks, 3:visible area
-        return [3, self.world.map.SIZE_X, self.world.map.SIZE_Y]
+        return [4, self.world.map.SIZE_X, self.world.map.SIZE_Y]
 
     def get_mask_coordinates(self, agent):
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
@@ -35,7 +35,7 @@ class RelativeViewObservaton(AbstractObservation):
         self.obs_y_min = max(0, pos_y - self.visible_radius)
         self.obs_y_max = min(self.world.map.SIZE_Y - 1, pos_y + self.visible_radius)
 
-    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
+    def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int) -> torch.Tensor:
         obs = torch.zeros(self.observation_space)
 
         self.get_mask_coordinates(agent)
@@ -51,26 +51,26 @@ class RelativeViewObservaton(AbstractObservation):
 
         return obs
 
-    def fill_obs_area(self, obs, agent, agent_id):
-        obs[2, :, :] -= 1
+    def fill_obs_area(self, obs, agent, agent_id) -> torch.Tensor:
+        obs[3, :, :] -= 1
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)
         obs[
-            2,
+            3,
             self.obs_x_min: (self.obs_x_max + 1),
             self.obs_y_min: (self.obs_y_max + 1)
         ] = self.observation_area_mask[pos_x, pos_y, self.global_x_min: self.global_x_max, self.global_y_min: self.global_y_max]
 
         return obs
 
-    def fill_obs_agent(self, obs, agent, agent_id):
+    def fill_obs_agent(self, obs, agent, agent_id) -> torch.Tensor:
         obs[
-            0,
+            1,
             self.obs_x_min: (self.obs_x_max + 1),
             self.obs_y_min: (self.obs_y_max + 1)
         ] = torch.from_numpy(
             np.where(
                 obs[
-                    2,
+                    3,
                     self.obs_x_min: (self.obs_x_max + 1),
                     self.obs_y_min: (self.obs_y_max + 1)
                 ] != -1,
@@ -82,17 +82,21 @@ class RelativeViewObservaton(AbstractObservation):
             )
         )
 
+        pos_x, pos_y = self.world.map.coord2ind(agent.xy)
+        obs[0, pos_x, pos_y] = 1
+        obs[1, pos_x, pos_y] = 0
+
         return obs
 
-    def fill_obs_object(self, obs, agent, agent_id):
+    def fill_obs_object(self, obs, agent, agent_id) -> torch.Tensor:
         obs[
-            1,
+            2,
             self.obs_x_min: (self.obs_x_max + 1),
             self.obs_y_min: (self.obs_y_max + 1)
         ] = torch.from_numpy(
             np.where(
                 obs[
-                    2,
+                    3,
                     self.obs_x_min: (self.obs_x_max + 1),
                     self.obs_y_min: (self.obs_y_max + 1)
                 ] != -1,
@@ -110,14 +114,16 @@ class RelativeViewObservaton(AbstractObservation):
         raise NotImplementedError()
 
     def render(self, state):
-        image = torch.zeros(self.observation_space)
+        image = torch.zeros([3, *self.observation_space[1:]])
         obs = state.permute(0, 2, 1)
 
+        # add observing agent (Green)
+        image[1] = obs[0]
         # add agent information (Blue)
-        image[2] += obs[0]
+        image[2] += obs[1]
         # add object information (Yellow)
-        image[torch.tensor([0, 1])] += obs[1]
+        image[torch.tensor([0, 1])] += obs[2]
         # add invisible area information (White)
-        image -= obs[2]
+        image -= obs[3]
 
         return image

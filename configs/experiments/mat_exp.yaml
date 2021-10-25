@@ -1,11 +1,11 @@
 defaults:
-  - model: mat # mlp, conv_mlp, mat, mat_baseline
+  - model: mat # mlp, conv_mlp, mat, mat_baseline, da6
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'MAEXP'
-name: 'mat_exp'
+project_name: 'DA6'
+name: 'implementation-trial'
 gpu: 0
 # ==================================================
 # configure environment
@@ -18,8 +18,8 @@ num_objects: 25
 # configure agent
 
 agent_type: 'mat' # default, mat
-brain: 'mat' # dqn, mat, mat_baseline
-view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view
+brain: 'mat' # dqn, mat, mat_baseline, da6
+view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view, merged_view
 observation_area_mask: 'default'
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0

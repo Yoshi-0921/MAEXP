@@ -14,10 +14,7 @@ from ..abstract_loop_handler import AbstractLoopHandler
 class AbstractTrainer(AbstractLoopHandler, ABC):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config=config, environment=environment)
-        self.buffer = ReplayBuffer(
-            config.capacity,
-            state_conv=config.model.name in ["conv_mlp", "mat", "mat_baseline"],
-        )
+        self.buffer = ReplayBuffer(config.capacity)
         self.epsilon = config.epsilon_initial
 
         wandb.init(

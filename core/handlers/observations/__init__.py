@@ -10,12 +10,13 @@ from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
 from .abstract_observation import AbstractObservation
+from .local_ind_types_observation import LocalIndTypesObservation
 from .local_simple_observation import LocalSimpleObservation
 from .local_transition_observation import LocalTransitionObservation
 from .local_types_observation import LocalTypesObservation
 from .local_view_observation import LocalViewObservaton
+from .merged_view_observation import MergedViewObservaton
 from .relative_view_observation import RelativeViewObservaton
-from .local_ind_types_observation import LocalIndTypesObservation
 
 logger = initialize_logging(__name__)
 
@@ -26,7 +27,8 @@ __all__ = [
     "LocalTransitionObservation",
     "LocalSimpleObservation",
     "LocalTypesObservation",
-    "LocalIndTypesObservation"
+    "LocalIndTypesObservation",
+    "MergedViewObservation"
 ]
 
 
@@ -50,6 +52,9 @@ def generate_observation_handler(
 
     elif config.view_method == "local_ind_types_view":
         obs = LocalIndTypesObservation(config=config, world=world)
+
+    elif config.view_method == "merged_view":
+        obs = MergedViewObservaton(config=config, world=world)
 
     else:
         logger.warn(

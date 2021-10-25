@@ -90,7 +90,7 @@ class AbstractLoopHandler(ABC):
         pbar.close()
 
     def log_models(self):
-        network_table = wandb.Table(columns=["Agent", "FLOPs", "Memory (B)"])
+        network_table = wandb.Table(columns=["Agent", "MACs", "Parameters"])
         model_artifact = wandb.Artifact(
             name=wandb.run.id + ".onnx",
             type="model_topology",
@@ -101,13 +101,26 @@ class AbstractLoopHandler(ABC):
             print(f"Agent {str(agent_id)}:")
             summary(model=agent.brain.network)
 
-            dummy_input = torch.randn(
-                size=(1, *self.states[agent_id].shape), device=agent.brain.device
-            )
-            macs, params = clever_format(
-                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                "%.3f",
-            )
+            if type(self.states[agent_id]) == tuple:
+                dummy_input0 = torch.randn(
+                    size=(1, *self.states[agent_id][0].shape), device=agent.brain.device
+                )
+                dummy_input1 = torch.randn(
+                    size=(1, *self.states[agent_id][1].shape), device=agent.brain.device
+                )
+                macs, params = clever_format(
+                    [*profile(agent.brain.network, inputs=(dummy_input0, dummy_input1,), verbose=False)],
+                    "%.3f",
+                )
+
+            else:
+                dummy_input = torch.randn(
+                    size=(1, *self.states[agent_id].shape), device=agent.brain.device
+                )
+                macs, params = clever_format(
+                    [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
+                    "%.3f",
+                )
             network_table.add_data(
                 f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
             )
@@ -119,10 +132,16 @@ class AbstractLoopHandler(ABC):
                 idx=agent_id,
             )
             try:
-                torch.onnx.export(
-                    agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-                )
-                model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
+                if type(self.states[agent_id]) == tuple:
+                    torch.onnx.export(
+                        agent.brain.network, (dummy_input0, dummy_input1), f"agent_{str(agent_id)}.onnx"
+                    )
+                    model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
+                else:
+                    torch.onnx.export(
+                        agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                    )
+                    model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
             except RuntimeError:
                 pass
 
@@ -149,6 +168,8 @@ class AbstractLoopHandler(ABC):
         wandb.log_artifact(weight_artifact)
 
     def load_state_dict(self):
+        return
+
         weight_artifact = wandb.use_artifact(
             self.config.pretrained_weight_path, type="pretrained_weight"
         )
