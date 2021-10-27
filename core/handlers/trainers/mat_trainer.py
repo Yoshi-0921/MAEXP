@@ -9,6 +9,8 @@ from core.utils.buffer import Experience
 
 from .default_trainer import DefaultTrainer
 
+plt.rcParams["figure.facecolor"] = 'white'
+plt.rcParams['savefig.facecolor'] = 'white'
 sns.set()
 
 

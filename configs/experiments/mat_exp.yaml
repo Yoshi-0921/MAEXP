@@ -1,6 +1,6 @@
 defaults:
-  - model: mat # mlp, conv_mlp, mat, mat_baseline, da6
-  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
+  - model: da6 # mlp, conv_mlp, mat, mat_baseline, da6
+  - map: simple # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
@@ -18,18 +18,23 @@ num_objects: 25
 # configure agent
 
 agent_type: 'mat' # default, mat
-brain: 'mat' # dqn, mat, mat_baseline, da6
-view_method: 'local_view' # local_view, relative_view, local_transition_view, local_simple_view, merged_view
-observation_area_mask: 'default'
+brain: 'da6' # dqn, mat, mat_baseline, da6
+num_agents: 6
+init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
+phase: 'training' # training, evaluation
+# ==================================================
+# configure observation
+
+visible_range: 7 # currently only 5, 7, 9 are suppoeted
+transparent_observation: False
+agent_view_method: 'default' # default, self, simple, transition, individual, merged_view
+object_view_method: 'default' # default, simple
+observation_area_mask: 'merged' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.3, 0.2, 0.1]
 std_distribution: [0.07, 0.05, 0.03]
 past_step: 1
-num_agents: 6
-init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
-visible_range: 7 # currently only 5, 7, 9 are suppoeted
-phase: 'training' # training, evaluation
 # ==================================================
 # configure training
 

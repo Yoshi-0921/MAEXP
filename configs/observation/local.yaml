@@ -1,0 +1,11 @@
+observation:
+  name: 'local'
+  visible_range: 7 # currently only 5, 7, 9 are suppoeted
+  transparent_observation: False
+  agent_view_method: 'default' # default, self, simple, transition, individual, merged_view
+  object_view_method: 'default' # default, simple
+  observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
+  noise_threshold_ratio: 0
+  flip_noise_probabilities: [0.3, 0.2, 0.1]
+  std_distribution: [0.07, 0.05, 0.03]
+  past_step: 1
