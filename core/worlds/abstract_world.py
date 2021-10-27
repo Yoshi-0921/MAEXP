@@ -39,10 +39,11 @@ class AbstractWorld(ABC):
     def reset_map(self):
         self.map.reset_all()
 
-    def step(self):
+    def step(self, order):
         force = [None] * len(self.agents)
         force = self.apply_action_force(force)
-        for agent_id, agent in enumerate(self.agents):
+        for agent_id in order:
+            agent = self.agents[agent_id]
             force = self.apply_environment_force(agent_id, agent, force)
             agent.push(force[agent_id])
         self.integrate_state()

@@ -26,7 +26,7 @@ class MATEvaluator(DefaultEvaluator):
             actions[agent_id] = action
             attention_maps[agent_id] = attns
 
-        rewards, _, new_states = self.env.step(actions)
+        rewards, _, new_states = self.env.step(actions, self.order)
 
         self.states = new_states
 

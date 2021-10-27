@@ -64,7 +64,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
             action = self.agents[agent_id].get_action(states[agent_id], epsilon)
             actions[agent_id] = action
 
-        rewards, dones, new_states = self.env.step(actions)
+        rewards, dones, new_states = self.env.step(actions, self.order)
 
         exp = Experience(self.states, actions, rewards, dones, new_states)
 

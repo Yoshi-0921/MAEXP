@@ -113,7 +113,7 @@ class DefaultEnvironment(AbstractEnvironment):
     def observation(self):
         raise NotImplementedError()
 
-    def step(self, action_n: List[np.array]):
+    def step(self, action_n: List[np.array], order: List[int]):
         reward_n: List[np.array] = []
         done_n: List[np.array] = []
         obs_n: List[np.array] = []
@@ -122,7 +122,7 @@ class DefaultEnvironment(AbstractEnvironment):
             self.action_ind(action_n[agent_id], agent)
 
         # excecute action in the environment
-        self.world.step()
+        self.world.step(order)
 
         # obtain the outcome from the environment for each agent
         for agent_id, agent in enumerate(self.agents):
