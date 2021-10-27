@@ -75,7 +75,7 @@ class MATTypesVideoEvaluator(DefaultEvaluator):
         if step == 0:
             self.images.append(image.transpose((1, 0, 2)))
 
-        fig = plt.figure()
+        _ = plt.figure()
         plt.subplot(2, 2, 1)
         plt.imshow(self.images.pop(0))
         plt.xticks([])
