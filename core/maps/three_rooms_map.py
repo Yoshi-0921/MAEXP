@@ -28,7 +28,7 @@ class ThreeRoomsMap(AbstractMap):
         if self.config.type_objects == 1:
             # Set objects area for object 0
             self.objects_area_matrix[0, 1:10, 1:10] = 1
-            self.objects_area_matrix[1, 1:10, 15:24] = 1
+            self.objects_area_matrix[0, 1:10, 15:24] = 1
             self.objects_area_matrix[0, 15:24, 1:24] = 1
 
         elif self.config.type_objects == 2:
