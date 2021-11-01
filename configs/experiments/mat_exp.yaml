@@ -1,19 +1,20 @@
 defaults:
-  - model: da6 # mlp, conv_mlp, mat, mat_baseline, da6
-  - map: simple # simple, four_rooms, four_rectangle, three_rooms
+  - model: mat # mlp, conv_mlp, mat, mat_baseline, da6
+  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'DA6'
-name: 'implementation-trial'
+name: 'da3'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward
+environment: 'default' # default, shared_mean_reward, shared_max_reward, object_types, mat_types_test
 seed: 921
 num_objects: 25
+type_objects: 1
 # ==================================================
 # configure agent
 
@@ -21,15 +22,16 @@ agent_type: 'mat' # default, mat
 brain: 'da6' # dqn, mat, mat_baseline, da6
 num_agents: 6
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
+shuffle_init_xys: True
 phase: 'training' # training, evaluation
 # ==================================================
 # configure observation
 
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
-agent_view_method: 'default' # default, self, simple, transition, individual, merged_view
-object_view_method: 'default' # default, simple
-observation_area_mask: 'merged' # local, relative, merged
+agent_view_method: 'default' # default, self, simple, transition, individual
+object_view_method: 'default' # default, simple, object_types
+observation_area_mask: 'local' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.3, 0.2, 0.1]
