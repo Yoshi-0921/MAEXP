@@ -36,9 +36,10 @@ class TransitionAgentObservationHandler(AbstractObservationHandler):
                 coordinates["area_y_min"]: coordinates["area_y_max"],
             ]
             * self.world.map.agents_matrix[
+                :,
                 coordinates["map_x_min"]: coordinates["map_x_max"],
                 coordinates["map_y_min"]: coordinates["map_y_max"],
-            ]
+            ].sum(axis=0)
         )
 
         for t in range(self.past_step):
@@ -75,11 +76,11 @@ class TransitionAgentObservationHandler(AbstractObservationHandler):
 
     def get_past_global_agents(self, agents, coordinate_handler):
         global_agents = [
-            self.world.map.agents_matrix.copy() for _ in range(self.num_agents)
+            self.world.map.agents_matrix.sum(axis=0).copy() for _ in range(self.num_agents)
         ]
         for agent_id, agent in enumerate(agents):
             coordinates = coordinate_handler.get_mask_coordinates(agent)
-            mask = np.zeros_like(self.world.map.agents_matrix)
+            mask = np.zeros_like(global_agents[0])
             mask[
                 coordinates["map_x_min"]: coordinates["map_x_max"],
                 coordinates["map_y_min"]: coordinates["map_y_max"],

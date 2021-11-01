@@ -5,7 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from random import random
+import random
 from typing import List
 
 import numpy as np
@@ -27,6 +27,9 @@ class DefaultEnvironment(AbstractEnvironment):
             self.action_space.append(4)
             self.observation_space.append(self.observation_handler.observation_space)
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
+        self.init_xys_order = [i for i in range(len(self.init_xys))]
+        self.type_objects = config.type_objects
+
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
             dtype=np.int32,
@@ -36,10 +39,10 @@ class DefaultEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_accumulated_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_accumulated_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_accumulated_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -63,10 +66,10 @@ class DefaultEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
         self.heatmap_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -75,38 +78,45 @@ class DefaultEnvironment(AbstractEnvironment):
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
 
-        for agent_id, agent in enumerate(self.agents):
+        if self.config.shuffle_init_xys:
+            random.shuffle(self.init_xys_order)
+
+        for agent_id, (agent, order) in enumerate(zip(self.agents, self.init_xys_order)):
             agent.collide_agents = False
             agent.collide_walls = False
 
             # Initialize agent position
-            agent.move(self.init_xys[agent_id])
-            pos_x, pos_y = self.world.map.coord2ind(self.init_xys[agent_id])
-            self.world.map.agents_matrix[pos_x, pos_y] = 1
+            agent.move(self.init_xys[order].copy())
+            pos_x, pos_y = self.world.map.coord2ind(self.init_xys[order])
+            self.world.map.agents_matrix[agent_id, pos_x, pos_y] = 1
 
         # Initialize object position
         self.world.reset_objects()
-        self.generate_objects(self.config.num_objects)
+        self.generate_objects()
 
         obs_n = self.observation_handler.reset(self.agents)
 
         return obs_n
 
-    def generate_objects(self, num_objects: int):
+    def generate_objects(self, num_objects: int = None, object_type: int = 0):
+        num_objects = num_objects or self.config.num_objects
+        self._generate_objects(num_objects, object_type)
+
+    def _generate_objects(self, num_objects: int, object_type: int = 0):
         num_generated = 0
         while num_generated < num_objects:
-            x = 1 + int(random() * (self.world.map.SIZE_X - 1))
-            y = 1 + int(random() * (self.world.map.SIZE_Y - 1))
+            x = 1 + int(random.random() * (self.world.map.SIZE_X - 1))
+            y = 1 + int(random.random() * (self.world.map.SIZE_Y - 1))
             if (
                 self.world.map.wall_matrix[x, y] == 0
-                and self.world.map.agents_matrix[x, y] == 0
-                and self.world.map.objects_matrix[x, y] == 0
-                and self.world.map.aisle_matrix[x, y] == 0
+                and self.world.map.agents_matrix[:, x, y].sum() == 0
+                and self.world.map.objects_matrix[:, x, y].sum() == 0
+                and self.world.map.objects_area_matrix[object_type, x, y] == 1
             ):
-                self.world.objects.append(Object())
+                self.world.objects.append(Object(object_type))
                 self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
-                self.world.map.objects_matrix[x, y] = 1
-                self.heatmap_objects[x, y] += 1
+                self.world.map.objects_matrix[object_type, x, y] = 1
+                self.heatmap_objects[object_type, x, y] += 1
                 num_generated += 1
                 self.objects_generated += 1
 
@@ -162,7 +172,7 @@ class DefaultEnvironment(AbstractEnvironment):
                 reward = 1.0
                 self.world.objects.pop(obj_idx)
                 obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
-                self.world.map.objects_matrix[obj_pos_x, obj_pos_y] = 0
+                self.world.map.objects_matrix[0, obj_pos_x, obj_pos_y] = 0
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
                 self.generate_objects(1)

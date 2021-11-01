@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Source code for default observation handler for agents.
+"""Source code for default observation handler for objects.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -15,6 +15,7 @@ class DefaultObjectObservationHandler(AbstractObservationHandler):
 
     def fill(self, agents, agent, agent_id, area_mask, coordinates):
         obs = torch.zeros(1, *area_mask.shape)
+
         obs[
             0,
             coordinates["obs_x_min"]: coordinates["obs_x_max"],
@@ -25,9 +26,10 @@ class DefaultObjectObservationHandler(AbstractObservationHandler):
                 coordinates["area_y_min"]: coordinates["area_y_max"],
             ]
             * self.world.map.objects_matrix[
+                :,
                 coordinates["map_x_min"]: coordinates["map_x_max"],
                 coordinates["map_y_min"]: coordinates["map_y_max"],
-            ]
+            ].sum(axis=0)
         )
 
         return obs

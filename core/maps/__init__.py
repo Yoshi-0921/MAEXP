@@ -19,16 +19,16 @@ logger = initialize_logging(__name__)
 
 def generate_map(config: DictConfig) -> AbstractMap:
     if config.map.name == "simple":
-        world_map = SimpleMap(config=config)
+        world_map = SimpleMap(config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y)
 
     elif config.map.name == "four_rooms":
-        world_map = FourRoomsMap(config=config)
+        world_map = FourRoomsMap(config=config, size_x=24, size_y=24)
 
     elif config.map.name == "three_rooms":
-        world_map = ThreeRoomsMap(config=config)
+        world_map = ThreeRoomsMap(config=config, size_x=25, size_y=25)
 
     elif config.map.name == "four_rectangle":
-        world_map = FourRectangleMap(config=config)
+        world_map = FourRectangleMap(config=config, size_x=40, size_y=24)
 
     else:
         logger.warn(f"Unexpected map is given. config.map.name: {config.map.name}")

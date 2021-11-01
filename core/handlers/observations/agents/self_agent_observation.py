@@ -26,9 +26,10 @@ class SelfAgentObservationHandler(AbstractObservationHandler):
                 coordinates["area_y_min"]: coordinates["area_y_max"],
             ]
             * self.world.map.agents_matrix[
+                :,
                 coordinates["map_x_min"]: coordinates["map_x_max"],
                 coordinates["map_y_min"]: coordinates["map_y_max"],
-            ]
+            ].sum(axis=0)
         )
 
         pos_x, pos_y = self.world.map.coord2ind(agent.xy)

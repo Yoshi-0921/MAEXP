@@ -4,13 +4,18 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
-from omegaconf import DictConfig
 
 from .abstract_map import AbstractMap
 
 
 class SimpleMap(AbstractMap):
-    def __init__(self, config: DictConfig):
-        super().__init__(
-            config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y
-        )
+    def set_objects_area(self):
+        if self.config.type_objects == 1:
+            # Set objects area for object 0
+            self.objects_area_matrix[0, 1:self.config.map.SIZE_X - 1, 1:self.config.map.SIZE_Y - 1] = 1
+
+        elif self.config.type_objects == 2:
+            # Set objects area for object 0
+            self.objects_area_matrix[0, 1:self.config.map.SIZE_X - 1, 1:self.config.map.SIZE_Y - 1] = 1
+            # Set objects area for object 1
+            self.objects_area_matrix[0, 1:self.config.map.SIZE_X - 1, 1:self.config.map.SIZE_Y - 1] = 1

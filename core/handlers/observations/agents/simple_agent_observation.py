@@ -23,9 +23,10 @@ class SimpleAgentObservationHandler(AbstractObservationHandler):
             coordinates["obs_y_min"]: coordinates["obs_y_max"],
         ] = torch.from_numpy(
             self.world.map.agents_matrix[
+                :,
                 coordinates["map_x_min"]: coordinates["map_x_max"],
                 coordinates["map_y_min"]: coordinates["map_y_max"],
-            ]
+            ].sum(axis=0)
         )
 
         return obs

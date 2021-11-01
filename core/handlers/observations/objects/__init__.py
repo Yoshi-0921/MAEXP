@@ -10,6 +10,7 @@ from core.worlds import AbstractWorld
 
 from .default_object_observation import DefaultObjectObservationHandler
 from .simple_object_observation import SimpleObjectObservationHandler
+from .types_object_observation import TypesObjectObservationHandler
 
 logger = initialize_logging(__name__)
 
@@ -20,6 +21,9 @@ def generate_observation_object(config, world: AbstractWorld):
 
     elif config.object_view_method == "simple":
         observation_object = SimpleObjectObservationHandler(config=config, world=world)
+
+    elif config.object_view_method == "object_types":
+        observation_object = TypesObjectObservationHandler(config=config, world=world)
 
     else:
         logger.warn(

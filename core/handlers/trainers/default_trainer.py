@@ -124,7 +124,9 @@ class DefaultTrainer(AbstractTrainer):
         heatmap_objects = np.where(
             heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
         )
-        heatmap[:, torch.tensor([0, 1]), ...] += torch.from_numpy(heatmap_objects)
+        for heatmap_object, (red, green) in zip(heatmap_objects, [(1., 1.), (1., 0.5), (0.5, 1.)]):
+            heatmap[:, 0, ...] += torch.from_numpy(heatmap_object) * red
+            heatmap[:, 1, ...] += torch.from_numpy(heatmap_object) * green
 
         heatmap = F.interpolate(
             heatmap,

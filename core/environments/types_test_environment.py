@@ -77,7 +77,7 @@ class TypesTestEnvironment(AbstractEnvironment):
             # Initialize agent position
             agent.move(self.init_xys[agent_id])
             pos_x, pos_y = self.world.map.coord2ind(self.init_xys[agent_id])
-            self.world.map.agents_matrix[pos_x, pos_y] = 1
+            self.world.map.agents_matrix[agent_id, pos_x, pos_y] = 1
 
         # Initialize object position
         self.world.reset_objects()
@@ -92,8 +92,8 @@ class TypesTestEnvironment(AbstractEnvironment):
         y = 10  # 10
         if (
             self.world.map.wall_matrix[x, y] == 0
-            and self.world.map.agents_matrix[x, y] == 0
-            and self.world.map.objects_matrix[x, y] == 0
+            and self.world.map.agents_matrix[:, x, y].sum() == 0
+            and self.world.map.objects_matrix[0, x, y] == 0
             and self.world.map.aisle_matrix[x, y] == 0
         ):
             self.world.objects.append(Object())
@@ -106,13 +106,13 @@ class TypesTestEnvironment(AbstractEnvironment):
         y = 5
         if (
             self.world.map.wall_matrix[x, y] == 0
-            and self.world.map.agents_matrix[x, y] == 0
-            and self.world.map.objects_matrix[x, y] == 0
+            and self.world.map.agents_matrix[:, x, y].sum() == 0
+            and self.world.map.objects_matrix[0, x, y] == 0
             and self.world.map.aisle_matrix[x, y] == 0
         ):
             self.world.objects.append(Object())
             self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
-            self.world.map.objects_matrix[x, y] = 1
+            self.world.map.objects_matrix[0, x, y] = 1
             self.heatmap_objects[x, y] += 1
             self.objects_generated += 1
 
@@ -138,7 +138,7 @@ class TypesTestEnvironment(AbstractEnvironment):
 
         self.observation_handler.step(self.agents)
 
-        self.heatmap_objects_left += self.world.map.objects_matrix
+        self.heatmap_objects_left += self.world.map.objects_matrix[0]
 
         obs_n = torch.stack(obs_n)
 
@@ -173,7 +173,7 @@ class TypesTestEnvironment(AbstractEnvironment):
                     reward = 1.0
                     self.world.objects.pop(obj_idx)
                     obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
-                    self.world.map.objects_matrix[obj_pos_x, obj_pos_y] = 0
+                    self.world.map.objects_matrix[0, obj_pos_x, obj_pos_y] = 0
                     self.objects_completed += 1
                     self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
                     # self.generate_objects(1)

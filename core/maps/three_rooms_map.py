@@ -5,16 +5,11 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 import numpy as np
-from omegaconf import DictConfig
 
 from .abstract_map import AbstractMap
 
 
 class ThreeRoomsMap(AbstractMap):
-    def __init__(self, config: DictConfig):
-        super().__init__(config=config, size_x=25, size_y=25)
-        self.locate_aisle()
-
     def locate_walls(self):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
@@ -29,10 +24,17 @@ class ThreeRoomsMap(AbstractMap):
             14, np.array([1, 2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23])
         ] = 1
 
-    def locate_aisle(self):
-        self.aisle_matrix[np.arange(10, 15), :] = 1
-        self.aisle_matrix[np.arange(1, 15), 10] = 1
-        self.aisle_matrix[np.arange(1, 15), 11] = 1
-        self.aisle_matrix[np.arange(1, 15), 12] = 1
-        self.aisle_matrix[np.arange(1, 15), 13] = 1
-        self.aisle_matrix[np.arange(1, 15), 14] = 1
+    def set_objects_area(self):
+        if self.config.type_objects == 1:
+            # Set objects area for object 0
+            self.objects_area_matrix[0, 1:10, 1:10] = 1
+            self.objects_area_matrix[1, 1:10, 15:24] = 1
+            self.objects_area_matrix[0, 15:24, 1:24] = 1
+
+        elif self.config.type_objects == 2:
+            # Set objects area for object 0
+            self.objects_area_matrix[0, 1:10, 1:10] = 1
+            self.objects_area_matrix[0, 15:24, 1:24] = 1
+            # Set objects area for object 1
+            self.objects_area_matrix[1, 1:10, 15:24] = 1
+            self.objects_area_matrix[1, 15:24, 1:24] = 1

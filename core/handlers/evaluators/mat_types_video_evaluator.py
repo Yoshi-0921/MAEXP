@@ -61,8 +61,8 @@ class MATTypesVideoEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         image = np.stack((self.env.world.map.wall_matrix.astype(np.float),) * 3, axis=-1)
-        image[..., 0] += self.env.world.map.objects_matrix.astype(np.float)
-        image[..., 1] += self.env.world.map.objects_matrix.astype(np.float)
+        image[..., 0] += self.env.world.map.objects_matrix[0].astype(np.float)
+        image[..., 1] += self.env.world.map.objects_matrix[0].astype(np.float)
         for agent_id, agent in enumerate(self.env.agents):
             pos_x, pos_y = self.env.world.map.coord2ind(agent.xy)
             if agent_id in [4, 5]:
