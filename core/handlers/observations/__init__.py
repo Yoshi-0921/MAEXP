@@ -5,62 +5,23 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.utils.logging import initialize_logging
 from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
-from .abstract_observation import AbstractObservation
-from .local_ind_types_observation import LocalIndTypesObservation
-from .local_simple_observation import LocalSimpleObservation
-from .local_transition_observation import LocalTransitionObservation
-from .local_types_observation import LocalTypesObservation
-from .local_view_observation import LocalViewObservaton
-from .merged_view_observation import MergedViewObservaton
-from .relative_view_observation import RelativeViewObservaton
-
-logger = initialize_logging(__name__)
+from .merged_observtion_handler import MergedObservationHandler
+from .observation_handler import ObservationHandler
 
 __all__ = [
-    "AbstractObservation",
-    "LocalViewObservation",
-    "RelativeViewObservation",
-    "LocalTransitionObservation",
-    "LocalSimpleObservation",
-    "LocalTypesObservation",
-    "LocalIndTypesObservation",
-    "MergedViewObservation"
+    "ObservationHandler",
+    "MergedObservationHandler"
 ]
 
 
-def generate_observation_handler(
-    config: DictConfig, world: AbstractWorld
-) -> AbstractObservation:
-    if config.view_method == "local_view":
-        obs = LocalViewObservaton(config=config, world=world)
-
-    elif config.view_method == "relative_view":
-        obs = RelativeViewObservaton(config=config, world=world)
-
-    elif config.view_method == "local_transition_view":
-        obs = LocalTransitionObservation(config=config, world=world)
-
-    elif config.view_method == "local_simple_view":
-        obs = LocalSimpleObservation(config=config, world=world)
-
-    elif config.view_method == "local_types_view":
-        obs = LocalTypesObservation(config=config, world=world)
-
-    elif config.view_method == "local_ind_types_view":
-        obs = LocalIndTypesObservation(config=config, world=world)
-
-    elif config.view_method == "merged_view":
-        obs = MergedViewObservaton(config=config, world=world)
+def generate_observation_handler(config: DictConfig, world: AbstractWorld):
+    if config.observation_area_mask == 'merged':
+        obs = MergedObservationHandler(config=config, world=world)
 
     else:
-        logger.warn(
-            f"Unexpected view_method is given. config.view_method: {config.view_method}"
-        )
-
-        raise ValueError()
+        obs = ObservationHandler(config=config, world=world)
 
     return obs

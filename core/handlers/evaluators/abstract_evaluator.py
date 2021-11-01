@@ -43,7 +43,7 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
             action = self.agents[agent_id].get_action(states[agent_id], epsilon)
             actions[agent_id] = action
 
-        rewards, _, new_states = self.env.step(actions)
+        rewards, _, new_states = self.env.step(actions, self.order)
 
         self.states = new_states
 

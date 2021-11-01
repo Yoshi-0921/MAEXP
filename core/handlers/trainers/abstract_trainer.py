@@ -31,7 +31,9 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
                 config.trainer + "_trainer",
                 config.model.name + "_model",
                 config.map.name + "_map",
-                config.view_method + "_method",
+                config.observation_area_mask + "_area_mask",
+                config.agent_view_method + "_agent_view_method",
+                config.object_view_method + "_object_view_method",
             ],
         )
 
@@ -62,7 +64,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
             action = self.agents[agent_id].get_action(states[agent_id], epsilon)
             actions[agent_id] = action
 
-        rewards, dones, new_states = self.env.step(actions)
+        rewards, dones, new_states = self.env.step(actions, self.order)
 
         exp = Experience(self.states, actions, rewards, dones, new_states)
 

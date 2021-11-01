@@ -38,8 +38,9 @@ class Entity(ABC):
 
 
 class Object(Entity):
-    def __init__(self):
+    def __init__(self, object_type: int = None):
         super().__init__()
+        self.type = object_type
 
 
 class Agent(Entity):

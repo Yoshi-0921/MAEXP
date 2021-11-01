@@ -9,6 +9,8 @@ from core.utils.buffer import Experience
 
 from .default_trainer import DefaultTrainer
 
+plt.rcParams["figure.facecolor"] = 'white'
+plt.rcParams['savefig.facecolor'] = 'white'
 sns.set()
 
 
@@ -27,7 +29,7 @@ class MATTrainer(DefaultTrainer):
             actions[agent_id] = action
             attention_maps[agent_id] = attns
 
-        rewards, dones, new_states = self.env.step(actions)
+        rewards, dones, new_states = self.env.step(actions, self.order)
 
         exp = Experience(self.states, actions, rewards, dones, new_states)
 

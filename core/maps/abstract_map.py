@@ -5,7 +5,7 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import numpy as np
 from omegaconf import DictConfig
@@ -14,25 +14,28 @@ from omegaconf import DictConfig
 class AbstractMap(ABC):
     def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.config = config
+        self.num_agents = config.num_agents
+        self.type_objects = config.type_objects
         self.SIZE_X = size_x
         self.SIZE_Y = size_y
 
-        self.wall_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.aisle_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.wall_matrix = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.objects_area_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
         self.locate_walls()
+        self.set_objects_area()
 
     def reset(self):
-        self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
     def reset_agents(self):
-        self.agents_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
     def reset_objects(self):
-        self.objects_matrix = np.zeros((self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
     def coord2ind(self, position: np.array, size_x: int = None, size_y: int = None):
         pos_x, pos_y = position
@@ -60,5 +63,6 @@ class AbstractMap(ABC):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
 
-    def locate_aisle(self):
+    @abstractmethod
+    def set_objects_area(self):
         raise NotImplementedError()

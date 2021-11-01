@@ -5,12 +5,12 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 from typing import List
-
+import numpy as np
 import torch
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
-
+import numpy.typing as npt
 from ..hard_shrink_attention import HardShrinkBlock
 from ..vit import Block, PatchEmbed
 
@@ -132,7 +132,7 @@ class DA6(nn.Module):
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.local_pos_embed
 
-        attns = list()
+        attns: List[npt.NDArray[np.float32]] = list()
         for blk in self.local_blocks:
             out, attn = blk.forward_attn(out)
             attns.append(attn.detach())
