@@ -82,9 +82,8 @@ class ObservationHandler:
     def render(self, state: torch.Tensor) -> torch.Tensor:
         image = torch.zeros(3, *self.observation_space[1:])
         obs = state.permute(0, 2, 1)
-        channel = 0
 
-        image, channel = self.observation_agent.render(obs, image, channel)
+        image, channel = self.observation_agent.render(obs, image, 0)
         image, channel = self.observation_object.render(obs, image, channel)
         # add invisible area information (White)
         image -= obs[channel]
