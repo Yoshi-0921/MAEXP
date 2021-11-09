@@ -5,7 +5,10 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+import numpy as np
 import torch
+from core.utils.color import RGB_COLORS
+
 from ..abstract_observation_handler import AbstractObservationHandler
 
 
@@ -35,8 +38,9 @@ class TypesObjectObservationHandler(AbstractObservationHandler):
 
     def render(self, obs, image, channel):
         # add object information (Yellow)
-        for i, (red, green) in zip(range(self.config.type_objects), [(1., 1.), (1., 0.5), (0.5, 1.)]):
-            image[0] += obs[channel + i] * red
-            image[1] += obs[channel + i] * green
+        for i, color in zip(range(self.config.type_objects), ["yellow", "orange", "chartreuse"]):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            image += obs[channel + i] * rgb
 
         return image, channel + self.get_channel()

@@ -7,6 +7,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 import numpy as np
 import torch
+from core.utils.color import RGB_COLORS
 from core.worlds import AbstractWorld
 from omegaconf import DictConfig
 
@@ -58,9 +59,11 @@ class TransitionAgentObservationHandler(AbstractObservationHandler):
 
     def render(self, obs, image, channel):
         # add agent information (Blue)
-        image[2] += obs[channel]
+        rgb = RGB_COLORS["blue"]
+        rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+        image += obs[channel] * rgb
         for t in range(1, self.past_step + 1):
-            image[2] += obs[channel + t] * (0.5 ** t)
+            image += obs[channel + t] * rgb * (0.5 ** t)
 
         return torch.clamp(image, min=0., max=1.), channel + self.get_channel()
 

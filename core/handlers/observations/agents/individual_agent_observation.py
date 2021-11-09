@@ -4,7 +4,10 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
+
+import numpy as np
 import torch
+from core.utils.color import RGB_COLORS
 
 from ..abstract_observation_handler import AbstractObservationHandler
 
@@ -36,7 +39,9 @@ class IndividualAgentObservationHandler(AbstractObservationHandler):
 
     def render(self, obs, image, channel):
         # add agent information (Blue)
+        rgb = RGB_COLORS["blue"]
+        rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
         for i in range(6):
-            image[2] += obs[channel + i]
+            image += obs[channel + i] * rgb
 
         return image, channel + self.get_channel()
