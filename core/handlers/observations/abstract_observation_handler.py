@@ -13,6 +13,11 @@ class AbstractObservationHandler(ABC):
         self.world = world
         self.visible_range = config.visible_range
         self.visible_radius = config.visible_range // 2
+        self.num_agents = config.num_agents
+        self.num_objects = config.num_objects
+        self.type_objects = config.type_objects
+        self.agents_color = config.agents_color
+        self.objects_color = config.objects_color
 
     @abstractmethod
     def get_channel(self) -> int:

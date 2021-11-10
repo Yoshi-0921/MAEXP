@@ -37,8 +37,7 @@ class TypesObjectObservationHandler(AbstractObservationHandler):
         return obs
 
     def render(self, obs, image, channel):
-        # add object information (Yellow)
-        for i, color in zip(range(self.config.type_objects), ["yellow", "orange", "chartreuse"]):
+        for i, color in enumerate(self.objects_color):
             rgb = RGB_COLORS[color]
             rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
             image += obs[channel + i] * rgb

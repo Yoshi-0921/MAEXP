@@ -14,11 +14,11 @@ from ..abstract_observation_handler import AbstractObservationHandler
 
 class IndividualAgentObservationHandler(AbstractObservationHandler):
     def get_channel(self):
-        # 0:agent0, 1:agent1, 2:agent2, 3:agent3, 4:random_agent1, 5:random_agent2
-        return 6
+        # 0:agent0, 1:agent1, ..., n:agentn
+        return self.num_agents
 
     def fill(self, agents, agent, agent_id, area_mask, coordinates):
-        obs = torch.zeros(6, *area_mask.shape)
+        obs = torch.zeros(self.num_agents, *area_mask.shape)
 
         for obs_i, agent_matrix in zip(obs, self.world.map.agents_matrix):
             obs_i[
@@ -38,10 +38,9 @@ class IndividualAgentObservationHandler(AbstractObservationHandler):
         return obs
 
     def render(self, obs, image, channel):
-        # add agent information (Blue)
-        rgb = RGB_COLORS["blue"]
-        rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
-        for i in range(6):
+        for i, color in enumerate(self.agents_color):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
             image += obs[channel + i] * rgb
 
         return image, channel + self.get_channel()

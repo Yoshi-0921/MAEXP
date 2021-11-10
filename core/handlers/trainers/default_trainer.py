@@ -2,6 +2,7 @@
 import numpy as np
 import torch
 import wandb
+from core.utils.color import RGB_COLORS
 from torch.nn import functional as F
 from torchvision.utils import make_grid
 
@@ -102,7 +103,7 @@ class DefaultTrainer(AbstractTrainer):
             self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
         )
 
-        for agent_id in range(self.env.num_agents):
+        for agent_id, color in enumerate(self.config.agents_color):
             # add agent path information
             heatmap_agents = (
                 0.5
@@ -112,7 +113,9 @@ class DefaultTrainer(AbstractTrainer):
             heatmap_agents = np.where(
                 heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
             )
-            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            heatmap[agent_id] += torch.from_numpy(heatmap_agents) * rgb
 
         # add wall information
         heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
@@ -124,9 +127,10 @@ class DefaultTrainer(AbstractTrainer):
         heatmap_objects = np.where(
             heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
         )
-        for heatmap_object, (red, green) in zip(heatmap_objects, [(1., 1.), (1., 0.5), (0.5, 1.)]):
-            heatmap[:, 0, ...] += torch.from_numpy(heatmap_object) * red
-            heatmap[:, 1, ...] += torch.from_numpy(heatmap_object) * green
+        for heatmap_object, color in zip(heatmap_objects, self.config.objects_color):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            heatmap[:, ...] += torch.from_numpy(heatmap_object) * rgb
 
         heatmap = F.interpolate(
             heatmap,
