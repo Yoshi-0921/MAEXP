@@ -9,8 +9,8 @@ from core.utils.buffer import Experience
 
 from .default_trainer import DefaultTrainer
 
-plt.rcParams["figure.facecolor"] = 'white'
-plt.rcParams['savefig.facecolor'] = 'white'
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
 
 
@@ -55,71 +55,83 @@ class MATTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                attention_map = (
-                    attention_maps[agent_id]
-                    .mean(dim=0)[0, :, 0, 1:]
-                    .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
-                    .cpu()
-                )
+                images = self.env.observation_handler.render(states[agent_id])
+                if type(images) != list:
+                    images = [images]
 
-                fig = plt.figure()
-                sns.heatmap(
-                    torch.t(attention_map.mean(dim=0)),
-                    vmin=0,
-                    square=True,
-                    annot=True,
-                    fmt=".3f",
-                    vmax=0.25,
-                )
+                for attention_map, image, view_method in zip(
+                    attention_maps[agent_id],
+                    images,
+                    ["local", "relative"],
+                ):
+                    attention_map = (
+                        attention_map.mean(dim=0)[0, :, 0, 1:]
+                        .view(
+                            -1,
+                            getattr(agent.brain, f"{view_method}_patched_size_x"),
+                            getattr(agent.brain, f"{view_method}_patched_size_y"),
+                        )
+                        .cpu()
+                    )
 
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/attention_mean": [
-                            wandb.Image(
-                                data_or_path=fig,
-                                caption="mean attention heatmap",
-                            )
-                        ]
-                    },
-                    step=self.global_step,
-                )
-
-                fig_list = []
-                for head_id, am in enumerate(attention_map):
                     fig = plt.figure()
                     sns.heatmap(
-                        torch.t(am),
+                        torch.t(attention_map.mean(dim=0)),
                         vmin=0,
                         square=True,
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
                     )
-                    fig_list.append(
-                        wandb.Image(
-                            data_or_path=fig,
-                            caption=f"attention heatmap from head {str(head_id)}",
-                        )
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_attention_mean": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"mean {view_method} attention heatmap",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
                     )
 
-                wandb.log(
-                    {f"agent_{str(agent_id)}/attention_heads": fig_list},
-                    step=self.global_step,
-                )
-
-                image = self.env.observation_handler.render(states[agent_id])
-
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/observation": [
+                    fig_list = []
+                    for head_id, am in enumerate(attention_map):
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(am),
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                        )
+                        fig_list.append(
                             wandb.Image(
-                                data_or_path=image,
-                                caption="local observation",
+                                data_or_path=fig,
+                                caption=f"{view_method} attention heatmap from head {str(head_id)}",
                             )
-                        ]
-                    },
-                    step=self.global_step,
-                )
+                        )
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_attention_heads": fig_list
+                        },
+                        step=self.global_step,
+                    )
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_observation": [
+                                wandb.Image(
+                                    data_or_path=image,
+                                    caption=f"{view_method} observation",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
 
         wandb.log(
             {

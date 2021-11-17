@@ -81,8 +81,8 @@ class DA6(nn.Module):
         self.fc1 = nn.Linear(config.model.embed_dim, config.model.embed_dim)
         self.fc2 = nn.Linear(config.model.embed_dim, output_size)
 
-    def forward(self, relative_x, local_x):
-        relative_x, local_x = self.state_encoder(relative_x, local_x)
+    def forward(self, local_x, relative_x):
+        local_x, relative_x = self.state_encoder(local_x, relative_x)
 
         out = self.relative_patch_embed(relative_x)
         saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
@@ -112,16 +112,18 @@ class DA6(nn.Module):
 
         return out
 
-    def forward_attn(self, relative_x, local_x):
-        relative_x, local_x = self.state_encoder(relative_x, local_x)
+    def forward_attn(self, local_x, relative_x):
+        local_x, relative_x = self.state_encoder(local_x, relative_x)
 
         out = self.relative_patch_embed(relative_x)
         saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.relative_pos_embed
 
+        relative_attns: List[npt.NDArray[np.float32]] = list()
         for blk in self.relative_blocks:
-            out = blk(out)
+            out, attn = blk.forward_attn(out)
+            relative_attns.append(attn.detach())
 
         out = self.norm(out)
         saliency_vector = out[:, 0]
@@ -132,10 +134,10 @@ class DA6(nn.Module):
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.local_pos_embed
 
-        attns: List[npt.NDArray[np.float32]] = list()
+        local_attns: List[npt.NDArray[np.float32]] = list()
         for blk in self.local_blocks:
             out, attn = blk.forward_attn(out)
-            attns.append(attn.detach())
+            local_attns.append(attn.detach())
 
         out = self.norm(out)
 
@@ -143,11 +145,11 @@ class DA6(nn.Module):
 
         out = self.fc2(saliency_vector)
 
-        return out, attns
+        return out, [local_attns, relative_attns]
 
-    def state_encoder(self, relative_x, local_x):
+    def state_encoder(self, local_x, relative_x):
         # x.shape: [1, 4, 25, 25]
         relative_x = relative_x[:, -1, ...].unsqueeze(1)  # [1, 1, 25, 25]が欲しい
         relative_x += 1
 
-        return relative_x, local_x
+        return local_x, relative_x

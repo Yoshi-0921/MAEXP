@@ -73,6 +73,10 @@ class ObservationHandler:
         return torch.from_numpy(area_mask).unsqueeze(0).float() - 1
 
     def fill_obs_noise(self, obs, agent, agent_id):
+        pos_x, pos_y = self.world.map.coord2ind(agent.xy)
+        if self.world.map.noise_area_matrix[pos_x, pos_y] == 0:
+            return obs
+
         obs = self.observation_noise.add_noise(
             obs, agent, agent_id
         )

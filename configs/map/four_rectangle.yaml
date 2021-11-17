@@ -1,2 +1,4 @@
 map:
   name: 'four_rectangle'
+  SIZE_X: 40
+  SIZE_Y: 24

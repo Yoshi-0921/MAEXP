@@ -129,42 +129,44 @@ class DefaultEvaluator(AbstractEvaluator):
             plt.close()
 
         # log heatmap_events
-        fig = plt.figure()
-        sns.heatmap(
-            self.env.heatmap_accumulated_objects.T,
-            vmin=0,
-            cmap="Blues",
-            square=True,
-            xticklabels=list(
-                str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
-            ),
-            yticklabels=list(
-                str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
-            ),
-        )
-        heatmap_accumulated_objects.append(
-            wandb.Image(data_or_path=fig, caption="Objects generated")
-        )
-        plt.close()
+        for i, heatmap in enumerate(heatmap_accumulated_objects):
+            fig = plt.figure()
+            sns.heatmap(
+                heatmap.T,
+                vmin=0,
+                cmap="Blues",
+                square=True,
+                xticklabels=list(
+                    str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
+                ),
+                yticklabels=list(
+                    str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
+                ),
+            )
+            heatmap_accumulated_objects.append(
+                wandb.Image(data_or_path=fig, caption=f"Object {i} generated")
+            )
+            plt.close()
 
         # log heatmap_events_left
-        fig = plt.figure()
-        sns.heatmap(
-            self.env.heatmap_accumulated_objects_left.T,
-            vmin=0,
-            cmap="Blues",
-            square=True,
-            xticklabels=list(
-                str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
-            ),
-            yticklabels=list(
-                str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
-            ),
-        )
-        heatmap_accumulated_objects_left.append(
-            wandb.Image(data_or_path=fig, caption="Objects left")
-        )
-        plt.close()
+        for i, heatmap in enumerate(self.env.heatmap_accumulated_objects_left):
+            fig = plt.figure()
+            sns.heatmap(
+                heatmap.T,
+                vmin=0,
+                cmap="Blues",
+                square=True,
+                xticklabels=list(
+                    str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
+                ),
+                yticklabels=list(
+                    str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
+                ),
+            )
+            heatmap_accumulated_objects_left.append(
+                wandb.Image(data_or_path=fig, caption=f"Object {i} left")
+            )
+            plt.close()
 
         # log heatmap_wall_collision
         fig = plt.figure()

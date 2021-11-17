@@ -18,8 +18,10 @@ class DA6Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
-        self.patched_size_x = config.visible_range // config.model.local_patch_size
-        self.patched_size_y = config.visible_range // config.model.local_patch_size
+        self.local_patched_size_x = config.visible_range // config.model.local_patch_size
+        self.local_patched_size_y = config.visible_range // config.model.local_patch_size
+        self.relative_patched_size_x = config.map.SIZE_X // config.model.relative_patch_size
+        self.relative_patched_size_y = config.map.SIZE_Y // config.model.relative_patch_size
 
     @torch.no_grad()
     def get_action(self, state):

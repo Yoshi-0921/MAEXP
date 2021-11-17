@@ -25,7 +25,8 @@ class MATAgent(AbstractAgent):
     def get_action_attns(self, state, epsilon):
         action, attns = self.brain.get_action(state)
 
-        attns = torch.stack(attns)
+        # attns = torch.stack(attns)
+        attns = [torch.stack(attn) for attn in attns]
 
         if random() < epsilon:
             action = self.get_random_action()

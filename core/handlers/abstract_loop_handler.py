@@ -168,8 +168,6 @@ class AbstractLoopHandler(ABC):
         wandb.log_artifact(weight_artifact)
 
     def load_state_dict(self):
-        return
-
         weight_artifact = wandb.use_artifact(
             self.config.pretrained_weight_path, type="pretrained_weight"
         )

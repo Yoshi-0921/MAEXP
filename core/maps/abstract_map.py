@@ -26,6 +26,7 @@ class AbstractMap(ABC):
 
         self.locate_walls()
         self.set_objects_area()
+        self.set_noise_area()
 
     def reset(self):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
@@ -62,6 +63,9 @@ class AbstractMap(ABC):
     def locate_walls(self):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
+
+    def set_noise_area(self):
+        self.noise_area_matrix = np.ones(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
     @abstractmethod
     def set_objects_area(self):

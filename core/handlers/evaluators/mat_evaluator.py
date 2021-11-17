@@ -1,4 +1,3 @@
-
 import random
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +17,7 @@ class MATEvaluator(DefaultEvaluator):
         attention_maps = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
-        states = self.states.clone()
+        states = self.states
         for agent_id in self.order:
             action, attns = self.agents[agent_id].get_action_attns(
                 states[agent_id], epsilon
@@ -39,74 +38,84 @@ class MATEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         log_step = self.max_episode_length // 2
-        if epoch % (self.max_epochs // 3) == 0 and step in [log_step - 1, log_step, log_step + 1]:
+        if epoch % (self.max_epochs // 3) == 0 and step in [
+            log_step - 1,
+            log_step,
+            log_step + 1,
+        ]:
             for agent_id, agent in enumerate(self.agents):
-                attention_map = (
-                    attention_maps[agent_id]
-                    .mean(dim=0)[0, :, 0, 1:]
-                    .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
-                    .cpu()
-                )
-                fig = plt.figure()
-                sns.heatmap(
-                    torch.t(attention_map.mean(dim=0)),
-                    vmin=0,
-                    square=True,
-                    annot=True,
-                    fmt=".3f",
-                    vmax=0.25,
-                    annot_kws={"fontsize": 8}
-                )
-
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/attention_mean": [
-                            wandb.Image(
-                                data_or_path=fig,
-                                caption="mean attention heatmap",
-                            )
-                        ]
-                    },
-                    step=self.global_step,
-                )
-
-                fig_list = []
-                for head_id, am in enumerate(attention_map):
+                for attention_map, image, view_method in zip(
+                    attention_maps[agent_id],
+                    self.env.observation_handler.render(states[agent_id]),
+                    ["local", "relative"],
+                ):
+                    attention_map = (
+                        attention_map.mean(dim=0)[0, :, 0, 1:]
+                        .view(
+                            -1,
+                            getattr(agent.brain, f"{view_method}_patched_size_x"),
+                            getattr(agent.brain, f"{view_method}_patched_size_y"),
+                        )
+                        .cpu()
+                    )
                     fig = plt.figure()
                     sns.heatmap(
-                        torch.t(am),
+                        torch.t(attention_map.mean(dim=0)),
                         vmin=0,
                         square=True,
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
-                        annot_kws={"fontsize": 8}
+                        annot_kws={"fontsize": 8},
                     )
-                    fig_list.append(
-                        wandb.Image(
-                            data_or_path=fig,
-                            caption=f"attention heatmap from head {str(head_id)}",
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_attention_mean": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"mean {view_method} attention heatmap",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+
+                    fig_list = []
+                    for head_id, am in enumerate(attention_map):
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(am),
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                            annot_kws={"fontsize": 8},
                         )
+                        fig_list.append(
+                            wandb.Image(
+                                data_or_path=fig,
+                                caption=f"{view_method} attention heatmap from head {str(head_id)}",
+                            )
+                        )
+
+                    wandb.log(
+                        {f"agent_{str(agent_id)}/{view_method}_attention_heads": fig_list},
+                        step=self.global_step,
                     )
 
-                wandb.log(
-                    {f"agent_{str(agent_id)}/attention_heads": fig_list},
-                    step=self.global_step,
-                )
-
-                image = self.env.observation_handler.render(states[agent_id])
-
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/observation": [
-                            wandb.Image(
-                                data_or_path=image,
-                                caption="local observation",
-                            )
-                        ]
-                    },
-                    step=self.global_step,
-                )
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_observation": [
+                                wandb.Image(
+                                    data_or_path=image,
+                                    caption=f"{view_method} observation",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
 
         wandb.log(
             {"training_step/total_reward": np.sum(rewards)},
