@@ -33,7 +33,7 @@ phase: 'training' # training, evaluation
 # configure training
 
 trainer: 'attention_wandering'
-evaluator: 'mat_types' # default, mat, mat_types, mat_video, mat_types_video
+evaluator: 'da3_wandering'
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32
