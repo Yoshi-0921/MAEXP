@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Builds evaluator to execute multi-agent reinforcement learning.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -10,11 +8,11 @@ from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
 from .abstract_evaluator import AbstractEvaluator
+from .attention_evaluator import AttentionEvaluator
+from .attention_types_evaluator import AttentionWanderingEvaluator
+from .da3_types_video_evaluator import DA3WanderingVideoEvaluator
+from .da3_video_evaluator import DA3VideoEvaluator
 from .default_evaluator import DefaultEvaluator
-from .da3_evaluator import DA3Evaluator
-from .mat_types_evaluator import MATTypesEvaluator
-from .mat_video_evaluator import MATVideoEvaluator
-from .mat_types_video_evaluator import MATTypesVideoEvaluator
 
 logger = initialize_logging(__name__)
 
@@ -25,17 +23,18 @@ def generate_evaluator(
     if config.evaluator == "default":
         evaluator = DefaultEvaluator(config=config, environment=environment)
 
-    elif config.evaluator == "mat":
-        evaluator = MATEvaluator(config=config, environment=environment)
+    elif config.evaluator == "attention":
+        evaluator = AttentionEvaluator(config=config, environment=environment)
 
-    elif config.evaluator == "mat_types":
-        evaluator = MATTypesEvaluator(config=config, environment=environment)
+    elif config.evaluator == "attention_wandering":
+        assert config.num_agents == 6
+        evaluator = AttentionWanderingEvaluator(config=config, environment=environment)
 
-    elif config.evaluator == "mat_video":
-        evaluator = MATVideoEvaluator(config=config, environment=environment)
+    elif config.evaluator == "da3_video":
+        evaluator = DA3VideoEvaluator(config=config, environment=environment)
 
-    elif config.evaluator == "mat_types_video":
-        evaluator = MATTypesVideoEvaluator(config=config, environment=environment)
+    elif config.evaluator == "da3_wandering_video":
+        evaluator = DA3WanderingVideoEvaluator(config=config, environment=environment)
 
     else:
         logger.warn(

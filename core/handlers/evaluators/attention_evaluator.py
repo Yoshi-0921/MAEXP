@@ -10,7 +10,7 @@ from .default_evaluator import DefaultEvaluator
 sns.set()
 
 
-class MATEvaluator(DefaultEvaluator):
+class AttentionEvaluator(DefaultEvaluator):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]

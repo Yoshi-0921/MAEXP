@@ -15,7 +15,7 @@ plt.rcParams['savefig.facecolor'] = 'gray'
 # sns.set()
 
 
-class MATVideoEvaluator(DefaultEvaluator):
+class DA3TypesVideoEvaluator(DefaultEvaluator):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config, environment)
 
@@ -32,13 +32,16 @@ class MATVideoEvaluator(DefaultEvaluator):
 
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
-        epsilon = 0.05
         actions = [[] for _ in range(self.env.num_agents)]
         attention_maps = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
-        states = self.states.clone()
+        states = self.states
         for agent_id in self.order:
+            if agent_id in [4, 5]:
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             action, attns = self.agents[agent_id].get_action_attns(
                 states[agent_id], epsilon
             )
@@ -62,14 +65,17 @@ class MATVideoEvaluator(DefaultEvaluator):
         image[..., 1] += self.env.world.map.objects_matrix[0].astype(np.float)
         for agent_id, agent in enumerate(self.env.agents):
             pos_x, pos_y = self.env.world.map.coord2ind(agent.xy)
-            image[pos_x, pos_y, 2] = 1
+            if agent_id in [4, 5]:
+                image[pos_x, pos_y, 0] = 1
+            else:
+                image[pos_x, pos_y, 2] = 1
         image *= 255.0
         image = image.astype(np.int)
         self.images.append(image.transpose((1, 0, 2)))
         if step == 0:
             self.images.append(image.transpose((1, 0, 2)))
 
-        plt.figure()
+        _ = plt.figure()
         plt.subplot(2, 2, 1)
         plt.imshow(self.images.pop(0))
         plt.xticks([])
@@ -79,7 +85,10 @@ class MATVideoEvaluator(DefaultEvaluator):
 
         agent_id, agent = 0, self.agents[0]
         for agent_id, agent in enumerate(self.agents):
-            plt.subplot(4, 6, agent_id + 1 + 12)
+            if agent_id in [4, 5]:
+                break
+
+            plt.subplot(4, 4, agent_id + 1 + 8)
             image = self.env.observation_handler.render(states[agent_id]).numpy().transpose((1, 2, 0))
             image *= 255.0
             image = image.astype(np.int)
@@ -89,14 +98,14 @@ class MATVideoEvaluator(DefaultEvaluator):
             plt.grid(False)
             plt.title(f'Agent {agent_id}')
 
-            plt.subplot(4, 6, agent_id + 7 + 12)
+            plt.subplot(4, 4, agent_id + 5 + 8)
             attention_map = (
                 attention_maps[agent_id]
                 .mean(dim=0)[0, :, 0, 1:]
                 .view(-1, agent.brain.patched_size_x, agent.brain.patched_size_y)
                 .cpu()
             )
-            if agent_id == 5:
+            if agent_id == 3:
                 sns.heatmap(
                     torch.t(attention_map.mean(dim=0)),
                     cmap='bone_r',
@@ -108,9 +117,7 @@ class MATVideoEvaluator(DefaultEvaluator):
                 sns.heatmap(
                     torch.t(attention_map.mean(dim=0)),
                     cmap='bone_r',
-                    vmin=0,
                     square=True,
-                    vmax=0.25,
                     cbar=False,
                 )
             plt.xticks([])

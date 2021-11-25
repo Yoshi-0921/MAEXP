@@ -10,7 +10,7 @@ from .default_evaluator import DefaultEvaluator
 sns.set()
 
 
-class MATTypesEvaluator(DefaultEvaluator):
+class AttentionWanderingEvaluator(DefaultEvaluator):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]
@@ -41,7 +41,7 @@ class MATTypesEvaluator(DefaultEvaluator):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        """log_step = self.max_episode_length // 2
+        log_step = self.max_episode_length // 2
         if epoch % (self.max_epochs // 5) == 0 and step in [
             log_step - 3,
             log_step - 2,
@@ -50,8 +50,7 @@ class MATTypesEvaluator(DefaultEvaluator):
             log_step + 1,
             log_step + 2,
             log_step + 3,
-        ]:"""
-        if 1:
+        ]:
             for agent_id, agent in enumerate(self.agents):
                 if agent_id in [4, 5]:
                     continue
