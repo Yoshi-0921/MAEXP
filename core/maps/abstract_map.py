@@ -16,6 +16,7 @@ class AbstractMap(ABC):
         self.config = config
         self.num_agents = config.num_agents
         self.type_objects = config.type_objects
+        self.destination_channel = config.destination_channel
         self.SIZE_X = size_x
         self.SIZE_Y = size_y
 
@@ -24,6 +25,8 @@ class AbstractMap(ABC):
         self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_area_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
+        self.destination_area_matrix = np.ones(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
         self.locate_walls()
         self.set_objects_area()
         self.set_noise_area()
@@ -31,6 +34,9 @@ class AbstractMap(ABC):
     def reset(self):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
+        if self.destination_channel:
+            self.reset_destination_area()
 
     def reset_agents(self):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
@@ -64,9 +70,12 @@ class AbstractMap(ABC):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
 
-    def set_noise_area(self):
-        self.noise_area_matrix = np.ones(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-
     @abstractmethod
     def set_objects_area(self):
         raise NotImplementedError()
+
+    def set_noise_area(self):
+        self.noise_area_matrix = np.ones(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
+    def reset_destination_area(self):
+        self.destination_area_matrix = np.ones(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)

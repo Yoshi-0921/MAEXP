@@ -23,7 +23,7 @@ class AbstractLoopHandler(ABC):
         )
         self.order = np.arange(environment.num_agents)
 
-        self.states = self.env.reset()
+        self.reset()
         self.env.render_world()
         self.global_step = 0
         self.episode_count = 0
@@ -100,27 +100,15 @@ class AbstractLoopHandler(ABC):
         for agent_id, agent in enumerate(self.agents):
             print(f"Agent {str(agent_id)}:")
             summary(model=agent.brain.network)
+            dummy_input = {
+                state_key: torch.randn(1, *state_value.shape, device=agent.brain.device)
+                for state_key, state_value in self.states[agent_id].items()
+            }
 
-            if type(self.states[agent_id]) == tuple:
-                dummy_input0 = torch.randn(
-                    size=(1, *self.states[agent_id][0].shape), device=agent.brain.device
-                )
-                dummy_input1 = torch.randn(
-                    size=(1, *self.states[agent_id][1].shape), device=agent.brain.device
-                )
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input0, dummy_input1,), verbose=False)],
-                    "%.3f",
-                )
-
-            else:
-                dummy_input = torch.randn(
-                    size=(1, *self.states[agent_id].shape), device=agent.brain.device
-                )
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                    "%.3f",
-                )
+            macs, params = clever_format(
+                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
+                "%.3f",
+            )
             network_table.add_data(
                 f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
             )
@@ -132,16 +120,10 @@ class AbstractLoopHandler(ABC):
                 idx=agent_id,
             )
             try:
-                if type(self.states[agent_id]) == tuple:
-                    torch.onnx.export(
-                        agent.brain.network, (dummy_input0, dummy_input1), f"agent_{str(agent_id)}.onnx"
-                    )
-                    model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
-                else:
-                    torch.onnx.export(
-                        agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-                    )
-                    model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
+                torch.onnx.export(
+                    agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                )
+                model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
             except RuntimeError:
                 pass
 

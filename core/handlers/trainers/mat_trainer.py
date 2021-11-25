@@ -6,7 +6,6 @@ import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
-
 from .default_trainer import DefaultTrainer
 
 plt.rcParams["figure.facecolor"] = "white"
@@ -31,7 +30,7 @@ class MATTrainer(DefaultTrainer):
 
         rewards, dones, new_states = self.env.step(actions, self.order)
 
-        exp = Experience(self.states, actions, rewards, dones, new_states)
+        exp = Experience(states, actions, rewards, dones, new_states)
 
         self.buffer.append(exp)
 
@@ -46,6 +45,9 @@ class MATTrainer(DefaultTrainer):
             self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
+        if self.config.destination_channel and self.episode_step % self.config.reset_destination_period == 0:
+            self.env.world.map.reset_destination_area()
+
         # execute in environment
         states, rewards, attention_maps = self.play_step(self.epsilon)
         self.episode_reward_sum += np.sum(rewards)
@@ -55,14 +57,30 @@ class MATTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                images = self.env.observation_handler.render(states[agent_id])
-                if type(images) != list:
-                    images = [images]
+                if self.config.destination_channel:
+                    fig = plt.figure()
+                    sns.heatmap(
+                        self.env.world.map.destination_area_matrix[agent_id].T,
+                        square=True,
+                    )
 
-                for attention_map, image, view_method in zip(
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/destination_channel": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption="destination channel",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+
+                images = self.env.observation_handler.render(states[agent_id])
+
+                for attention_map, (view_method, image) in zip(
                     attention_maps[agent_id],
-                    images,
-                    ["local", "relative"],
+                    images.items()
                 ):
                     attention_map = (
                         attention_map.mean(dim=0)[0, :, 0, 1:]
