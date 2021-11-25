@@ -1,5 +1,5 @@
 import random
-from random import deepcopy
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np

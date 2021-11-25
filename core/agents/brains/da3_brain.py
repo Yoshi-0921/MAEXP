@@ -16,8 +16,8 @@ class DA3Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
-        self.patched_size_x = obs_shape[1] // config.model.patch_size
-        self.patched_size_y = obs_shape[2] // config.model.patch_size
+        setattr(self, f"{config.observation_area_mask}_patched_size_x", obs_shape[1] // config.model.patch_size)
+        setattr(self, f"{config.observation_area_mask}_patched_size_y", obs_shape[2] // config.model.patch_size)
 
     @torch.no_grad()
     def get_action(self, state):
