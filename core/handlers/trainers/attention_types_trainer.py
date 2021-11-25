@@ -14,7 +14,7 @@ plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
 
 
-class AttentionTypesTrainer(DefaultTrainer):
+class AttentionWanderingTrainer(DefaultTrainer):
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
         actions = [[] for _ in range(self.env.num_agents)]

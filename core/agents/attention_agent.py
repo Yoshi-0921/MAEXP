@@ -16,7 +16,6 @@ class AttentionAgent(AbstractAgent):
     def get_action_attns(self, state, epsilon):
         action, attns = self.brain.get_action(state)
 
-        # attns = torch.stack(attns)
         attns = [torch.stack(attn) for attn in attns]
 
         if random() < epsilon:
