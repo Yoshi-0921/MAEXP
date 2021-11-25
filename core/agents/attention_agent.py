@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Source code for mat agent class.
+"""Source code for attention agent class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -12,7 +12,7 @@ import torch
 from .abstract_agent import AbstractAgent
 
 
-class MATAgent(AbstractAgent):
+class AttentionAgent(AbstractAgent):
     def get_action_attns(self, state, epsilon):
         action, attns = self.brain.get_action(state)
 
