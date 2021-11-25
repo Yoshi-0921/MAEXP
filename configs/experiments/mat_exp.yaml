@@ -1,5 +1,5 @@
 defaults:
-  - model: mat # mlp, conv_mlp, mat, mat_baseline, da6
+  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled

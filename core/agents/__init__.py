@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Builds agents that learn the environment.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -27,7 +25,7 @@ def generate_agents(
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 
-    elif config.agent_type == "mat":
+    elif config.agent_type == "da3":
         agents = [
             MATAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
