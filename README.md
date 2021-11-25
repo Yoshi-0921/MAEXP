@@ -76,5 +76,5 @@ epsilon_end: float{type the terminal value of epsilon}
 # configre evaluation
 
 validate_epochs: int{type the number of maximum evaluation epochs}
-pretrained_weight_path: False
+pretrained_weight_path: str{type the path to pretrained weight via wandb API, otherwise False}
 ```
