@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""Source code for mat brain class.
+"""Source code for da3 brain class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -14,7 +12,7 @@ from torch import nn
 from .abstract_brain import AbstractBrain
 
 
-class MATBrain(AbstractBrain):
+class DA3Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
@@ -64,7 +62,7 @@ class MATBrain(AbstractBrain):
         return loss
 
 
-class MATBaselineBrain(MATBrain):
+class DA3BaselineBrain(DA3Brain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         attn_size = self.patched_size_x * self.patched_size_y + 1

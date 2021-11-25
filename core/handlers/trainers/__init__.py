@@ -27,6 +27,7 @@ def generate_trainer(
         trainer = MATTrainer(config=config, environment=environment)
 
     elif config.trainer == "mat_types":
+        assert config.num_agents == 6
         trainer = MATTypesTrainer(config=config, environment=environment)
 
     else:

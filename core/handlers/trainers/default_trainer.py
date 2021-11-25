@@ -1,5 +1,6 @@
-
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 import torch
 import wandb
 from core.utils.color import RGB_COLORS
@@ -7,6 +8,10 @@ from torch.nn import functional as F
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
+
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
+sns.set()
 
 
 class DefaultTrainer(AbstractTrainer):
@@ -21,6 +26,12 @@ class DefaultTrainer(AbstractTrainer):
             self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
+        if (
+            self.config.destination_channel
+            and self.episode_step % self.config.reset_destination_period == 0
+        ):
+            self.env.world.map.reset_destination_area()
+
         # execute in environment
         states, rewards = self.play_step(self.epsilon)
         self.episode_reward_sum += np.sum(rewards)
@@ -31,19 +42,38 @@ class DefaultTrainer(AbstractTrainer):
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
-                image = self.env.observation_handler.render(states[agent_id])
+                if self.config.destination_channel:
+                    fig = plt.figure()
+                    sns.heatmap(
+                        self.env.world.map.destination_area_matrix[agent_id].T,
+                        square=True,
+                    )
 
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/observation": [
-                            wandb.Image(
-                                data_or_path=image,
-                                caption="local observation",
-                            )
-                        ]
-                    },
-                    step=self.global_step,
-                )
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/destination_channel": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption="destination channel",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+
+                images = self.env.observation_handler.render(states[agent_id])
+                for view_method, image in images.items():
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_observation": [
+                                wandb.Image(
+                                    data_or_path=image,
+                                    caption=f"{view_method} observation",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
 
         wandb.log(
             {

@@ -72,7 +72,3 @@ class DA6Brain(AbstractBrain):
         self.optimizer.step()
 
         return loss
-
-
-class DA6BaselineBrain(DA6Brain):
-    pass
