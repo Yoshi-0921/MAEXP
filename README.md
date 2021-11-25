@@ -13,7 +13,7 @@ GIF cited from [here](https://openai.com/blog/learning-to-cooperate-compete-and-
 - DA6
 
 # 2. Config for experiments
-```
+```yaml
 defaults:
   - model: {mlp, conv_mlp, da3, da3_baseline, da6}
   - map: {simple, four_rooms, four_rectangle, three_rooms}
