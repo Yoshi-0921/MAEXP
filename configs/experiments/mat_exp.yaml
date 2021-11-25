@@ -19,8 +19,8 @@ objects_color: ["yellow"]
 # ==================================================
 # configure agent
 
-agent_type: 'da3' # default, da3
-brain: 'mat' # dqn, mat, mat_baseline, da6
+agent_type: 'attention' # default, attention
+brain: 'mat' # dqn, mat, mat_baseline, da6, da6_baseline
 num_agents: 6
 agents_color: ["blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
