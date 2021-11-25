@@ -1,4 +1,5 @@
 import random
+from random import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +7,7 @@ import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
+
 from .default_trainer import DefaultTrainer
 
 plt.rcParams["figure.facecolor"] = "white"
@@ -23,7 +25,7 @@ class AttentionTrainer(DefaultTrainer):
         states = self.states
         for agent_id in self.order:
             action, attns = self.agents[agent_id].get_action_attns(
-                states[agent_id], epsilon
+                deepcopy(states[agent_id]), epsilon
             )
             actions[agent_id] = action
             attention_maps[agent_id] = attns
@@ -45,7 +47,10 @@ class AttentionTrainer(DefaultTrainer):
             self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
-        if self.config.destination_channel and self.episode_step % self.config.reset_destination_period == 0:
+        if (
+            self.config.destination_channel
+            and self.episode_step % self.config.reset_destination_period == 0
+        ):
             self.env.world.map.reset_destination_area()
 
         # execute in environment
@@ -79,8 +84,7 @@ class AttentionTrainer(DefaultTrainer):
                 images = self.env.observation_handler.render(states[agent_id])
 
                 for attention_map, (view_method, image) in zip(
-                    attention_maps[agent_id],
-                    images.items()
+                    attention_maps[agent_id], images.items()
                 ):
                     attention_map = (
                         attention_map.mean(dim=0)[0, :, 0, 1:]
