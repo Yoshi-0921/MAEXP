@@ -11,7 +11,7 @@ from omegaconf import DictConfig
 
 from .abstract_evaluator import AbstractEvaluator
 from .default_evaluator import DefaultEvaluator
-from .mat_evaluator import MATEvaluator
+from .da3_evaluator import DA3Evaluator
 from .mat_types_evaluator import MATTypesEvaluator
 from .mat_video_evaluator import MATVideoEvaluator
 from .mat_types_video_evaluator import MATTypesVideoEvaluator

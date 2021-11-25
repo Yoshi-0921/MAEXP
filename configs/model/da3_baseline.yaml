@@ -1,5 +1,5 @@
 model:
-  name: 'mat_baseline'
+  name: 'da3_baseline'
   hidden_channels: [32]
   output_channel: 64
   hidden_kernels: [2, 2]

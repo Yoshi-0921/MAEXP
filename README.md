@@ -9,4 +9,5 @@ GIF cited from [here](https://openai.com/blog/learning-to-cooperate-compete-and-
 
 ## 1. Implemented so far
 - DQN
-- MATDQN
+- DA3
+- DA6

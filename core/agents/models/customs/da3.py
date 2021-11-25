@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""Source code for multi-agent transfromer (MAT) model.
+"""Source code for distributed attentional actor architecture (DA3) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -17,7 +15,7 @@ from ..vit import Block, PatchEmbed
 logger = initialize_logging(__name__)
 
 
-class MAT(nn.Module):
+class DA3(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
         patched_size_x = input_shape[1] // config.model.patch_size
@@ -48,7 +46,7 @@ class MAT(nn.Module):
         )
 
         self.norm = nn.LayerNorm(config.model.embed_dim)
-        self.fc1 = nn.Linear(config.model.embed_dim, output_size)
+        self.head = nn.Linear(config.model.embed_dim, output_size)
 
     def forward(self, x):
         out = self.patch_embed(x)
@@ -63,7 +61,7 @@ class MAT(nn.Module):
         out = self.norm(out)
         out = out[:, 0]
 
-        out = self.fc1(out)
+        out = self.head(out)
 
         return out
 
@@ -82,6 +80,6 @@ class MAT(nn.Module):
         out = self.norm(out)
         out = out[:, 0]
 
-        out = self.fc1(out)
+        out = self.head(out)
 
         return out, attns
