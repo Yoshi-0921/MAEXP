@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for multi-agent transfromer (DA6) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
