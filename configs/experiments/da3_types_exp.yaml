@@ -1,24 +1,24 @@
 defaults:
-  - model: mat # mlp, conv_mlp, mat, mat_baseline
+  - model: da3 # mlp, conv_mlp, da3, da3_baseline
   - map: simple # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'MAT-noise-types-exp'
-name: 'mat_types_exp'
+project_name: 'DA3-noise-types-exp'
+name: 'da3_types_exp'
 gpu: 0
 # ==================================================
 # configure environment
 
-world: 'default' # default
-environment: 'mat_types' # default, shared_mean_reward, shared_max_reward, mat_types, mat_types_test
+world: 'default'
+environment: 'da3_types'
 seed: 921
 num_objects: 25
 # ==================================================
 # configure agent
 
-agent_type: 'mat' # default, mat
-brain: 'mat' # dqn, mat, mat_baseline
+agent_type: 'da3'
+brain: 'da3'
 view_method: 'local_ind_types_view' # local_view, relative_view, local_transition_view, local_simple_view, local_types_view, local_ind_types_view
 observation_area_mask: 'default'
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
@@ -32,8 +32,8 @@ phase: 'training' # training, evaluation
 # ==================================================
 # configure training
 
-trainer: 'mat_types' # default, mat, mat_types
-evaluator: 'mat_types' # default, mat, mat_types, mat_video, mat_types_video
+trainer: 'attention_wandering'
+evaluator: 'da3_wandering'
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32

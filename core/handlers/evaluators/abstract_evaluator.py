@@ -27,7 +27,9 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
                 config.evaluator + "_evaluator",
                 config.model.name + "_model",
                 config.map.name + "_map",
-                config.view_method + "_method",
+                config.observation_area_mask + "_area_mask",
+                config.agent_view_method + "_agent_view_method",
+                config.object_view_method + "_object_view_method",
             ],
         )
 

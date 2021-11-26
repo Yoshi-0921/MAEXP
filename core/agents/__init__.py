@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Builds agents that learn the environment.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -11,11 +9,11 @@ from omegaconf import DictConfig
 
 from .abstract_agent import AbstractAgent
 from .default_agent import DefaultAgent
-from .mat_agent import MATAgent
+from .attention_agent import AttentionAgent
 
 logger = initialize_logging(__name__)
 
-__all__ = ["AbstractAgent", "DefaultAgent", "MATAgent"]
+__all__ = ["AbstractAgent", "DefaultAgent", "AttentionAgent"]
 
 
 def generate_agents(
@@ -27,9 +25,9 @@ def generate_agents(
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 
-    elif config.agent_type == "mat":
+    elif config.agent_type == "attention":
         agents = [
-            MATAgent(config, obs_shape, act_size)
+            AttentionAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 

@@ -9,10 +9,11 @@ import random
 from typing import List
 
 import numpy as np
+from core.handlers.observations import generate_observation_handler
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent, Object
 from omegaconf import DictConfig
-from core.handlers.observations import generate_observation_handler
+
 from .abstract_environment import AbstractEnvironment
 
 
@@ -39,10 +40,12 @@ class DefaultEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_accumulated_objects = np.zeros(
-            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_accumulated_objects_left = np.zeros(
-            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_accumulated_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -66,10 +69,12 @@ class DefaultEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_objects = np.zeros(
-            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_objects_left = np.zeros(
-            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -81,7 +86,9 @@ class DefaultEnvironment(AbstractEnvironment):
         if self.config.shuffle_init_xys:
             random.shuffle(self.init_xys_order)
 
-        for agent_id, (agent, order) in enumerate(zip(self.agents, self.init_xys_order)):
+        for agent_id, (agent, order) in enumerate(
+            zip(self.agents, self.init_xys_order)
+        ):
             agent.collide_agents = False
             agent.collide_walls = False
 
@@ -169,9 +176,16 @@ class DefaultEnvironment(AbstractEnvironment):
         reward = 0.0
         for obj_idx, obj in enumerate(self.world.objects):
             if all(agent.xy == obj.xy):
-                reward = 1.0
-                self.world.objects.pop(obj_idx)
                 obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
+                if (
+                    self.world.map.destination_area_matrix[agent_id][
+                        obj_pos_x, obj_pos_y
+                    ]
+                    == 1
+                ):
+                    reward = 1.0
+
+                self.world.objects.pop(obj_idx)
                 self.world.map.objects_matrix[0, obj_pos_x, obj_pos_y] = 0
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1

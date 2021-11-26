@@ -1,11 +1,17 @@
-
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 import torch
 import wandb
+from core.utils.color import RGB_COLORS
 from torch.nn import functional as F
 from torchvision.utils import make_grid
 
 from .abstract_trainer import AbstractTrainer
+
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
+sns.set()
 
 
 class DefaultTrainer(AbstractTrainer):
@@ -20,6 +26,12 @@ class DefaultTrainer(AbstractTrainer):
             self.total_loss_sum += torch.sum(loss_list).item()
             self.total_loss_agents += loss_list
 
+        if (
+            self.config.destination_channel
+            and self.episode_step % self.config.reset_destination_period == 0
+        ):
+            self.env.world.map.reset_destination_area()
+
         # execute in environment
         states, rewards = self.play_step(self.epsilon)
         self.episode_reward_sum += np.sum(rewards)
@@ -30,19 +42,38 @@ class DefaultTrainer(AbstractTrainer):
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
-                image = self.env.observation_handler.render(states[agent_id])
+                if self.config.destination_channel:
+                    fig = plt.figure()
+                    sns.heatmap(
+                        self.env.world.map.destination_area_matrix[agent_id].T,
+                        square=True,
+                    )
 
-                wandb.log(
-                    {
-                        f"agent_{str(agent_id)}/observation": [
-                            wandb.Image(
-                                data_or_path=image,
-                                caption="local observation",
-                            )
-                        ]
-                    },
-                    step=self.global_step,
-                )
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/destination_channel": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption="destination channel",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+
+                images = self.env.observation_handler.render(states[agent_id])
+                for view_method, image in images.items():
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/{view_method}_observation": [
+                                wandb.Image(
+                                    data_or_path=image,
+                                    caption=f"{view_method} observation",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
 
         wandb.log(
             {
@@ -102,7 +133,7 @@ class DefaultTrainer(AbstractTrainer):
             self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
         )
 
-        for agent_id in range(self.env.num_agents):
+        for agent_id, color in enumerate(self.config.agents_color):
             # add agent path information
             heatmap_agents = (
                 0.5
@@ -112,7 +143,9 @@ class DefaultTrainer(AbstractTrainer):
             heatmap_agents = np.where(
                 heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
             )
-            heatmap[agent_id, 2, ...] += torch.from_numpy(heatmap_agents)
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            heatmap[agent_id] += torch.from_numpy(heatmap_agents) * rgb
 
         # add wall information
         heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
@@ -124,9 +157,10 @@ class DefaultTrainer(AbstractTrainer):
         heatmap_objects = np.where(
             heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
         )
-        for heatmap_object, (red, green) in zip(heatmap_objects, [(1., 1.), (1., 0.5), (0.5, 1.)]):
-            heatmap[:, 0, ...] += torch.from_numpy(heatmap_object) * red
-            heatmap[:, 1, ...] += torch.from_numpy(heatmap_object) * green
+        for heatmap_object, color in zip(heatmap_objects, self.config.objects_color):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            heatmap[:, ...] += torch.from_numpy(heatmap_object) * rgb
 
         heatmap = F.interpolate(
             heatmap,

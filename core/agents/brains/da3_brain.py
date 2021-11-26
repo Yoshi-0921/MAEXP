@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""Source code for mat brain class.
+"""Source code for da3 brain class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -14,16 +12,17 @@ from torch import nn
 from .abstract_brain import AbstractBrain
 
 
-class MATBrain(AbstractBrain):
+class DA3Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
-        self.patched_size_x = obs_shape[1] // config.model.patch_size
-        self.patched_size_y = obs_shape[2] // config.model.patch_size
+        setattr(self, f"{config.observation_area_mask}_patched_size_x", obs_shape[1] // config.model.patch_size)
+        setattr(self, f"{config.observation_area_mask}_patched_size_y", obs_shape[2] // config.model.patch_size)
 
     @torch.no_grad()
     def get_action(self, state):
-        state = state.unsqueeze(0).float().to(self.device)
+        for state_key, state_value in state.items():
+            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         q_values, attns = self.network.forward_attn(state)
         _, action = torch.max(q_values, dim=1)
@@ -32,11 +31,13 @@ class MATBrain(AbstractBrain):
         return action, attns
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
-        states_ind = states_ind.float().to(self.device)
+        for states_key, states_value in states_ind.items():
+            states_ind[states_key] = states_value.float().to(self.device)
         actions_ind = actions_ind.to(self.device)
         rewards_ind = rewards_ind.float().to(self.device)
         dones_ind = dones_ind.to(self.device)
-        next_states_ind = next_states_ind.float().to(self.device)
+        for next_states_key, next_states_value in next_states_ind.items():
+            next_states_ind[next_states_key] = next_states_value.float().to(self.device)
 
         self.network.eval()
         self.target_network.eval()
@@ -61,7 +62,7 @@ class MATBrain(AbstractBrain):
         return loss
 
 
-class MATBaselineBrain(MATBrain):
+class DA3BaselineBrain(DA3Brain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         attn_size = self.patched_size_x * self.patched_size_y + 1

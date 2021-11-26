@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Builds trainer to execute multi-agent reinforcement learning.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -11,8 +9,8 @@ from omegaconf import DictConfig
 
 from .abstract_trainer import AbstractTrainer
 from .default_trainer import DefaultTrainer
-from .mat_trainer import MATTrainer
-from .mat_types_trainer import MATTypesTrainer
+from .attention_trainer import AttentionTrainer
+from .attention_types_trainer import AttentionWanderingTrainer
 
 logger = initialize_logging(__name__)
 
@@ -23,11 +21,12 @@ def generate_trainer(
     if config.trainer == "default":
         trainer = DefaultTrainer(config=config, environment=environment)
 
-    elif config.trainer == "mat":
-        trainer = MATTrainer(config=config, environment=environment)
+    elif config.trainer == "attention":
+        trainer = AttentionTrainer(config=config, environment=environment)
 
-    elif config.trainer == "mat_types":
-        trainer = MATTypesTrainer(config=config, environment=environment)
+    elif config.trainer == "attention_wandering":
+        assert config.num_agents == 6
+        trainer = AttentionWanderingTrainer(config=config, environment=environment)
 
     else:
         logger.warn(f"Unexpected trainer is given. config.trainer: {config.trainer}")

@@ -1,5 +1,5 @@
 model:
-  name: 'mat'
+  name: 'da3'
   attention: 'normal' # 'normal', 'hard'
   af_lambd: 0.02
   embed_dim: 64

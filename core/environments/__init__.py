@@ -44,7 +44,7 @@ def generate_environment(
     elif config.environment == 'object_types':
         env = TypesEnvironment(config=config, world=world)
 
-    elif config.environment == 'mat_types_test':
+    elif config.environment == 'da3_types_test':
         env = TypesTestEnvironment(config=config, world=world)
 
     else:

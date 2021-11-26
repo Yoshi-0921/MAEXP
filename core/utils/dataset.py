@@ -5,8 +5,6 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from typing import Tuple
-
 from core.utils.buffer import ReplayBuffer
 from torch.utils.data import IterableDataset
 
@@ -24,7 +22,7 @@ class RLDataset(IterableDataset):
         self.buffer = buffer
         self.sample_size = sample_size
 
-    def __iter__(self) -> Tuple:
+    def __iter__(self):
         states, actions, rewards, dones, new_states = self.buffer.sample(
             self.sample_size
         )

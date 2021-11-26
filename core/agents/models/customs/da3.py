@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""Source code for multi-agent transfromer (MAT) model.
+"""Source code for distributed attentional actor architecture (DA3) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -17,11 +15,12 @@ from ..vit import Block, PatchEmbed
 logger = initialize_logging(__name__)
 
 
-class MAT(nn.Module):
+class DA3(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
         patched_size_x = input_shape[1] // config.model.patch_size
         patched_size_y = input_shape[2] // config.model.patch_size
+        self.view_method = config.observation_area_mask
 
         self.patch_embed = PatchEmbed(
             patch_size=config.model.patch_size,
@@ -29,7 +28,7 @@ class MAT(nn.Module):
             embed_dim=config.model.embed_dim,
         )
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
+        self.saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
             torch.zeros(1, patched_size_x * patched_size_y + 1, config.model.embed_dim)
         )
@@ -48,13 +47,14 @@ class MAT(nn.Module):
         )
 
         self.norm = nn.LayerNorm(config.model.embed_dim)
-        self.fc1 = nn.Linear(config.model.embed_dim, output_size)
+        self.head = nn.Linear(config.model.embed_dim, output_size)
 
-    def forward(self, x):
+    def forward(self, state):
+        x = self.state_encoder(state)
+
         out = self.patch_embed(x)
-
-        cls_tokens = self.cls_token.expand(out.shape[0], -1, -1)
-        out = torch.cat((cls_tokens, out), dim=1)
+        saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
+        out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.pos_embed
 
         for blk in self.blocks:
@@ -63,15 +63,16 @@ class MAT(nn.Module):
         out = self.norm(out)
         out = out[:, 0]
 
-        out = self.fc1(out)
+        out = self.head(out)
 
         return out
 
-    def forward_attn(self, x):
-        out = self.patch_embed(x)
+    def forward_attn(self, state):
+        x = self.state_encoder(state)
 
-        cls_tokens = self.cls_token.expand(out.shape[0], -1, -1)
-        out = torch.cat((cls_tokens, out), dim=1)
+        out = self.patch_embed(x)
+        saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
+        out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.pos_embed
 
         attns = list()
@@ -82,6 +83,10 @@ class MAT(nn.Module):
         out = self.norm(out)
         out = out[:, 0]
 
-        out = self.fc1(out)
+        out = self.head(out)
 
-        return out, attns
+        return out, [attns]
+
+    def state_encoder(self, state):
+
+        return state[self.view_method]

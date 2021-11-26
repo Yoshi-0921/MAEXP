@@ -1,26 +1,28 @@
 defaults:
-  - model: mat # mlp, conv_mlp, mat, mat_baseline, da6
+  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'DA6'
+project_name: 'DA3'
 name: 'da3'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward, object_types, mat_types_test
+environment: 'default' # default, shared_mean_reward, shared_max_reward, object_types, da3_types_test
 seed: 921
 num_objects: 25
 type_objects: 1
+objects_color: ["yellow"]
 # ==================================================
 # configure agent
 
-agent_type: 'mat' # default, mat
-brain: 'da6' # dqn, mat, mat_baseline, da6
+agent_type: 'attention' # default, attention
+brain: 'da3' # dqn, da3, da3_baseline, da6
 num_agents: 6
+agents_color: ["blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 shuffle_init_xys: True
 phase: 'training' # training, evaluation
@@ -29,19 +31,22 @@ phase: 'training' # training, evaluation
 
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
+destination_channel: False
+reset_destination_period: 50
 agent_view_method: 'default' # default, self, simple, transition, individual
 object_view_method: 'default' # default, simple, object_types
 observation_area_mask: 'local' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
-flip_noise_probabilities: [0.3, 0.2, 0.1]
+flip_noise_probabilities: [0.2, 0.1, 0.05]
 std_distribution: [0.07, 0.05, 0.03]
 past_step: 1
+
 # ==================================================
 # configure training
 
-trainer: 'mat' # default, mat
-evaluator: 'default' # default, mat, mat_types, mat_video, mat_types_video
+trainer: 'attention' # default, attention, attention_wandering
+evaluator: 'attention' # default, attention, attention_wandering, da3_video, da3_wandering_video
 max_epochs: 10000
 max_episode_length: 200
 batch_size: 32

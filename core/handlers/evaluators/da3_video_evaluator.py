@@ -15,7 +15,7 @@ plt.rcParams['savefig.facecolor'] = 'gray'
 # sns.set()
 
 
-class MATVideoEvaluator(DefaultEvaluator):
+class DA3VideoEvaluator(DefaultEvaluator):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config, environment)
 
