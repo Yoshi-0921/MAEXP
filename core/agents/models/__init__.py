@@ -12,6 +12,7 @@ from .mlp import MLP
 from .customs.da3 import DA3
 from .customs.da6 import DA6
 from .customs.categorical_dqn import CategoricalDQN
+from .customs.quantile_regression_dqn import QRDQN
 
 logger = initialize_logging(__name__)
 
@@ -33,6 +34,9 @@ def generate_network(
 
     elif config.model.name == "categorical_dqn":
         network = CategoricalDQN(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "qr_dqn":
+        network = QRDQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.network: {config.network}")
