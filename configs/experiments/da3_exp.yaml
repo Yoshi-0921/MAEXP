@@ -1,11 +1,11 @@
 defaults:
-  - model: categorical_dqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn
+  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, quantile_regression_dqn
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'DA3'
-name: 'da3-c51'
+name: 'da3'
 gpu: 0
 # ==================================================
 # configure environment
@@ -20,7 +20,7 @@ objects_color: ["yellow"]
 # configure agent
 
 agent_type: 'default' # default, attention
-brain: 'categorical_dqn' # dqn, da3, da3_baseline, da6, categorical_dqn
+brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, quantile_regression_dqn
 num_agents: 6
 agents_color: ["blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
