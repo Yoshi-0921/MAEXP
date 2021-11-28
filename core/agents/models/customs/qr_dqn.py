@@ -1,4 +1,4 @@
-"""Source code for quantile regression dqn layers class.
+"""Source code for quantile regression dqn (QR-DQN) layers class.
 
 Original code: https://github.com/ku2482/fqf-iqn-qrdqn.pytorch
 """
