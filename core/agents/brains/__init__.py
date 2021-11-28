@@ -9,13 +9,14 @@ from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
 from .abstract_brain import AbstractBrain
+from .categorical_dqn_brain import CategoricalDQNBrain
 from .da3_brain import DA3BaselineBrain, DA3Brain
 from .da6_brain import DA6Brain
 from .dqn_brain import DQNBrain
 
 logger = initialize_logging(__name__)
 
-__all__ = ["AbstractBrain", "DQNBrain", "DA3Brain", "DA3BaselineBrain", "DA6Brain"]
+__all__ = ["AbstractBrain", "DQNBrain", "DA3Brain", "DA3BaselineBrain", "DA6Brain", "CategoricalDQNBrain"]
 
 
 def generate_brain(
@@ -32,6 +33,9 @@ def generate_brain(
 
     elif config.brain == "da6":
         brain = DA6Brain(config=config, obs_shape=obs_shape, act_size=act_size)
+
+    elif config.brain == "categorical_dqn":
+        brain = CategoricalDQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
 
     else:
         logger.warn(f"Unexpected brain is given. config.brain: {config.brain}")

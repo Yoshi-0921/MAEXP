@@ -1,11 +1,12 @@
 import random
 from abc import ABC
+from copy import deepcopy
 
 import torch
 import wandb
 from core.utils.buffer import Experience, ReplayBuffer
-from omegaconf import DictConfig
 from core.utils.dataset import RLDataset
+from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
 from ..abstract_loop_handler import AbstractLoopHandler
@@ -16,6 +17,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         super().__init__(config=config, environment=environment)
         self.buffer = ReplayBuffer(config.capacity)
         self.epsilon = config.epsilon_initial
+        self.synchronize_frequency = config.synchronize_frequency
 
         wandb.init(
             project=config.project_name,
@@ -59,9 +61,11 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
 
         for agent_id in self.order:
             # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
+            states = self.states
 
-            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
+            action = self.agents[agent_id].get_action(
+                deepcopy(states[agent_id]), epsilon
+            )
             actions[agent_id] = action
 
         rewards, dones, new_states = self.env.step(actions, self.order)
