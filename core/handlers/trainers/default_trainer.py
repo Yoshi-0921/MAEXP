@@ -97,8 +97,9 @@ class DefaultTrainer(AbstractTrainer):
         self.epsilon *= self.config.epsilon_decay
         self.epsilon = max(self.config.epsilon_end, self.epsilon)
 
-        for agent in self.agents:
-            agent.synchronize_brain()
+        if self.episode_count % self.synchronize_frequency == 0:
+            for agent in self.agents:
+                agent.synchronize_brain()
 
         self.log_scalar()
         if self.episode_count % (self.max_epochs // 10) == 0:

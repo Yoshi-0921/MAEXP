@@ -1,0 +1,15 @@
+model:
+  name: 'categorical_dqn'
+  num_atoms: 51
+  V_min: -10
+  V_max: 10
+  hidden_channels: [32]
+  output_channel: 64
+  hidden_kernels: [2, 2]
+  hidden_strides: [1, 1]
+  conv_afs: ['max_pool2d', 'max_pool2d']
+  af_kernels: [2, 2]
+  af_strides: [2, 2]
+
+  hidden_layer_sizes: [128]
+  fc_afs: ['relu']

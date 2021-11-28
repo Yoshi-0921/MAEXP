@@ -69,6 +69,7 @@ batch_size: int{type batch size for training}
 populate_steps: int{type number of steps to populate the replay buffer}
 capacity: int{type the capacity of replay buffer}
 gamma: float{type the discout factor of reward}
+synchronize_frequency: int{type the frequency to synchronize the network and its target network}
 epsilon_decay: float{type the ratio to decay epsilon}
 epsilon_initial: float{type the initial value of epsilon}
 epsilon_end: float{type the terminal value of epsilon}

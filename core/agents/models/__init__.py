@@ -11,6 +11,7 @@ from .customs.conv_mlp import ConvMLP
 from .mlp import MLP
 from .customs.da3 import DA3
 from .customs.da6 import DA6
+from .customs.categorical_dqn import CategoricalDQN
 
 logger = initialize_logging(__name__)
 
@@ -21,7 +22,7 @@ def generate_network(
     if config.model.name == "mlp":
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
-    elif config.model.name in ["conv_mlp", "da3_baseline"]:
+    elif config.model.name == "conv_mlp":
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "da3":
@@ -29,6 +30,9 @@ def generate_network(
 
     elif config.model.name == "da6":
         network = DA6(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "categorical_dqn":
+        network = CategoricalDQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.network: {config.network}")

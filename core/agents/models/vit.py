@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
 """Source code for vision transformer.
 
 Original code: https://github.com/lucidrains/vit-pytorch
-
 """
 import torch.nn as nn
 

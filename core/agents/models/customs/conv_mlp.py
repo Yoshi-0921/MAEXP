@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for convolution-mlp layers class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
