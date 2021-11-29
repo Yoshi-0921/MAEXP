@@ -105,10 +105,17 @@ class AbstractLoopHandler(ABC):
                 for state_key, state_value in self.states[agent_id].items()
             }
 
-            macs, params = clever_format(
-                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                "%.3f",
-            )
+            if self.config.model.name == "iqn":
+                taus = torch.rand(1, agent.brain.num_quantiles, device=agent.brain.device)
+                macs, params = clever_format(
+                    [*profile(agent.brain.network, inputs=(dummy_input, taus,), verbose=False)],
+                    "%.3f",
+                )
+            else:
+                macs, params = clever_format(
+                    [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
+                    "%.3f",
+                )
             network_table.add_data(
                 f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
             )
@@ -120,9 +127,14 @@ class AbstractLoopHandler(ABC):
                 idx=agent_id,
             )
             try:
-                torch.onnx.export(
-                    agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-                )
+                if 1:
+                    torch.onnx.export(
+                        agent.brain.network, (dummy_input, taus), f"agent_{str(agent_id)}.onnx"
+                    )
+                else:
+                    torch.onnx.export(
+                        agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                    )
                 model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
             except RuntimeError:
                 pass

@@ -13,7 +13,8 @@ from .categorical_dqn_brain import CategoricalDQNBrain
 from .da3_brain import DA3BaselineBrain, DA3Brain
 from .da6_brain import DA6Brain
 from .dqn_brain import DQNBrain
-from .quantile_regression_dqn_brain import QRDQNBrain
+from .iqn_brain import IQNBrain
+from .qr_dqn_brain import QRDQNBrain
 
 logger = initialize_logging(__name__)
 
@@ -25,6 +26,7 @@ __all__ = [
     "DA6Brain",
     "CategoricalDQNBrain",
     "QRDQNBrain",
+    "IQNBrain",
 ]
 
 
@@ -48,8 +50,11 @@ def generate_brain(
             config=config, obs_shape=obs_shape, act_size=act_size
         )
 
-    elif config.brain == "quantile_regression_dqn":
+    elif config.brain == "qr_dqn":
         brain = QRDQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
+
+    elif config.brain == "iqn":
+        brain = IQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
 
     else:
         logger.warn(f"Unexpected brain is given. config.brain: {config.brain}")
