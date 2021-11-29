@@ -1,5 +1,5 @@
 defaults:
-  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, quantile_regression_dqn
+  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn
   - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
   - opt: rmsprop
   - job_logging: disabled
@@ -20,7 +20,7 @@ objects_color: ["yellow"]
 # configure agent
 
 agent_type: 'default' # default, attention
-brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, quantile_regression_dqn
+brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn
 num_agents: 6
 agents_color: ["blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
@@ -51,7 +51,7 @@ max_epochs: 10000
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
-capacity: 500000
+capacity: 100000
 synchronize_frequency: 1
 gamma: 0.9
 epsilon_decay: 0.998
