@@ -11,6 +11,7 @@ from omegaconf import DictConfig
 from .abstract_brain import AbstractBrain
 from .categorical_dqn_brain import CategoricalDQNBrain
 from .da3_brain import DA3BaselineBrain, DA3Brain
+from .da3_iqn_brain import DA3_IQNBrain
 from .da6_brain import DA6Brain
 from .dqn_brain import DQNBrain
 from .iqn_brain import IQNBrain
@@ -27,6 +28,7 @@ __all__ = [
     "CategoricalDQNBrain",
     "QRDQNBrain",
     "IQNBrain",
+    "DA3_IQNBrain"
 ]
 
 
@@ -38,6 +40,9 @@ def generate_brain(
 
     elif config.brain == "da3":
         brain = DA3Brain(config=config, obs_shape=obs_shape, act_size=act_size)
+
+    elif config.brain == "da3_iqn":
+        brain = DA3_IQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
 
     elif config.brain == "da3_baseline":
         brain = DA3BaselineBrain(config=config, obs_shape=obs_shape, act_size=act_size)

@@ -1,4 +1,4 @@
-"""Source code for quantile regression dqn brain class.
+"""Source code for implicit quantile network (IQN) brain class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """

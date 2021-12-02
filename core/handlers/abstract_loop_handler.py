@@ -105,7 +105,7 @@ class AbstractLoopHandler(ABC):
                 for state_key, state_value in self.states[agent_id].items()
             }
 
-            if self.config.model.name == "iqn":
+            if self.config.model.name in ["iqn", "da3_iqn"]:
                 taus = torch.rand(1, agent.brain.num_quantiles, device=agent.brain.device)
                 macs, params = clever_format(
                     [*profile(agent.brain.network, inputs=(dummy_input, taus,), verbose=False)],
@@ -127,7 +127,7 @@ class AbstractLoopHandler(ABC):
                 idx=agent_id,
             )
             try:
-                if 1:
+                if self.config.model.name in ["iqn", "da3_iqn"]:
                     torch.onnx.export(
                         agent.brain.network, (dummy_input, taus), f"agent_{str(agent_id)}.onnx"
                     )

@@ -12,6 +12,7 @@ from torch import nn
 from .customs.categorical_dqn import CategoricalDQN
 from .customs.conv_mlp import ConvMLP
 from .customs.da3 import DA3
+from .customs.da3_iqn import DA3_IQN
 from .customs.da6 import DA6
 from .customs.iqn import IQN
 from .customs.qr_dqn import QRDQN
@@ -31,6 +32,9 @@ def generate_network(
 
     elif config.model.name == "da3":
         network = DA3(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "da3_iqn":
+        network = DA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "da6":
         network = DA6(config=config, input_shape=obs_shape, output_size=act_size)

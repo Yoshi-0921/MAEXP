@@ -1,8 +1,8 @@
 model:
   name: 'iqn'
-  num_quantiles: 8
-  num_quantiles_dash: 8
-  num_cosines: 8
+  num_quantiles: 4
+  num_quantiles_dash: 4
+  num_cosines: 4
   hidden_channels: [32]
   output_channel: 64
   hidden_kernels: [2, 2]
