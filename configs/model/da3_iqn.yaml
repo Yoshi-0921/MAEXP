@@ -1,0 +1,16 @@
+model:
+  name: 'da3_iqn'
+  attention: 'normal' # 'normal', 'hard'
+  af_lambd: 0.02
+  embed_dim: 64
+  patch_size: 1
+  block_loop: 1
+  num_heads: 4
+  mlp_ratio: 4
+
+  num_quantiles: 4
+  num_quantiles_dash: 4
+  num_cosines: 4
+
+  hidden_layer_sizes: [64]
+  fc_afs: ['relu']

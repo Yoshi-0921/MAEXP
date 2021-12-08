@@ -37,7 +37,7 @@ class DefaultTrainer(AbstractTrainer):
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
-        if epoch % (self.max_epochs // 10) == 0 and step == (
+        if epoch % (self.max_epochs // 4) == 0 and step == (
             self.max_episode_length // 2
         ):
             # log attention_maps of agent0

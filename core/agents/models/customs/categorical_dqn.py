@@ -1,4 +1,4 @@
-"""Source code for categorical dqn layers class.
+"""Source code for categorical dqn (C51) layers class.
 
 Original code: https://github.com/Kaixhin/Rainbow
 """
