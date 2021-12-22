@@ -27,7 +27,7 @@ def generate_network(
     if config.model.name == "mlp":
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
-    elif config.model.name == "conv_mlp":
+    elif config.model.name in ["conv_mlp", "da3_baseline"]:
         network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "da3":
@@ -51,7 +51,7 @@ def generate_network(
         network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
-        logger.warn(f"Unexpected network is given. config.network: {config.network}")
+        logger.warn(f"Unexpected network is given. config.model.name: {config.model.name}")
 
         raise ValueError()
 

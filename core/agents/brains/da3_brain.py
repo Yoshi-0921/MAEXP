@@ -16,8 +16,16 @@ class DA3Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
-        setattr(self, f"{config.observation_area_mask}_patched_size_x", obs_shape[1] // config.model.patch_size)
-        setattr(self, f"{config.observation_area_mask}_patched_size_y", obs_shape[2] // config.model.patch_size)
+        setattr(
+            self,
+            f"{config.observation_area_mask}_patched_size_x",
+            obs_shape[1] // config.model.patch_size,
+        )
+        setattr(
+            self,
+            f"{config.observation_area_mask}_patched_size_y",
+            obs_shape[2] // config.model.patch_size,
+        )
 
     @torch.no_grad()
     def get_action(self, state):
@@ -65,7 +73,11 @@ class DA3Brain(AbstractBrain):
 class DA3BaselineBrain(DA3Brain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
-        attn_size = self.patched_size_x * self.patched_size_y + 1
+        attn_size = (
+            getattr(self, f"{config.observation_area_mask}_patched_size_x")
+            * getattr(self, f"{config.observation_area_mask}_patched_size_y")
+            + 1
+        )
         self.attns = [
             torch.zeros(
                 config.batch_size, config.model.num_heads, attn_size, attn_size
@@ -74,10 +86,11 @@ class DA3BaselineBrain(DA3Brain):
 
     @torch.no_grad()
     def get_action(self, state):
-        state = state.unsqueeze(0).to(self.device)
+        for state_key, state_value in state.items():
+            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         q_values = self.network.forward(state)
         _, action = torch.max(q_values, dim=1)
         action = int(action.item())
 
-        return action, self.attns
+        return action, [self.attns]

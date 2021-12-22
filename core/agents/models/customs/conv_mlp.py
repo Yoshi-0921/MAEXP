@@ -19,6 +19,7 @@ logger = initialize_logging(__name__)
 class ConvMLP(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
+        self.view_method = config.observation_area_mask
         self.conv = Conv(
             config=config,
             input_channel=input_shape[0],
@@ -27,7 +28,9 @@ class ConvMLP(nn.Module):
         input_size = self.get_mlp_input_size(input_shape)
         self.mlp = MLP(config=config, input_size=input_size, output_size=output_size)
 
-    def forward(self, x):
+    def forward(self, state):
+        x = self.state_encoder(state)
+
         out = self.conv(x)
 
         out = out.view(out.shape[0], -1)
@@ -41,3 +44,7 @@ class ConvMLP(nn.Module):
         outputs = self.conv(random_input)
 
         return outputs.view(-1).shape[0]
+
+    def state_encoder(self, state):
+
+        return state[self.view_method]
