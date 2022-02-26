@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Main file to launch the experiments based on configuration.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code to generate multi-agent world.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
