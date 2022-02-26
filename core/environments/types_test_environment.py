@@ -22,7 +22,7 @@ class TypesTestEnvironment(AbstractEnvironment):
         # self.init_xys = np.asarray([[6, 4], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8) # Situation 2
         # self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [6, 4]], dtype=np.int8) # Situation 3
         # self.init_xys = np.asarray([[0, 2], [3, 3], [-8, -7], [-7, -8], [-6, -4], [6, 4]], dtype=np.int8) # Situation 4
-        self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8) # おまけ
+        self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8)  # おまけ
         self.type_objects = config.type_objects
 
         self.heatmap_accumulated_agents = np.zeros(
