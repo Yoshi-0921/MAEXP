@@ -59,10 +59,8 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         actions = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
+        states = self.states
         for agent_id in self.order:
-            # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = self.states
-
             action = self.agents[agent_id].get_action(
                 deepcopy(states[agent_id]), epsilon
             )

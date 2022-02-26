@@ -47,7 +47,7 @@ class DefaultEvaluator(AbstractEvaluator):
     def loop_epoch_end(self):
         self.env.accumulate_heatmap()
         self.log_scalar()
-        if (self.episode_count + 1) % (self.max_epochs // 10) == 0:
+        if (self.episode_count + 1) % (self.max_epochs // 10 + 1) == 0:
             self.log_heatmap()
         self.reset()
 
@@ -126,6 +126,7 @@ class DefaultEvaluator(AbstractEvaluator):
             heatmap_accumulated_complete.append(
                 wandb.Image(data_or_path=fig, caption=f"Agent {agent_id}")
             )
+            # plt.savefig(f"agent{agent_id}.pdf")
             plt.close()
 
         # log heatmap_events
@@ -148,7 +149,7 @@ class DefaultEvaluator(AbstractEvaluator):
             )
             plt.close()
 
-        # log heatmap_events_left
+        # log heatmap_events_left FIXME only object 0 is plotted
         for i, heatmap in enumerate(self.env.heatmap_accumulated_objects_left):
             fig = plt.figure()
             sns.heatmap(

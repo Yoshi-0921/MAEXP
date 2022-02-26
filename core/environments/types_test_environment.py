@@ -1,7 +1,6 @@
 from typing import List
 
 import numpy as np
-import torch
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent, Object
 from omegaconf import DictConfig
@@ -19,9 +18,13 @@ class TypesTestEnvironment(AbstractEnvironment):
         for _ in self.agents:
             self.action_space.append(4)
             self.observation_space.append(self.observation_handler.observation_space)
-        # self.init_xys = np.asarray([[3, 3], [-8, -8], [-8, -7], [-7, -8], [6, 4], [-7, -7]], dtype=np.int8)
-        # self.init_xys = np.asarray([[3, 3], [6, 4], [-8, -7], [-7, -8], [-8, -8], [-7, -7]], dtype=np.int8)
-        self.init_xys = np.asarray([[3, 3], [-6, -6], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8)
+        # self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8) # Situation 1
+        # self.init_xys = np.asarray([[6, 4], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8) # Situation 2
+        # self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [6, 4]], dtype=np.int8) # Situation 3
+        # self.init_xys = np.asarray([[0, 2], [3, 3], [-8, -7], [-7, -8], [-6, -4], [6, 4]], dtype=np.int8) # Situation 4
+        self.init_xys = np.asarray([[-8, -8], [3, 3], [-8, -7], [-7, -8], [-6, -4], [-7, -7]], dtype=np.int8) # おまけ
+        self.type_objects = config.type_objects
+
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
             dtype=np.int32,
@@ -31,10 +34,12 @@ class TypesTestEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_accumulated_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_accumulated_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_accumulated_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -58,10 +63,12 @@ class TypesTestEnvironment(AbstractEnvironment):
             dtype=np.int32,
         )
         self.heatmap_objects = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_objects_left = np.zeros(
-            shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+            shape=(self.type_objects, self.world.map.SIZE_X, self.world.map.SIZE_Y),
+            dtype=np.int32,
         )
         self.heatmap_wall_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
@@ -89,17 +96,17 @@ class TypesTestEnvironment(AbstractEnvironment):
 
     def generate_test_objects(self):
         x = 11
-        y = 10  # 10
+        y = 9
         if (
             self.world.map.wall_matrix[x, y] == 0
             and self.world.map.agents_matrix[:, x, y].sum() == 0
             and self.world.map.objects_matrix[0, x, y] == 0
-            and self.world.map.aisle_matrix[x, y] == 0
+            and self.world.map.objects_area_matrix[0, x, y] == 1
         ):
             self.world.objects.append(Object())
             self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
-            self.world.map.objects_matrix[x, y] = 1
-            self.heatmap_objects[x, y] += 1
+            self.world.map.objects_matrix[0, x, y] = 1
+            self.heatmap_objects[0, x, y] += 1
             self.objects_generated += 1
 
         x = 15
@@ -108,12 +115,12 @@ class TypesTestEnvironment(AbstractEnvironment):
             self.world.map.wall_matrix[x, y] == 0
             and self.world.map.agents_matrix[:, x, y].sum() == 0
             and self.world.map.objects_matrix[0, x, y] == 0
-            and self.world.map.aisle_matrix[x, y] == 0
+            and self.world.map.objects_area_matrix[0, x, y] == 1
         ):
             self.world.objects.append(Object())
             self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
             self.world.map.objects_matrix[0, x, y] = 1
-            self.heatmap_objects[x, y] += 1
+            self.heatmap_objects[0, x, y] += 1
             self.objects_generated += 1
 
     def observation(self):
@@ -139,8 +146,6 @@ class TypesTestEnvironment(AbstractEnvironment):
         self.observation_handler.step(self.agents)
 
         self.heatmap_objects_left += self.world.map.objects_matrix[0]
-
-        obs_n = torch.stack(obs_n)
 
         return reward_n, done_n, obs_n
 
