@@ -5,7 +5,7 @@ defaults:
   - job_logging: disabled
 
 project_name: 'DA6-control'
-name: 'da6-3'
+name: 'da6-4'
 gpu: 0
 # ==================================================
 # configure environment
@@ -32,7 +32,7 @@ phase: 'training' # training, evaluation
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
 destination_channel: True
-reset_destination_period: 3
+reset_destination_period: 4
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'default' # default, simple, object_types
 observation_area_mask: 'merged' # local, relative, merged
