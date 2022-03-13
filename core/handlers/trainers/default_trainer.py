@@ -168,7 +168,7 @@ class DefaultTrainer(AbstractTrainer):
             size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
         )
         heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=3)
+        heatmap = make_grid(heatmap, nrow=self.config.episode_hm_nrow)
         wandb.log(
             {
                 "episode/heatmap": [

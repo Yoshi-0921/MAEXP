@@ -23,7 +23,7 @@ class AttentionWanderingTrainer(DefaultTrainer):
 
         states = self.states
         for agent_id in self.order:
-            if agent_id in [4, 5]:
+            if 3 < agent_id:
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
 
@@ -59,7 +59,7 @@ class AttentionWanderingTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                if agent_id in [4, 5]:
+                if 3 < agent_id:
                     continue
 
                 if self.config.destination_channel:

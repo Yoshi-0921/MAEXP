@@ -11,6 +11,7 @@ from .four_rectangle import FourRectangleMap
 from .four_rooms_map import FourRoomsMap
 from .simple_map import SimpleMap
 from .three_rooms_map import ThreeRoomsMap
+from .central_room_map import CentralRoomMap
 
 logger = initialize_logging(__name__)
 
@@ -27,6 +28,9 @@ def generate_map(config: DictConfig) -> AbstractMap:
 
     elif config.map.name == "four_rectangle":
         world_map = FourRectangleMap(config=config, size_x=40, size_y=24)
+    
+    elif config.map.name == "central_room":
+        world_map = CentralRoomMap(config=config, size_x=25, size_y=25)
 
     else:
         logger.warn(f"Unexpected map is given. config.map.name: {config.map.name}")

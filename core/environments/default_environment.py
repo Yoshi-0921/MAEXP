@@ -30,6 +30,7 @@ class DefaultEnvironment(AbstractEnvironment):
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
         self.init_xys_order = [i for i in range(len(self.init_xys))]
         self.type_objects = config.type_objects
+        self.agent_tasks = config.agent_tasks
 
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
@@ -105,9 +106,16 @@ class DefaultEnvironment(AbstractEnvironment):
 
         return obs_n
 
-    def generate_objects(self, num_objects: int = None, object_type: int = 0):
+    def generate_objects(self, num_objects: int = None, object_type: int = None):
         num_objects = num_objects or self.config.num_objects
-        self._generate_objects(num_objects, object_type)
+        if object_type is None:
+            for object_type in range(self.type_objects):
+                self._generate_objects(
+                    num_objects,
+                    object_type=object_type,
+                )
+        else:
+            self._generate_objects(num_objects, object_type)
 
     def _generate_objects(self, num_objects: int, object_type: int = 0):
         num_generated = 0
@@ -175,7 +183,7 @@ class DefaultEnvironment(AbstractEnvironment):
 
         reward = 0.0
         for obj_idx, obj in enumerate(self.world.objects):
-            if all(agent.xy == obj.xy):
+            if all(agent.xy == obj.xy) and self.agent_tasks[agent_id] == obj.type:
                 obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
                 if (
                     self.world.map.destination_area_matrix[agent_id][
@@ -186,10 +194,10 @@ class DefaultEnvironment(AbstractEnvironment):
                     reward = 1.0
 
                 self.world.objects.pop(obj_idx)
-                self.world.map.objects_matrix[0, obj_pos_x, obj_pos_y] = 0
+                self.world.map.objects_matrix[obj.type, obj_pos_x, obj_pos_y] = 0
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
-                self.generate_objects(1)
+                self.generate_objects(1, obj.type)
 
         # negative reward for collision with other agents
         if agent.collide_agents:
