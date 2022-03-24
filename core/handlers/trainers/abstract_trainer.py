@@ -43,6 +43,9 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         loss_list = []
         states, actions, rewards, dones, next_states = batch
         for agent_id, agent in enumerate(self.agents):
+            if self.config.agent_tasks[int(agent_id)] == -1:
+                loss_list.append(torch.zeros(size=(1,))[0])
+                continue
             loss = agent.learn(
                 states[agent_id],
                 actions[agent_id],

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for dataset to handle multi-agent experience.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>

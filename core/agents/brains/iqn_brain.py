@@ -73,12 +73,14 @@ class IQNBrain(AbstractBrain):
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         for states_key, states_value in states_ind.items():
-            states_ind[states_key] = states_value.float().to(self.device)
+            if isinstance(states_value, torch.Tensor):
+                states_ind[states_key] = states_value.float().to(self.device)
         actions_ind = actions_ind.to(self.device)
         rewards_ind = rewards_ind.float().to(self.device)
         dones_ind = dones_ind.to(self.device)
         for next_states_key, next_states_value in next_states_ind.items():
-            next_states_ind[next_states_key] = next_states_value.float().to(self.device)
+            if isinstance(next_states_value, torch.Tensor):
+                next_states_ind[next_states_key] = next_states_value.float().to(self.device)
 
         batch_size = dones_ind.shape[0]
         taus = torch.rand(batch_size, self.num_quantiles, device=self.device)
@@ -88,7 +90,7 @@ class IQNBrain(AbstractBrain):
         ].unsqueeze(1)
         with torch.no_grad():
             # 最も価値の高いactionを抽出
-            quantiles = self.network(next_states_ind, taus)  # ここのtausは再度生成した方が良いかも？
+            quantiles = self.network(next_states_ind, taus)  # ここのtausは再度生成した方が良いかも？ ← そうなら内部に組み込める
             best_actions = quantiles.mean(dim=2).argmax(dim=1)
 
             tau_dashes = torch.rand(

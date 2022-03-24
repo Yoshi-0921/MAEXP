@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for default multi-agent environment.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -182,6 +180,9 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
         reward = 0.0
+        if self.agent_tasks[agent_id] == -1:
+            return reward
+
         for obj_idx, obj in enumerate(self.world.objects):
             if all(agent.xy == obj.xy) and self.agent_tasks[agent_id] == obj.type:
                 obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)

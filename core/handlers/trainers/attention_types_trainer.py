@@ -23,7 +23,7 @@ class AttentionWanderingTrainer(DefaultTrainer):
 
         states = self.states
         for agent_id in self.order:
-            if 3 < agent_id:
+            if self.config.agent_tasks[int(agent_id)] == -1:
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
 
@@ -37,7 +37,9 @@ class AttentionWanderingTrainer(DefaultTrainer):
 
         exp = Experience(self.states, actions, rewards, dones, new_states)
 
-        self.buffer.append(exp)
+        self.buffer.append(deepcopy(exp))
+
+        del exp
 
         self.states = new_states
 
@@ -59,7 +61,7 @@ class AttentionWanderingTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                if 3 < agent_id:
+                if self.config.agent_tasks[int(agent_id)] == -1:
                     continue
 
                 if self.config.destination_channel:

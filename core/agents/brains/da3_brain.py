@@ -16,6 +16,7 @@ class DA3Brain(AbstractBrain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
+        self.observation_area_mask = config.observation_area_mask
         setattr(
             self,
             f"{config.observation_area_mask}_patched_size_x",
@@ -30,7 +31,8 @@ class DA3Brain(AbstractBrain):
     @torch.no_grad()
     def get_action(self, state):
         for state_key, state_value in state.items():
-            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
+            if isinstance(state_value, torch.Tensor):
+                state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         q_values, attns = self.network.forward_attn(state)
         _, action = torch.max(q_values, dim=1)
@@ -40,12 +42,14 @@ class DA3Brain(AbstractBrain):
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         for states_key, states_value in states_ind.items():
-            states_ind[states_key] = states_value.float().to(self.device)
+            if isinstance(states_value, torch.Tensor):
+                states_ind[states_key] = states_value.float().to(self.device)
         actions_ind = actions_ind.to(self.device)
         rewards_ind = rewards_ind.float().to(self.device)
         dones_ind = dones_ind.to(self.device)
         for next_states_key, next_states_value in next_states_ind.items():
-            next_states_ind[next_states_key] = next_states_value.float().to(self.device)
+            if isinstance(next_states_value, torch.Tensor):
+                next_states_ind[next_states_key] = next_states_value.float().to(self.device)
 
         self.network.eval()
         self.target_network.eval()
@@ -88,6 +92,8 @@ class DA3BaselineBrain(DA3Brain):
     def get_action(self, state):
         for state_key, state_value in state.items():
             state[state_key] = state_value.unsqueeze(0).float().to(self.device)
+            if isinstance(state_value, torch.Tensor):
+                state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         q_values = self.network.forward(state)
         _, action = torch.max(q_values, dim=1)

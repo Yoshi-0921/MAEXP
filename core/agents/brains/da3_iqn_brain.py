@@ -20,7 +20,8 @@ class DA3_IQNBrain(IQNBrain):
     @torch.no_grad()
     def get_action(self, state):
         for state_key, state_value in state.items():
-            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
+            if isinstance(state_value, torch.Tensor):
+                state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         taus = torch.rand(1, self.num_quantiles, device=self.device)
         quantiles, attns = self.network.forward_attn(state, taus)

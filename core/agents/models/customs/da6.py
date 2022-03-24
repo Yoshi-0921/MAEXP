@@ -3,12 +3,15 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 from typing import List
+
 import numpy as np
+import numpy.typing as npt
 import torch
+from core.handlers.observations.observation_handler import ObservationHandler
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
-import numpy.typing as npt
+
 from ..hard_shrink_attention import HardShrinkBlock
 from ..vit import Block, PatchEmbed
 
@@ -24,6 +27,7 @@ class DA6(nn.Module):
         relative_patched_size_y = input_shape[2] // config.model.relative_patch_size
         local_patched_size_x = config.visible_range // config.model.local_patch_size
         local_patched_size_y = config.visible_range // config.model.local_patch_size
+        self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
 
         self.relative_patch_embed = PatchEmbed(
             patch_size=config.model.relative_patch_size,
@@ -157,7 +161,10 @@ class DA6(nn.Module):
     def state_encoder(self, state):
         local_x = state["local"]
         # x.shape: [1, 4, 25, 25]
-        relative_x = state["relative"][:, -1:, ...]  # [1, 1, 25, 25]が欲しい
+        relative_x = ObservationHandler.decode_relative_state(
+            state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+        )
+        relative_x = relative_x[:, -1:, ...]  # [1, 1, 25, 25]が欲しい
         relative_x += 1
 
         if self.destination_channel:

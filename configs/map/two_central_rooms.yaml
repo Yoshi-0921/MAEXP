@@ -1,0 +1,4 @@
+map:
+  name: 'two_central_rooms'
+  SIZE_X: 50
+  SIZE_Y: 25

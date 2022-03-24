@@ -25,7 +25,6 @@ def generate_trainer(
         trainer = AttentionTrainer(config=config, environment=environment)
 
     elif config.trainer == "attention_wandering":
-        assert config.num_agents == 8
         trainer = AttentionWanderingTrainer(config=config, environment=environment)
 
     else:

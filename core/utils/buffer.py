@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for replay buffer used in multi-agent reinforcement learning.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -41,18 +39,5 @@ class ReplayBuffer:
 
     def sample(self, batch_size: int) -> Tuple:
         indices = np.random.choice(len(self.buffer), batch_size, replace=False)
-        (
-            global_states,
-            global_actions,
-            global_rewards,
-            global_dones,
-            global_next_states,
-        ) = zip(*[self.buffer[idx] for idx in indices])
 
-        return (
-            global_states,
-            global_actions,
-            global_rewards,
-            global_dones,
-            global_next_states,
-        )
+        return tuple(zip(*[self.buffer[idx] for idx in indices]))

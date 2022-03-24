@@ -100,22 +100,25 @@ class AbstractLoopHandler(ABC):
         for agent_id, agent in enumerate(self.agents):
             print(f"Agent {str(agent_id)}:")
             summary(model=agent.brain.network)
-            dummy_input = {
-                state_key: torch.randn(1, *state_value.shape, device=agent.brain.device)
-                for state_key, state_value in self.states[agent_id].items()
-            }
+            dummy_inputs = ({},)
+            for state_key, state_value in self.states[agent_id].items():
+                if isinstance(state_value, torch.Tensor):
+                    dummy_inputs[0][state_key] = torch.randn(
+                        1, *state_value.shape, device=agent.brain.device
+                    )
+                else:
+                    dummy_inputs[0][state_key] = state_value
 
             if self.config.model.name in ["iqn", "da3_iqn"]:
-                taus = torch.rand(1, agent.brain.num_quantiles, device=agent.brain.device)
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input, taus,), verbose=False)],
-                    "%.3f",
+                taus = torch.rand(
+                    1, agent.brain.num_quantiles, device=agent.brain.device
                 )
-            else:
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                    "%.3f",
-                )
+                dummy_inputs.append(taus)
+
+            macs, params = clever_format(
+                [*profile(agent.brain.network, inputs=dummy_inputs, verbose=False)],
+                "%.3f",
+            )
             network_table.add_data(
                 f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
             )
@@ -129,11 +132,13 @@ class AbstractLoopHandler(ABC):
             try:
                 if self.config.model.name in ["iqn", "da3_iqn"]:
                     torch.onnx.export(
-                        agent.brain.network, (dummy_input, taus), f"agent_{str(agent_id)}.onnx"
+                        agent.brain.network, dummy_inputs, f"agent_{str(agent_id)}.onnx"
                     )
                 else:
                     torch.onnx.export(
-                        agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                        agent.brain.network,
+                        dummy_inputs[0],
+                        f"agent_{str(agent_id)}.onnx",
                     )
                 model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
             except RuntimeError:
