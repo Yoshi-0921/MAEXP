@@ -78,7 +78,7 @@ class IQN(nn.Module):
     def forward(self, state, external_taus: torch.Tensor = None):
         state_embeddings = self.get_state_embeddings(state=state)
         quantiles = self.get_quantiles(state_embeddings=state_embeddings, external_taus=external_taus)
-        q_values = quantiles.mean(dim=2)
+        q_values = self.get_q_values(quantiles)
 
         return q_values
 
@@ -91,13 +91,11 @@ class IQN(nn.Module):
 
         return state_embeddings
 
-    def get_taus(self, device):
-        taus = torch.rand(1, self.num_quantiles, device=device)
-
-        return taus
+    def get_taus(self, state_embeddings):
+        return torch.rand(1, self.num_quantiles, device=state_embeddings.device)
 
     def get_quantiles(self, state_embeddings, external_taus: torch.Tensor = None):
-        taus = external_taus or self.get_taus(device=state_embeddings.device)
+        taus = external_taus or self.get_taus(state_embeddings=state_embeddings)
         tau_embeddings = self.cosine_net(taus)
 
         # Reshape into (batch_size, 1, embedding_dim).
@@ -119,6 +117,9 @@ class IQN(nn.Module):
         quantiles = V.expand_as(A) + (A - average_A.expand_as(A))
 
         return quantiles
+
+    def get_q_values(self, quantiles):
+        return quantiles.mean(dim=2)
 
     def get_mlp_input_size(self, input_shape: List[int]) -> int:
         random_input = torch.randn(size=input_shape).unsqueeze(0)
