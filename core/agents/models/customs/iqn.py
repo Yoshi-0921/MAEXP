@@ -75,27 +75,45 @@ class IQN(nn.Module):
             output_size=output_size * self.num_quantiles
         )
 
-    def forward(self, state, taus):
+    def forward(self, state, external_taus: torch.Tensor = None):
+        state_embeddings = self.get_state_embeddings(state=state)
+        quantiles = self.get_quantiles(state_embeddings=state_embeddings, external_taus=external_taus)
+        q_values = quantiles.mean(dim=2)
+
+        return q_values
+
+    def state_embeddings(self, state):
         x = self.state_encoder(state)
 
         out = self.conv(x)
         out = out.view(out.shape[0], -1)
         state_embeddings = self.state_embedder(out)
 
+        return state_embeddings
+
+    def get_taus(self, device):
+        taus = torch.rand(1, self.num_quantiles, device=device)
+
+        return taus
+
+    def get_quantiles(self, state_embeddings, external_taus: torch.Tensor = None):
+        taus = external_taus or self.get_taus(device=state_embeddings.device)
         tau_embeddings = self.cosine_net(taus)
 
         # Reshape into (batch_size, 1, embedding_dim).
-        state_embeddings = state_embeddings.view(out.shape[0], 1, self.embedding_dim)
+        batch_size = state_embeddings.shape[0]
+        state_embeddings = state_embeddings.view(batch_size, 1, self.embedding_dim)
+
         # Calculate embeddings of states and taus.
         embeddings = (state_embeddings * tau_embeddings).view(
-            out.shape[0], self.num_quantiles * self.embedding_dim
+            batch_size, self.num_quantiles * self.embedding_dim
         )
 
         V = self.fc_V(embeddings)
         A = self.fc_A(embeddings)
 
-        V = V.view(out.shape[0], 1, self.num_quantiles)
-        A = A.view(out.shape[0], self.num_actions, self.num_quantiles)
+        V = V.view(batch_size, 1, self.num_quantiles)
+        A = A.view(batch_size, self.num_actions, self.num_quantiles)
 
         average_A = A.mean(1, keepdim=True)
         quantiles = V.expand_as(A) + (A - average_A.expand_as(A))
@@ -109,5 +127,4 @@ class IQN(nn.Module):
         return outputs.view(-1).shape[0]
 
     def state_encoder(self, state):
-
         return state[self.view_method]

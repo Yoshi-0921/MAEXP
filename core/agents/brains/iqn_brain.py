@@ -62,11 +62,9 @@ class IQNBrain(AbstractBrain):
         for state_key, state_value in state.items():
             state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
-        taus = torch.rand(1, self.num_quantiles, device=self.device)
-        quantiles = self.network(state, taus)
-        q_values = quantiles.mean(dim=2)
+        q_values = self.network(state)
 
-        _, action = torch.max(q_values, dim=1)
+        action = q_values.argmax(dim=1)
         action = int(action.item())
 
         return action
@@ -84,22 +82,22 @@ class IQNBrain(AbstractBrain):
 
         batch_size = dones_ind.shape[0]
         taus = torch.rand(batch_size, self.num_quantiles, device=self.device)
-        current_s_quantiles = self.network(states_ind, taus)
+        current_s_quantiles = self.network.get_quantiles(states_ind, taus)
         current_sa_quantiles = current_s_quantiles[
             range(batch_size), actions_ind.squeeze()
         ].unsqueeze(1)
         with torch.no_grad():
             # 最も価値の高いactionを抽出
-            quantiles = self.network(next_states_ind, taus)  # ここのtausは再度生成した方が良いかも？ ← そうなら内部に組み込める
-            best_actions = quantiles.mean(dim=2).argmax(dim=1)
+            q_values = self.network(next_states_ind)
+            best_actions = q_values.argmax(dim=1)
 
             tau_dashes = torch.rand(
                 batch_size, self.num_quantiles_dash, device=self.device
             )
-            p_next = self.target_network(next_states_ind, tau_dashes)
+            next_s_quantiles = self.target_network.get_quantiles(next_states_ind, tau_dashes)
 
             # terminal state以外はDDQNで計算したもので上書き
-            next_sa_quantiles = p_next[range(batch_size), best_actions].unsqueeze(1).transpose(1, 2)
+            next_sa_quantiles = next_s_quantiles[range(batch_size), best_actions].unsqueeze(1).transpose(1, 2)
 
             # Calculate target quantile values.
             target_sa_quantiles = (
