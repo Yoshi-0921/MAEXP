@@ -55,7 +55,7 @@ class IQN(nn.Module):
             input_channel=input_shape[0],
             output_channel=config.model.output_channel,
         )
-        self.embedding_dim: int = self.get_mlp_input_size(input_shape)
+        self.embedding_dim: int = IQN.get_mlp_input_size(self.conv, input_shape)
         self.num_quantiles: int = config.model.num_quantiles
         self.num_cosines: int = config.model.num_cosines
         self.state_embedder = MLP(
@@ -128,9 +128,10 @@ class IQN(nn.Module):
     def get_q_values(self, quantiles: torch.Tensor):
         return quantiles.mean(dim=1)
 
-    def get_mlp_input_size(self, input_shape: List[int]) -> int:
+    @staticmethod
+    def get_mlp_input_size(conv, input_shape: List[int]) -> int:
         random_input = torch.randn(size=input_shape).unsqueeze(0)
-        outputs = self.conv(random_input)
+        outputs = conv(random_input)
 
         return outputs.view(-1).shape[0]
 
@@ -157,8 +158,8 @@ class MergedIQN(IQN):
             output_channel=config.model.output_channel,
         )
 
-        local_embedding_dim: int = self.get_mlp_input_size([input_shape[0], config.visible_range, config.visible_range])
-        relative_embedding_dim: int = self.get_mlp_input_size([1, *input_shape[1:]])
+        local_embedding_dim: int = MergedIQN.get_mlp_input_size(self.local_conv, [input_shape[0], config.visible_range, config.visible_range])
+        relative_embedding_dim: int = MergedIQN.get_mlp_input_size(self.relative_conv, [1, *input_shape[1:]])
 
         self.embedding_dim: int = local_embedding_dim + relative_embedding_dim
         self.local_state_embedder = MLP(

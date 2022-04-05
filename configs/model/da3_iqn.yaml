@@ -12,5 +12,5 @@ model:
   num_quantiles_dash: 4
   num_cosines: 4
 
-  hidden_layer_sizes: [64]
+  hidden_layer_sizes: [128]
   fc_afs: ['relu']
