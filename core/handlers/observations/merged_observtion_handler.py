@@ -27,6 +27,7 @@ class MergedObservationHandler:
         self.relative_view_observation_handler = ObservationHandler(
             config=config, world=world
         )
+        config.observation_area_mask = 'merged'
 
     @property
     def observation_space(self):

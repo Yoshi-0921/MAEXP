@@ -99,8 +99,6 @@ class DA6(nn.Module):
         saliency_vector = out[:, 0]
         saliency_vector = self.fc1(saliency_vector)
 
-        residual_saliency_vector = saliency_vector.clone()
-
         out = self.local_patch_embed(local_x)
         saliency_vector = saliency_vector.unsqueeze(1)
         out = torch.cat((saliency_vector, out), dim=1)
@@ -112,8 +110,6 @@ class DA6(nn.Module):
         out = self.norm(out)
 
         saliency_vector = out[:, 0]
-
-        saliency_vector += residual_saliency_vector
 
         out = self.drl_head(saliency_vector)
 
@@ -136,8 +132,6 @@ class DA6(nn.Module):
         saliency_vector = out[:, 0]
         saliency_vector = self.fc1(saliency_vector)
 
-        residual_saliency_vector = saliency_vector.clone()
-
         out = self.local_patch_embed(local_x)
         saliency_vector = saliency_vector.unsqueeze(1)
         out = torch.cat((saliency_vector, out), dim=1)
@@ -151,8 +145,6 @@ class DA6(nn.Module):
         out = self.norm(out)
 
         saliency_vector = out[:, 0]
-
-        saliency_vector += residual_saliency_vector
 
         out = self.drl_head(saliency_vector)
 
