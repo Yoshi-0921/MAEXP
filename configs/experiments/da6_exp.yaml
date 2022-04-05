@@ -1,11 +1,11 @@
 defaults:
-  - model: da6 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn
-  - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room
+  - model: iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+  - map: two_central_rooms # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'PAAMS-exp'
-name: 'da6-dqn-merged'
+name: 'iqn-local'
 gpu: 0
 # ==================================================
 # configure environment
@@ -13,19 +13,22 @@ gpu: 0
 world: 'default' # default
 environment: 'default' # default, shared_mean_reward, shared_max_reward, object_types, da3_types_test
 seed: 921
-num_objects: 20
+num_objects: 40
 type_objects: 2
 objects_color: ["yellow", "orange"]
-agent_tasks: [0, 0, 1, 1, -1, -1, -1, -1]
+agent_tasks: [0, 0, 0, 0, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]
+# agent_tasks: [0, 0, 1, 1, -1, -1, -1, -1]
 # ==================================================
 # configure agent
 
-agent_type: 'attention' # default, attention
-brain: 'da6' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn
-num_agents: 8
+agent_type: 'default' # default, attention
+brain: 'iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+num_agents: 16
 episode_hm_nrow: 4
-agents_color: ["blue", "blue", "dodger_blue", "dodger_blue", "red", "red", "red", "red"]
-init_xys: [[2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2], [0, -2], [2, -2]]
+agents_color: ["blue", "blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue", "dodger_blue", "red", "red", "red", "red", "red", "red", "red", "red"]
+# agents_color: ["blue", "blue", "dodger_blue", "dodger_blue", "red", "red", "red", "red"]
+init_xys: [[-11, 0], [-11, 2], [-13, 2], [-15, 2], [-15, 0], [-15, -2], [-13, -2], [-11, -2], [14, 0], [14, 2], [12, 2], [10, 2], [10, 0], [10, -2], [12, -2], [14, -2]]
+# init_xys: [[2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2], [0, -2], [2, -2]]
 shuffle_init_xys: True
 phase: 'training' # training, evaluation
 # ==================================================
@@ -37,7 +40,7 @@ destination_channel: False
 reset_destination_period: 1
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
-observation_area_mask: 'merged' # local, relative, merged
+observation_area_mask: 'local' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
@@ -47,7 +50,7 @@ past_step: 1
 # ==================================================
 # configure training
 
-trainer: 'attention_wandering' # default, attention, attention_wandering
+trainer: 'default' # default, attention, attention_wandering
 evaluator: 'default' # default, attention, attention_wandering, da3_video, da3_wandering_video
 max_epochs: 5000
 max_episode_length: 200
