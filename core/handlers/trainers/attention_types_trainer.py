@@ -49,8 +49,10 @@ class AttentionWanderingTrainer(DefaultTrainer):
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list).item()
-            self.total_loss_agents += loss_list
+            loss_list = self.loss_and_update(batch)
+            self.step_loss_sum += sum(
+                [loss_dict["total_loss"].item() for loss_dict in loss_list]
+            )
 
         # execute in environment
         states, rewards, attention_maps = self.play_step(self.epsilon)
@@ -161,16 +163,22 @@ class AttentionWanderingTrainer(DefaultTrainer):
             {
                 "training_step/epsilon": self.epsilon,
                 "training_step/total_reward": np.sum(rewards),
-                "training_step/total_loss": self.total_loss_sum,
+                "training_step/total_loss": self.step_loss_sum,
             },
             step=self.global_step,
         )
 
-        for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
-            wandb.log(
+        for agent_id, (loss_dict, reward) in enumerate(zip(loss_list, rewards)):
+            output_dict = {
+                f"agent_{str(agent_id)}/step_{loss_name}": loss
+                for loss_name, loss in loss_dict.items()
+            }
+            output_dict.update(
                 {
-                    f"agent_{str(agent_id)}/step_loss": loss,
                     f"agent_{str(agent_id)}/step_reward": reward,
-                },
+                }
+            )
+            wandb.log(
+                output_dict,
                 step=self.global_step,
             )

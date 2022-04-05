@@ -8,6 +8,7 @@ import torch
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
+from core.handlers.observations.observation_handler import ObservationHandler
 
 from ..hard_shrink_attention import HardShrinkBlock
 from ..vit import Block, PatchEmbed
@@ -133,5 +134,9 @@ class DA3_IQN(nn.Module):
         return out, [attns]
 
     def state_encoder(self, state):
+        if self.view_method == "relative":
+            return ObservationHandler.decode_relative_state(
+                state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+            )
 
         return state[self.view_method]

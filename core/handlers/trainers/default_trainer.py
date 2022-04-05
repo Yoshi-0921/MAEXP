@@ -23,8 +23,9 @@ class DefaultTrainer(AbstractTrainer):
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list).item()
-            self.total_loss_agents += loss_list
+            self.step_loss_sum += sum(
+                [loss_dict["total_loss"].item() for loss_dict in loss_list]
+            )
 
         if (
             self.config.destination_channel
@@ -42,6 +43,9 @@ class DefaultTrainer(AbstractTrainer):
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
+                if self.config.agent_tasks[int(agent_id)] == -1:
+                    continue
+
                 if self.config.destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
@@ -79,17 +83,23 @@ class DefaultTrainer(AbstractTrainer):
             {
                 "training/epsilon": self.epsilon,
                 "training/total_reward": np.sum(rewards),
-                "training/total_loss": self.total_loss_sum,
+                "training/total_loss": self.step_loss_sum,
             },
             step=self.global_step,
         )
 
-        for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
-            wandb.log(
+        for agent_id, (loss_dict, reward) in enumerate(zip(loss_list, rewards)):
+            output_dict = {
+                f"agent_{str(agent_id)}/step_{loss_name}": loss
+                for loss_name, loss in loss_dict.items()
+            }
+            output_dict.update(
                 {
-                    f"agent_{str(agent_id)}/step_loss": loss,
                     f"agent_{str(agent_id)}/step_reward": reward,
-                },
+                }
+            )
+            wandb.log(
+                output_dict,
                 step=self.global_step,
             )
 

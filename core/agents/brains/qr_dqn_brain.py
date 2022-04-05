@@ -113,7 +113,7 @@ class QRDQNBrain(AbstractBrain):
         td_errors = target_sa_quantiles - current_sa_quantiles
         loss = calculate_quantile_huber_loss(td_errors, self.tau_hats)
         loss.backward()
-        nn.utils.clip_grad_norm_(self.network.parameters(), 10)
+        nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
         return loss.detach()

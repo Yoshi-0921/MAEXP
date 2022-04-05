@@ -14,6 +14,7 @@ from .customs.conv_mlp import ConvMLP
 from .customs.da3 import DA3
 from .customs.da3_iqn import DA3_IQN
 from .customs.da6 import DA6
+from .customs.fqf import FQF
 from .customs.iqn import IQN
 from .customs.qr_dqn import QRDQN
 from .mlp import MLP
@@ -22,7 +23,7 @@ logger = initialize_logging(__name__)
 
 
 def generate_network(
-    config: DictConfig, obs_shape: List[int], act_size: int
+    config: DictConfig, obs_shape: List[int], act_size: int, target: bool = False
 ) -> nn.Module:
     if config.model.name == "mlp":
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
@@ -49,6 +50,9 @@ def generate_network(
 
     elif config.model.name == "iqn":
         network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
+    
+    elif config.model.name == "fqf":
+        network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)
 
     else:
         logger.warn(f"Unexpected network is given. config.model.name: {config.model.name}")

@@ -71,7 +71,7 @@ class DA3Brain(AbstractBrain):
         nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss
+        return {"total_loss": loss.detach().cpu()}
 
 
 class DA3BaselineBrain(DA3Brain):
