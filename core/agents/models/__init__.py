@@ -15,7 +15,7 @@ from .customs.da3 import DA3
 from .customs.da3_iqn import DA3_IQN
 from .customs.da6 import DA6
 from .customs.fqf import FQF
-from .customs.iqn import IQN
+from .customs.iqn import IQN, MergedIQN
 from .customs.qr_dqn import QRDQN
 from .mlp import MLP
 
@@ -49,7 +49,10 @@ def generate_network(
         network = QRDQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "iqn":
-        network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
+        if config.observation_area_mask == "merged":
+            network = MergedIQN(config=config, input_shape=obs_shape, output_size=act_size)
+        else:
+            network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
     
     elif config.model.name == "fqf":
         network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)
