@@ -50,7 +50,9 @@ class IQN_Head(nn.Module):
         return torch.rand(1, self.num_quantiles, device=state_embeddings.device)
 
     def get_quantiles(
-        self, state_embeddings: torch.Tensor = None, taus: torch.Tensor = None,
+        self,
+        state_embeddings: torch.Tensor = None,
+        taus: torch.Tensor = None,
     ):
         tau_embeddings = self.cosine_net(taus)
 
@@ -202,12 +204,12 @@ class MergedDA3_IQN(DA3_IQN):
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
 
         self.relative_patch_embed = PatchEmbed(
-            patch_size=5, # config.model.relative_patch_size,
+            patch_size=5,  # config.model.relative_patch_size,
             in_chans=2 if config.destination_channel else 1,
             embed_dim=config.model.embed_dim,
         )
         self.local_patch_embed = PatchEmbed(
-            patch_size=1, # config.model.local_patch_size,
+            patch_size=1,  # config.model.local_patch_size,
             in_chans=input_shape[0],
             embed_dim=config.model.embed_dim,
         )
@@ -292,9 +294,7 @@ class MergedDA3_IQN(DA3_IQN):
         relative_saliency_vector = out[:, 0]
 
         out = self.local_patch_embed(local_x)
-        local_saliency_vector = self.local_saliency_vector.expand(
-            out.shape[0], -1, -1
-        )
+        local_saliency_vector = self.local_saliency_vector.expand(out.shape[0], -1, -1)
         out = torch.cat((local_saliency_vector, out), dim=1)
         out = out + self.local_pos_embed
 

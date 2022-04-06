@@ -17,6 +17,7 @@ from .customs.da6 import DA6
 from .customs.fqf import FQF
 from .customs.iqn import IQN, MergedIQN
 from .customs.qr_dqn import QRDQN
+from .customs.da6_iqn import DA6_IQN
 from .mlp import MLP
 
 logger = initialize_logging(__name__)
@@ -56,9 +57,12 @@ def generate_network(
             network = MergedIQN(config=config, input_shape=obs_shape, output_size=act_size)
         else:
             network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
-    
+
     elif config.model.name == "fqf":
         network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)
+
+    elif config.model.name == "da6_iqn":
+        network = DA6_IQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.model.name: {config.model.name}")
