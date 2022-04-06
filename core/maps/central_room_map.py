@@ -26,8 +26,11 @@ class CentralRoomMap(AbstractMap):
 
         elif self.config.type_objects == 2:
             # Set objects area for object 0
-            self.objects_area_matrix[0, 1:24, 1:13] = 1
-            self.objects_area_matrix[0, 8:17, 8:13] = 0
+            self.objects_area_matrix[0, 1:14, 1:14] = 1
+            self.objects_area_matrix[0, 11:24, 11:24] = 1
             # Set objects area for object 1
-            self.objects_area_matrix[1, 1:24, 12:24] = 1
-            self.objects_area_matrix[1, 8:17, 12:17] = 0
+            self.objects_area_matrix[1, 11:24, 1:14] = 1
+            self.objects_area_matrix[1, 1:14, 14:24] = 1
+
+            self.objects_area_matrix[0, 8:17, 8:17] = 0
+            self.objects_area_matrix[1, 8:17, 8:17] = 0
