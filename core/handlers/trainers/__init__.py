@@ -10,7 +10,6 @@ from omegaconf import DictConfig
 from .abstract_trainer import AbstractTrainer
 from .default_trainer import DefaultTrainer
 from .attention_trainer import AttentionTrainer
-from .attention_types_trainer import AttentionWanderingTrainer
 
 logger = initialize_logging(__name__)
 
@@ -23,9 +22,6 @@ def generate_trainer(
 
     elif config.trainer == "attention":
         trainer = AttentionTrainer(config=config, environment=environment)
-
-    elif config.trainer == "attention_wandering":
-        trainer = AttentionWanderingTrainer(config=config, environment=environment)
 
     else:
         logger.warn(f"Unexpected trainer is given. config.trainer: {config.trainer}")

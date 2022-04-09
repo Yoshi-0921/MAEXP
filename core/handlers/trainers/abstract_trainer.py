@@ -44,7 +44,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         loss_list = []
         states, actions, rewards, dones, next_states = batch
         for agent_id, agent in enumerate(self.agents):
-            if self.config.agent_tasks[int(agent_id)] == -1:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
                 loss_list.append({"total_loss": torch.zeros(size=(1,))[0]})
                 continue
             loss = agent.learn(
@@ -65,7 +65,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
 
         states = self.states
         for agent_id in self.order:
-            if self.config.agent_tasks[int(agent_id)] == -1:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
             action = self.agents[agent_id].get_action(

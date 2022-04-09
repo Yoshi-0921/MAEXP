@@ -23,7 +23,7 @@ class AttentionEvaluator(DefaultEvaluator):
 
         states = self.states
         for agent_id in self.order:
-            if self.config.agent_tasks[int(agent_id)] == -1:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
 
@@ -56,7 +56,7 @@ class AttentionEvaluator(DefaultEvaluator):
             log_step + 3,
         ]:
             for agent_id, agent in enumerate(self.agents):
-                if self.config.agent_tasks[int(agent_id)] == -1:
+                if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
                 if self.config.save_pdf_figs:
                     if not os.path.exists(f"agent_{str(agent_id)}"):

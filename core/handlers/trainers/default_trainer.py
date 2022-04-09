@@ -43,7 +43,7 @@ class DefaultTrainer(AbstractTrainer):
         ):
             # log attention_maps of agent0
             for agent_id in range(len(self.agents)):
-                if self.config.agent_tasks[int(agent_id)] == -1:
+                if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
                 if self.config.destination_channel:

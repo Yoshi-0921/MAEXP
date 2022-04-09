@@ -24,7 +24,7 @@ class AttentionTrainer(DefaultTrainer):
 
         states = self.states
         for agent_id in self.order:
-            if self.config.agent_tasks[int(agent_id)] == -1:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
 
@@ -69,7 +69,7 @@ class AttentionTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                if self.config.agent_tasks[int(agent_id)] == -1:
+                if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
                 if self.config.destination_channel:
