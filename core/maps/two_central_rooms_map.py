@@ -44,3 +44,26 @@ class TwoCentralRoomsMap(AbstractMap):
 
             self.objects_area_matrix[1, 24:49, 1:13] = 1
             self.objects_area_matrix[1, 33:42, 8:13] = 0
+
+    def reset_destination_area(self):
+        self.destination_area_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
+        # Agent A
+        self.destination_area_matrix[0:2, 1:26, 1:13] = 1
+        self.destination_area_matrix[0:2, 24:49, 12:24] = 1
+
+        # Agent B
+        self.destination_area_matrix[2:4, 1:26, 12:24] = 1
+        self.destination_area_matrix[2:4, 24:49, 1:13] = 1
+
+        # Agent C
+        self.destination_area_matrix[4:6, 1:49, 1:13] = 1
+
+        # Agent D
+        self.destination_area_matrix[6:8, 1:49, 12:24] = 1
+
+        # Agent E
+        self.destination_area_matrix[8:10, 1:26, 1:24] = 1
+
+        # Agent F
+        self.destination_area_matrix[10:12, 24:49, 1:24] = 1
