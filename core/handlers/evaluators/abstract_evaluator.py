@@ -39,6 +39,10 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
         random.shuffle(self.order)
 
         for agent_id in self.order:
+            if self.config.agent_tasks[int(agent_id)] == -1:
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             # normalize states [0, map.SIZE] -> [0, 1.0]
             states = torch.tensor(self.states).float()
 

@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,7 +7,7 @@ import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
-from copy import deepcopy
+
 from .default_trainer import DefaultTrainer
 
 plt.rcParams["figure.facecolor"] = "white"
@@ -48,7 +49,6 @@ class AttentionWanderingTrainer(DefaultTrainer):
     def loop_step(self, step: int, epoch: int):
         # train based on experiments
         for batch in self.dataloader:
-            loss_list = self.loss_and_update(batch)
             loss_list = self.loss_and_update(batch)
             self.step_loss_sum += sum(
                 [loss_dict["total_loss"].item() for loss_dict in loss_list]

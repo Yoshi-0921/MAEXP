@@ -24,6 +24,10 @@ class AttentionTrainer(DefaultTrainer):
 
         states = self.states
         for agent_id in self.order:
+            if self.config.agent_tasks[int(agent_id)] == -1:
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             action, attns = self.agents[agent_id].get_action_attns(
                 deepcopy(states[agent_id]), epsilon
             )
@@ -34,7 +38,9 @@ class AttentionTrainer(DefaultTrainer):
 
         exp = Experience(states, actions, rewards, dones, new_states)
 
-        self.buffer.append(exp)
+        self.buffer.append(deepcopy(exp))
+
+        del exp
 
         self.states = new_states
 
@@ -63,6 +69,9 @@ class AttentionTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
+                if self.config.agent_tasks[int(agent_id)] == -1:
+                    continue
+
                 if self.config.destination_channel:
                     fig = plt.figure()
                     sns.heatmap(

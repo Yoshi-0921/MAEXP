@@ -16,21 +16,29 @@ class DA3_IQNBrain(IQNBrain):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         if config.observation_area_mask == "merged":
             self.local_patched_size_x = (
-                config.visible_range // 1 # config.model.local_patch_size
+                config.visible_range // 1  # config.model.local_patch_size
             )
             self.local_patched_size_y = (
-                config.visible_range // 1 # config.model.local_patch_size
+                config.visible_range // 1  # config.model.local_patch_size
             )
             self.relative_patched_size_x = (
-                config.map.SIZE_X // 5 # config.model.relative_patch_size
+                config.map.SIZE_X // 5  # config.model.relative_patch_size
             )
             self.relative_patched_size_y = (
-                config.map.SIZE_Y // 5 # config.model.relative_patch_size
+                config.map.SIZE_Y // 5  # config.model.relative_patch_size
             )
 
         else:
-            setattr(self, f"{config.observation_area_mask}_patched_size_x", obs_shape[1] // config.model.patch_size)
-            setattr(self, f"{config.observation_area_mask}_patched_size_y", obs_shape[2] // config.model.patch_size)
+            setattr(
+                self,
+                f"{config.observation_area_mask}_patched_size_x",
+                obs_shape[1] // config.model.patch_size,
+            )
+            setattr(
+                self,
+                f"{config.observation_area_mask}_patched_size_y",
+                obs_shape[2] // config.model.patch_size,
+            )
 
     @torch.no_grad()
     def get_action(self, state):
