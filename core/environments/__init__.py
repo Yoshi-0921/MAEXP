@@ -15,7 +15,6 @@ from .shared_reward_environment import (
     SharedMaxRewardEnvironment,
     SharedMeanRewardEnvironment,
 )
-from .types_environment import TypesEnvironment
 from .test_environment import TestEnvironment
 
 logger = initialize_logging(__name__)

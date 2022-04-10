@@ -9,7 +9,7 @@ from typing import List
 import numpy as np
 from core.handlers.observations import generate_observation_handler
 from core.worlds import AbstractWorld
-from core.worlds.entity import Agent, Object
+from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
@@ -97,7 +97,6 @@ class DefaultEnvironment(AbstractEnvironment):
             self.world.map.agents_matrix[agent_id, pos_x, pos_y] = 1
 
         # Initialize object position
-        self.world.reset_objects()
         self.generate_objects()
 
         obs_n = self.observation_handler.reset(self.agents)
@@ -126,8 +125,6 @@ class DefaultEnvironment(AbstractEnvironment):
                 and self.world.map.objects_matrix[:, x, y].sum() == 0
                 and self.world.map.objects_area_matrix[object_type, x, y] == 1
             ):
-                self.world.objects.append(Object(object_type))
-                self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
                 self.world.map.objects_matrix[object_type, x, y] = 1
                 self.heatmap_objects[object_type, x, y] += 1
                 num_generated += 1
@@ -183,22 +180,17 @@ class DefaultEnvironment(AbstractEnvironment):
         if self.agent_tasks[agent_id] == "-1":
             return reward
 
-        for obj_idx, obj in enumerate(self.world.objects):
-            if all(agent.xy == obj.xy) and str(obj.type) in self.agent_tasks[agent_id]:
-                obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
-                if (
-                    self.world.map.destination_area_matrix[agent_id][
-                        obj_pos_x, obj_pos_y
-                    ]
-                    == 1
-                ):
-                    reward = 1.0
-
-                self.world.objects.pop(obj_idx)
-                self.world.map.objects_matrix[obj.type, obj_pos_x, obj_pos_y] = 0
+        for object_type in self.agent_tasks[agent_id]:
+            if (
+                self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y]
+                == self.world.map.destination_area_matrix[agent_id][a_pos_x, a_pos_y]
+                == 1
+            ):
+                reward = 1.0
+                self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y] = 0
                 self.objects_completed += 1
-                self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
-                self.generate_objects(1, obj.type)
+                self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
+                self.generate_objects(1, int(object_type))
 
         # negative reward for collision with other agents
         if agent.collide_agents:
@@ -217,9 +209,9 @@ class DefaultEnvironment(AbstractEnvironment):
         return reward
 
     def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
-        for obj in self.world.objects:
-            if all(agent.xy == obj.xy):
-                return 1
+        # for obj in self.world.objects:
+        #     if all(agent.xy == obj.xy):
+        #         return 1
 
         return 0
 

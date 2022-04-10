@@ -10,7 +10,7 @@ from typing import List
 
 import numpy as np
 from core.maps.abstract_map import AbstractMap
-from .entity import Agent, Object
+from .entity import Agent
 from omegaconf import DictConfig
 
 
@@ -19,22 +19,17 @@ class AbstractWorld(ABC):
         self.config = config
         self.map = world_map
         self.agents: List[Agent] = []
-        self.objects: List[Object] = []
 
     @property
     def entities(self):
-        return self.agents + self.objects
+        return self.agents
 
     def reset_all(self):
         self.reset_agents()
-        self.reset_objects()
         self.reset_map()
 
     def reset_agents(self):
         self.agents = []
-
-    def reset_objects(self):
-        self.objects = []
 
     def reset_map(self):
         self.map.reset_all()
