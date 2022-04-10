@@ -42,9 +42,6 @@ def generate_environment(
     elif config.environment == "shared_max_reward":
         env = SharedMaxRewardEnvironment(config=config, world=world)
 
-    elif config.environment == 'object_types':
-        env = TypesEnvironment(config=config, world=world)
-
     elif config.environment == 'test':
         env = TestEnvironment(config=config, world=world)
 
