@@ -1,4 +1,4 @@
-"""Source code for distributed attentional actor architecture (DA3) model.
+"""Source code for distributed attentional actor architecture after another attention (DA6) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
