@@ -88,10 +88,11 @@ class ObservationHandler:
 
         return {
             self.view_method: obs,
-            # "destination_channel": torch.from_numpy(
-            #     self.world.map.destination_area_matrix[agent_id]
-            # ).unsqueeze(0),
             "coordinates": coordinates,
+            "agents": torch.stack([torch.from_numpy(self.world.map.coord2ind(agent_ind.xy)) for agent_ind in agents]),
+            "objects": torch.from_numpy(
+                deepcopy(self.world.map.objects_matrix)
+            )
         }
 
     def observation_area_fill(self, agents, agent, agent_id, area_mask, coordinates):

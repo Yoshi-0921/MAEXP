@@ -28,7 +28,7 @@ class DefaultTrainer(AbstractTrainer):
             )
 
         if (
-            self.config.destination_channel
+            self.config.reset_destination
             and self.episode_step % self.config.reset_destination_period == 0
         ):
             self.env.world.map.reset_destination_area()

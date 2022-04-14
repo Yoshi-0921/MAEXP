@@ -63,7 +63,7 @@ class AttentionEvaluator(DefaultEvaluator):
                         os.mkdir(f"agent_{str(agent_id)}")
                     os.mkdir(f"agent_{str(agent_id)}/step_{step}")
 
-                if self.config.destination_channel:
+                if self.config.output_destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,

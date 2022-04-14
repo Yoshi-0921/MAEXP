@@ -14,7 +14,6 @@ class AbstractMap(ABC):
         self.config = config
         self.num_agents = config.num_agents
         self.type_objects = config.type_objects
-        self.destination_channel = config.destination_channel
         self.SIZE_X = size_x
         self.SIZE_Y = size_y
 
@@ -33,8 +32,7 @@ class AbstractMap(ABC):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
-        if self.destination_channel:
-            self.reset_destination_area()
+        self.reset_destination_area()
 
     def reset_agents(self):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)

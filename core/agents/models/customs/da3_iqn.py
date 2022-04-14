@@ -188,7 +188,6 @@ class MergedDA3_IQN(DA3_IQN):
             config=config, input_shape=input_shape, output_size=output_size
         )
         self.visible_range = config.visible_range
-        self.destination_channel = config.destination_channel
         relative_patched_size_x = (
             input_shape[1] // 5
         )  # config.model.relative_patch_size
@@ -205,7 +204,7 @@ class MergedDA3_IQN(DA3_IQN):
 
         self.relative_patch_embed = PatchEmbed(
             patch_size=5,  # config.model.relative_patch_size,
-            in_chans=2 if config.destination_channel else 1,
+            in_chans=1,
             embed_dim=config.model.embed_dim,
         )
         self.local_patch_embed = PatchEmbed(

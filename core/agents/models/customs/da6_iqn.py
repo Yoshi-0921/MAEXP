@@ -37,9 +37,10 @@ class DA6_IQN(DA3_IQN):
             config.visible_range // 1
         )  # config.model.local_patch_size
 
+        self.objects_channel = config.objects_channel
         self.relative_patch_embed = PatchEmbed(
             patch_size=5,  # config.model.relative_patch_size,
-            in_chans=2 if config.destination_channel else 1,
+            in_chans=1 + config.type_objects if self.objects_channel else 1,
             embed_dim=config.model.embed_dim,
         )
         self.local_patch_embed = PatchEmbed(
@@ -149,4 +150,8 @@ class DA6_IQN(DA3_IQN):
         )
         relative_x = relative_x[:, -1:, ...]  # [1, 1, 25, 25]が欲しい
         relative_x += 1
+
+        if self.objects_channel:
+            relative_x = torch.cat((relative_x, state["objects"]), dim=1)
+
         return local_x, relative_x

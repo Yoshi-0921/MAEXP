@@ -22,7 +22,6 @@ class DA6(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
         self.visible_range = config.visible_range
-        self.destination_channel = config.destination_channel
         relative_patched_size_x = input_shape[1] // config.model.relative_patch_size
         relative_patched_size_y = input_shape[2] // config.model.relative_patch_size
         local_patched_size_x = config.visible_range // config.model.local_patch_size
@@ -31,7 +30,7 @@ class DA6(nn.Module):
 
         self.relative_patch_embed = PatchEmbed(
             patch_size=config.model.relative_patch_size,
-            in_chans=2 if config.destination_channel else 1,
+            in_chans=1,
             embed_dim=config.model.embed_dim,
         )
         self.local_patch_embed = PatchEmbed(
@@ -158,9 +157,5 @@ class DA6(nn.Module):
         )
         relative_x = relative_x[:, -1:, ...]  # [1, 1, 25, 25]が欲しい
         relative_x += 1
-
-        if self.destination_channel:
-            destination_channel = state["destination_channel"][:, -1:, ...]
-            relative_x = torch.cat((relative_x, destination_channel), dim=1)
 
         return local_x, relative_x
