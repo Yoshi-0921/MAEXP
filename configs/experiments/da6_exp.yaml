@@ -1,11 +1,11 @@
 defaults:
-  - model: da6_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn
+  - model: da6_iqn_cond # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
   - map: two_central_rooms # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'NeurIPS22-exp'
-name: 'DA6-IQN-merged+all_object_type'
+name: 'DA6-IQN-merged+all_agents'
 gpu: 0
 # ==================================================
 # configure environment
@@ -34,8 +34,8 @@ phase: 'training' # training, evaluation
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
 output_destination_channel: False
-objects_channel: True
-reset_destination: flip_noise_probabilities
+objects_channel: False
+reset_destination: False
 reset_destination_period: 200
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
