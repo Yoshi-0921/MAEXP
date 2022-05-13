@@ -46,7 +46,7 @@ class DefaultTrainer(AbstractTrainer):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
-                if self.config.destination_channel:
+                if self.config.output_destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,
