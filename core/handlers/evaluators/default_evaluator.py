@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import wandb
+import os
 
 from .abstract_evaluator import AbstractEvaluator
 
@@ -86,15 +87,23 @@ class DefaultEvaluator(AbstractEvaluator):
         size_x = self.env.world.map.SIZE_X // 2
         size_y = self.env.world.map.SIZE_Y // 2
 
+        if self.config.save_pdf_figs:
+            if not os.path.exists("heatmap_accumulated_agents"):
+                os.mkdir("heatmap_accumulated_agents")
+            if not os.path.exists("heatmap_accumulated_complete"):
+                os.mkdir("heatmap_accumulated_complete")
+            os.mkdir(f"heatmap_accumulated_agents/epoch_{self.episode_count}")
+            os.mkdir(f"heatmap_accumulated_complete/epoch_{self.episode_count}")
+
         for agent_id in range(self.env.num_agents):
             # log heatmap_agents
             fig = plt.figure()
             sns.heatmap(
                 self.env.heatmap_accumulated_agents[agent_id].T,
                 vmin=0,
-                cmap="Blues",
+                cmap="PuBu",
                 square=True,
-                cbar_kws={"shrink": 1.0},  # 4agents:1.0, 8agents:0.65
+                cbar_kws={"shrink": 0.61},
                 xticklabels=list(
                     str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
                 ),
@@ -102,7 +111,13 @@ class DefaultEvaluator(AbstractEvaluator):
                     str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
                 ),
             )
-            plt.title(f"Agent {agent_id}")
+            ax = plt.gca()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+            if self.config.save_pdf_figs:
+                plt.savefig(f'heatmap_accumulated_agents/epoch_{self.episode_count}/agent_{str(agent_id)}.pdf', dpi=300)
+
             heatmap_accumulated_agents.append(
                 wandb.Image(data_or_path=fig, caption=f"Agent {agent_id}")
             )
@@ -113,8 +128,9 @@ class DefaultEvaluator(AbstractEvaluator):
             sns.heatmap(
                 self.env.heatmap_accumulated_complete[agent_id].T,
                 vmin=0,
-                cmap="Blues",
+                cmap="PuBu",
                 square=True,
+                cbar_kws={"shrink": 0.61},
                 xticklabels=list(
                     str(x) if x % 2 == 0 else "" for x in range(-size_x, size_x)
                 ),
@@ -122,7 +138,13 @@ class DefaultEvaluator(AbstractEvaluator):
                     str(y) if y % 2 == 0 else "" for y in range(size_y, -size_y, -1)
                 ),
             )
-            plt.title(f"Agent {agent_id}")
+            ax = plt.gca()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+            if self.config.save_pdf_figs:
+                plt.savefig(f'heatmap_accumulated_complete/epoch_{self.episode_count}/agent_{str(agent_id)}.pdf', dpi=300)
+
             heatmap_accumulated_complete.append(
                 wandb.Image(data_or_path=fig, caption=f"Agent {agent_id}")
             )
