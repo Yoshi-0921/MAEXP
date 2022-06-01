@@ -61,7 +61,7 @@ class AttentionEvaluator(DefaultEvaluator):
                 if self.config.save_pdf_figs:
                     if not os.path.exists(f"agent_{str(agent_id)}"):
                         os.mkdir(f"agent_{str(agent_id)}")
-                    os.mkdir(f"agent_{str(agent_id)}/step_{step}")
+                    os.mkdir(f"agent_{str(agent_id)}/step_{self.global_step}")
 
                 if self.config.output_destination_channel:
                     fig = plt.figure()
@@ -70,7 +70,7 @@ class AttentionEvaluator(DefaultEvaluator):
                         square=True,
                     )
                     if self.config.save_pdf_figs:
-                        plt.savefig(f'agent_{str(agent_id)}/step_{step}/destination_channel.pdf', dpi=300)
+                        plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/destination_channel.pdf', dpi=300)
 
                     wandb.log(
                         {
@@ -101,15 +101,18 @@ class AttentionEvaluator(DefaultEvaluator):
                     fig = plt.figure()
                     sns.heatmap(
                         torch.t(attention_map.mean(dim=0)),
+                        cmap='PuBu',
+                        linecolor='black',
+                        linewidths=.1,
                         vmin=0,
                         square=True,
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
-                        annot_kws={"fontsize": 8},
+                        annot_kws={"fontsize": 12},
                     )
                     if self.config.save_pdf_figs:
-                        plt.savefig(f'agent_{str(agent_id)}/step_{step}/{view_method}_attention_mean.pdf', dpi=300)
+                        plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/{view_method}_attention_mean.pdf', dpi=300)
 
                     wandb.log(
                         {
@@ -136,7 +139,7 @@ class AttentionEvaluator(DefaultEvaluator):
                             annot_kws={"fontsize": 8},
                         )
                         if self.config.save_pdf_figs:
-                            plt.savefig(f'agent_{str(agent_id)}/step_{step}/{view_method}_attention_head_{str(head_id)}.pdf', dpi=300)
+                            plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/{view_method}_attention_head_{str(head_id)}.pdf', dpi=300)
 
                         fig_list.append(
                             wandb.Image(
