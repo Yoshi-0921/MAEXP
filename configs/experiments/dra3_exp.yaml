@@ -1,0 +1,69 @@
+defaults:
+  - model: da6_iqn_cond # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - map: two_central_rooms # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
+  - opt: rmsprop
+  - job_logging: disabled
+
+project_name: 'NeurIPS22-exp'
+name: 'DA6-IQN-merged+all_agents'
+gpu: 0
+# ==================================================
+# configure environment
+
+world: 'default' # default
+environment: 'default' # default, shared_mean_reward, shared_max_reward, test
+seed: 921
+num_objects: 40
+type_objects: 2
+objects_color: ["yellow", "orange"]
+agent_tasks: ["0", "0", "1", "1", "01", "01", "01", "01", "01", "01", "01", "01", "-1", "-1", "-1", "-1"]
+# ==================================================
+# configure agent
+
+agent_type: 'attention' # default, attention
+brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+num_agents: 16
+episode_hm_nrow: 4
+agents_color: ["blue", "blue", "green", "green", "dodger_blue", "dodger_blue", "spring_green", "spring_green", "pink", "pink", "magenta", "magenta", "red", "red", "red", "red"]
+init_xys: [[-11, 0], [-11, 2], [-13, 2], [-15, 2], [-15, 0], [-15, -2], [-13, -2], [-11, -2], [14, 0], [14, 2], [12, 2], [10, 2], [10, 0], [10, -2], [12, -2], [14, -2]]
+shuffle_init_xys: True
+phase: 'training' # training, evaluation
+# ==================================================
+# configure observation
+
+visible_range: 7 # currently only 5, 7, 9 are suppoeted
+transparent_observation: False
+output_destination_channel: False
+objects_channel: False
+reset_destination: False
+reset_destination_period: 200
+agent_view_method: 'individual' # default, self, simple, transition, individual
+object_view_method: 'object_types' # default, simple, object_types
+observation_area_mask: 'merged' # local, relative, merged
+observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
+noise_threshold_ratio: 0
+flip_noise_probabilities: [0.2, 0.1, 0.05]
+std_distribution: [0.07, 0.05, 0.03]
+past_step: 1
+
+# ==================================================
+# configure training
+
+trainer: 'attention' # default, attention
+evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
+max_epochs: 5000
+max_episode_length: 200
+batch_size: 32
+populate_steps: 1000
+capacity: 100000
+synchronize_frequency: 1
+gamma: 0.9
+epsilon_decay: 0.998
+epsilon_initial: 1.0
+epsilon_end: 0.05
+# ==================================================
+# configre evaluation
+
+validate_epochs: 1000
+pretrained_weight_path: False
+save_pdf_figs: False
