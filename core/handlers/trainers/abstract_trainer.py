@@ -7,6 +7,7 @@ import wandb
 from core.utils.buffer import Experience, ReplayBuffer
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
+from typing import Dict, List
 from torch.utils.data import DataLoader
 
 from ..abstract_loop_handler import AbstractLoopHandler
@@ -39,10 +40,13 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
             ],
         )
 
-    def loss_and_update(self, batch):
+    def loss_and_update(self, batch) -> List[Dict[str, torch.Tensor]]:
         loss_list = []
         states, actions, rewards, dones, next_states = batch
         for agent_id, agent in enumerate(self.agents):
+            if self.config.agent_tasks[int(agent_id)] == "-1":
+                loss_list.append({"total_loss": torch.zeros(size=(1,))[0]})
+                continue
             loss = agent.learn(
                 states[agent_id],
                 actions[agent_id],
@@ -50,9 +54,9 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
                 dones[agent_id],
                 next_states[agent_id],
             )
-            loss_list.append(loss.detach().cpu())
+            loss_list.append(loss)
 
-        return torch.stack(loss_list)
+        return loss_list
 
     @torch.no_grad()
     def play_step(self, epsilon: float = 0.0):
@@ -61,6 +65,9 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
 
         states = self.states
         for agent_id in self.order:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
             action = self.agents[agent_id].get_action(
                 deepcopy(states[agent_id]), epsilon
             )

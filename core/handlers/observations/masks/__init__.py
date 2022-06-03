@@ -31,7 +31,8 @@ def generate_observation_area_mask(
         area_mask = generate_local_area_mask(config=config, world=world)
 
     elif config.observation_area_mask == "relative":
-        area_mask = generate_relative_area_mask(config=config, world=world)
+        area_mask = generate_local_area_mask(config=config, world=world)
+        # area_mask = generate_relative_area_mask(config=config, world=world)
 
     else:
         logger.warn(
@@ -44,17 +45,20 @@ def generate_observation_area_mask(
 
 
 def generate_observation_mask_coordinate(
-    config: DictConfig, world: AbstractWorld, observation_space: List[int]
+    config: DictConfig, world: AbstractWorld
 ) -> AbstractObservationCoordinateHandler:
     if config.observation_area_mask == "local":
         observation_mask_coordinate = LocalObservationCoordinateHandler(
-            config=config, world=world, observation_space=observation_space
+            config=config, world=world
         )
 
     elif config.observation_area_mask == "relative":
-        observation_mask_coordinate = RelativeObservationCoordinateHandler(
-            config=config, world=world, observation_space=observation_space
+        observation_mask_coordinate = LocalObservationCoordinateHandler(
+            config=config, world=world
         )
+        # observation_mask_coordinate = RelativeObservationCoordinateHandler(
+        #     config=config, world=world, observation_space=observation_space
+        # )
 
     else:
         logger.warn(

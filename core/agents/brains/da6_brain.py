@@ -32,7 +32,8 @@ class DA6Brain(AbstractBrain):
     @torch.no_grad()
     def get_action(self, state):
         for state_key, state_value in state.items():
-            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
+            if isinstance(state_value, torch.Tensor):
+                state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
         q_values, attns = self.network.forward_attn(state)
         _, action = torch.max(q_values, dim=1)
@@ -42,12 +43,14 @@ class DA6Brain(AbstractBrain):
 
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         for states_key, states_value in states_ind.items():
-            states_ind[states_key] = states_value.float().to(self.device)
+            if isinstance(states_value, torch.Tensor):
+                states_ind[states_key] = states_value.float().to(self.device)
         actions_ind = actions_ind.to(self.device)
         rewards_ind = rewards_ind.float().to(self.device)
         dones_ind = dones_ind.to(self.device)
         for next_states_key, next_states_value in next_states_ind.items():
-            next_states_ind[next_states_key] = next_states_value.float().to(self.device)
+            if isinstance(next_states_value, torch.Tensor):
+                next_states_ind[next_states_key] = next_states_value.float().to(self.device)
 
         self.network.eval()
         self.target_network.eval()
@@ -69,4 +72,4 @@ class DA6Brain(AbstractBrain):
         nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss
+        return {"total_loss": loss.detach().cpu()}

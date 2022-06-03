@@ -1,12 +1,16 @@
 import random
+from copy import deepcopy
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
 import wandb
-
+import os
 from .default_evaluator import DefaultEvaluator
 
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
 
 
@@ -19,8 +23,12 @@ class AttentionEvaluator(DefaultEvaluator):
 
         states = self.states
         for agent_id in self.order:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             action, attns = self.agents[agent_id].get_action_attns(
-                states[agent_id], epsilon
+                deepcopy(states[agent_id]), epsilon
             )
             actions[agent_id] = action
             attention_maps[agent_id] = attns
@@ -38,16 +46,48 @@ class AttentionEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         log_step = self.max_episode_length // 2
-        if epoch % (self.max_epochs // 3) == 0 and step in [
+        if epoch % (self.max_epochs // 5 + 1) == 0 and step in [
+            log_step - 3,
+            log_step - 2,
             log_step - 1,
             log_step,
             log_step + 1,
+            log_step + 2,
+            log_step + 3,
         ]:
             for agent_id, agent in enumerate(self.agents):
-                for attention_map, image, view_method in zip(
-                    attention_maps[agent_id],
-                    self.env.observation_handler.render(states[agent_id]),
-                    ["local", "relative"],
+                if self.config.agent_tasks[int(agent_id)] == "-1":
+                    continue
+                if self.config.save_pdf_figs:
+                    if not os.path.exists(f"agent_{str(agent_id)}"):
+                        os.mkdir(f"agent_{str(agent_id)}")
+                    os.mkdir(f"agent_{str(agent_id)}/step_{self.global_step}")
+
+                if self.config.output_destination_channel:
+                    fig = plt.figure()
+                    sns.heatmap(
+                        self.env.world.map.destination_area_matrix[agent_id].T,
+                        square=True,
+                    )
+                    if self.config.save_pdf_figs:
+                        plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/destination_channel.pdf', dpi=300)
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/destination_channel": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption="destination channel",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+
+                images = self.env.observation_handler.render(states[agent_id])
+
+                for attention_map, (view_method, image) in zip(
+                    attention_maps[agent_id], images.items()
                 ):
                     attention_map = (
                         attention_map.mean(dim=0)[0, :, 0, 1:]
@@ -61,13 +101,18 @@ class AttentionEvaluator(DefaultEvaluator):
                     fig = plt.figure()
                     sns.heatmap(
                         torch.t(attention_map.mean(dim=0)),
+                        cmap='PuBu',
+                        linecolor='black',
+                        linewidths=.1,
                         vmin=0,
                         square=True,
                         annot=True,
                         fmt=".3f",
                         vmax=0.25,
-                        annot_kws={"fontsize": 8},
+                        annot_kws={"fontsize": 12},
                     )
+                    if self.config.save_pdf_figs:
+                        plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/{view_method}_attention_mean.pdf', dpi=300)
 
                     wandb.log(
                         {
@@ -93,6 +138,9 @@ class AttentionEvaluator(DefaultEvaluator):
                             vmax=0.25,
                             annot_kws={"fontsize": 8},
                         )
+                        if self.config.save_pdf_figs:
+                            plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/{view_method}_attention_head_{str(head_id)}.pdf', dpi=300)
+
                         fig_list.append(
                             wandb.Image(
                                 data_or_path=fig,

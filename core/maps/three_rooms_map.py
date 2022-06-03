@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for three rooms environmental map used in multi-agent world.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>

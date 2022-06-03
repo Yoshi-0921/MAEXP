@@ -14,11 +14,10 @@ from omegaconf import DictConfig
 
 class AbstractObservationCoordinateHandler(ABC):
     def __init__(
-        self, config: DictConfig, world: AbstractWorld, observation_space: List[int]
+        self, config: DictConfig, world: AbstractWorld
     ):
         self.config = config
         self.world = world
-        self.observation_space = observation_space
         self.visible_range = config.visible_range
         self.visible_radius = config.visible_range // 2
 

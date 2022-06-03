@@ -15,8 +15,7 @@ from .shared_reward_environment import (
     SharedMaxRewardEnvironment,
     SharedMeanRewardEnvironment,
 )
-from .types_environment import TypesEnvironment
-from .types_test_environment import TypesTestEnvironment
+from .test_environment import TestEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -25,7 +24,8 @@ __all__ = [
     "DefaultEnvironment",
     "SharedMaxRewardEnvironment",
     "SharedMeanRewardEnvironment",
-    "TypesEnvironment"
+    "TypesEnvironment",
+    "TestEnvironment"
 ]
 
 
@@ -41,11 +41,8 @@ def generate_environment(
     elif config.environment == "shared_max_reward":
         env = SharedMaxRewardEnvironment(config=config, world=world)
 
-    elif config.environment == 'object_types':
-        env = TypesEnvironment(config=config, world=world)
-
-    elif config.environment == 'da3_types_test':
-        env = TypesTestEnvironment(config=config, world=world)
+    elif config.environment == 'test':
+        env = TestEnvironment(config=config, world=world)
 
     else:
         logger.warn(

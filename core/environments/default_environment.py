@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for default multi-agent environment.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -11,7 +9,7 @@ from typing import List
 import numpy as np
 from core.handlers.observations import generate_observation_handler
 from core.worlds import AbstractWorld
-from core.worlds.entity import Agent, Object
+from core.worlds.entity import Agent
 from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
@@ -30,6 +28,7 @@ class DefaultEnvironment(AbstractEnvironment):
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
         self.init_xys_order = [i for i in range(len(self.init_xys))]
         self.type_objects = config.type_objects
+        self.agent_tasks = config.agent_tasks
 
         self.heatmap_accumulated_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
@@ -98,16 +97,22 @@ class DefaultEnvironment(AbstractEnvironment):
             self.world.map.agents_matrix[agent_id, pos_x, pos_y] = 1
 
         # Initialize object position
-        self.world.reset_objects()
         self.generate_objects()
 
         obs_n = self.observation_handler.reset(self.agents)
 
         return obs_n
 
-    def generate_objects(self, num_objects: int = None, object_type: int = 0):
+    def generate_objects(self, num_objects: int = None, object_type: int = None):
         num_objects = num_objects or self.config.num_objects
-        self._generate_objects(num_objects, object_type)
+        if object_type is None:
+            for object_type in range(self.type_objects):
+                self._generate_objects(
+                    num_objects,
+                    object_type=object_type,
+                )
+        else:
+            self._generate_objects(num_objects, object_type)
 
     def _generate_objects(self, num_objects: int, object_type: int = 0):
         num_generated = 0
@@ -120,8 +125,6 @@ class DefaultEnvironment(AbstractEnvironment):
                 and self.world.map.objects_matrix[:, x, y].sum() == 0
                 and self.world.map.objects_area_matrix[object_type, x, y] == 1
             ):
-                self.world.objects.append(Object(object_type))
-                self.world.objects[-1].move(self.world.map.ind2coord((x, y)))
                 self.world.map.objects_matrix[object_type, x, y] = 1
                 self.heatmap_objects[object_type, x, y] += 1
                 num_generated += 1
@@ -174,22 +177,20 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
         reward = 0.0
-        for obj_idx, obj in enumerate(self.world.objects):
-            if all(agent.xy == obj.xy):
-                obj_pos_x, obj_pos_y = self.world.map.coord2ind(obj.xy)
-                if (
-                    self.world.map.destination_area_matrix[agent_id][
-                        obj_pos_x, obj_pos_y
-                    ]
-                    == 1
-                ):
-                    reward = 1.0
+        if self.agent_tasks[agent_id] == "-1":
+            return reward
 
-                self.world.objects.pop(obj_idx)
-                self.world.map.objects_matrix[0, obj_pos_x, obj_pos_y] = 0
+        for object_type in self.agent_tasks[agent_id]:
+            if (
+                self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y]
+                == self.world.map.destination_area_matrix[agent_id][a_pos_x, a_pos_y]
+                == 1
+            ):
+                reward = 1.0
+                self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y] = 0
                 self.objects_completed += 1
-                self.heatmap_complete[agent_id, obj_pos_x, obj_pos_y] += 1
-                self.generate_objects(1)
+                self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
+                self.generate_objects(1, int(object_type))
 
         # negative reward for collision with other agents
         if agent.collide_agents:
@@ -208,9 +209,9 @@ class DefaultEnvironment(AbstractEnvironment):
         return reward
 
     def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
-        for obj in self.world.objects:
-            if all(agent.xy == obj.xy):
-                return 1
+        # for obj in self.world.objects:
+        #     if all(agent.xy == obj.xy):
+        #         return 1
 
         return 0
 

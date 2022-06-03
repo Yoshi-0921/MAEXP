@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Main file to launch the experiments based on configuration.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -25,7 +23,7 @@ warnings.simplefilter("ignore")
 logger = initialize_logging(__name__)
 
 
-@hydra.main(config_path="configs", config_name=config_names["da3"])
+@hydra.main(config_path="configs", config_name=config_names["da6"])
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)

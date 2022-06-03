@@ -5,6 +5,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
+from core.handlers.observations.observation_handler import ObservationHandler
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
@@ -21,6 +22,7 @@ class DA3(nn.Module):
         patched_size_x = input_shape[1] // config.model.patch_size
         patched_size_y = input_shape[2] // config.model.patch_size
         self.view_method = config.observation_area_mask
+        self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
 
         self.patch_embed = PatchEmbed(
             patch_size=config.model.patch_size,
@@ -88,5 +90,9 @@ class DA3(nn.Module):
         return out, [attns]
 
     def state_encoder(self, state):
+        if self.view_method == "relative":
+            return ObservationHandler.decode_relative_state(
+                state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+            )
 
         return state[self.view_method]

@@ -1,6 +1,6 @@
 defaults:
   - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn
-  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms
+  - map: three_rooms # simple, four_rooms, four_rectangle, three_rooms, central_room
   - opt: rmsprop
   - job_logging: disabled
 
@@ -22,6 +22,7 @@ objects_color: ["yellow"]
 agent_type: 'attention' # default, attention
 brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn
 num_agents: 6
+episode_hm_nrow: 3
 agents_color: ["blue", "blue", "blue", "dodger_blue", "dodger_blue", "dodger_blue"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 shuffle_init_xys: True

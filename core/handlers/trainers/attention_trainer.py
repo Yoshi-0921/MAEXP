@@ -24,6 +24,10 @@ class AttentionTrainer(DefaultTrainer):
 
         states = self.states
         for agent_id in self.order:
+            if self.config.agent_tasks[int(agent_id)] == "-1":
+                actions[agent_id] = self.agents[agent_id].get_random_action()
+                continue
+
             action, attns = self.agents[agent_id].get_action_attns(
                 deepcopy(states[agent_id]), epsilon
             )
@@ -34,7 +38,9 @@ class AttentionTrainer(DefaultTrainer):
 
         exp = Experience(states, actions, rewards, dones, new_states)
 
-        self.buffer.append(exp)
+        self.buffer.append(deepcopy(exp))
+
+        del exp
 
         self.states = new_states
 
@@ -44,11 +50,12 @@ class AttentionTrainer(DefaultTrainer):
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
-            self.total_loss_sum += torch.sum(loss_list).item()
-            self.total_loss_agents += loss_list
+            self.step_loss_sum += sum(
+                [loss_dict["total_loss"].item() for loss_dict in loss_list]
+            )
 
         if (
-            self.config.destination_channel
+            self.config.reset_destination
             and self.episode_step % self.config.reset_destination_period == 0
         ):
             self.env.world.map.reset_destination_area()
@@ -62,7 +69,10 @@ class AttentionTrainer(DefaultTrainer):
             self.max_episode_length // 2
         ):
             for agent_id, agent in enumerate(self.agents):
-                if self.config.destination_channel:
+                if self.config.agent_tasks[int(agent_id)] == "-1":
+                    continue
+
+                if self.config.output_destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,
@@ -159,16 +169,22 @@ class AttentionTrainer(DefaultTrainer):
             {
                 "training_step/epsilon": self.epsilon,
                 "training_step/total_reward": np.sum(rewards),
-                "training_step/total_loss": self.total_loss_sum,
+                "training_step/total_loss": self.step_loss_sum,
             },
             step=self.global_step,
         )
 
-        for agent_id, (loss, reward) in enumerate(zip(self.total_loss_agents, rewards)):
-            wandb.log(
+        for agent_id, (loss_dict, reward) in enumerate(zip(loss_list, rewards)):
+            output_dict = {
+                f"agent_{str(agent_id)}/step_{loss_name}": loss
+                for loss_name, loss in loss_dict.items()
+            }
+            output_dict.update(
                 {
-                    f"agent_{str(agent_id)}/step_loss": loss,
                     f"agent_{str(agent_id)}/step_reward": reward,
-                },
+                }
+            )
+            wandb.log(
+                output_dict,
                 step=self.global_step,
             )

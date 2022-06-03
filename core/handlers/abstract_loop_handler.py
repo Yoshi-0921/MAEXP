@@ -73,8 +73,8 @@ class AbstractLoopHandler(ABC):
             for epoch in range(self.max_epochs):
                 self.loop_epoch_start(epoch)
                 for step in range(self.max_episode_length):
-                    self.total_loss_sum = 0.0
-                    self.total_loss_agents = torch.zeros(self.env.num_agents)
+                    self.step_loss_sum = 0.0
+                    self.step_loss_agents = torch.zeros(self.env.num_agents)
                     self.loop_step(step, epoch)
                     self.global_step += 1
                     self.episode_step += 1
@@ -82,7 +82,7 @@ class AbstractLoopHandler(ABC):
                 self.episode_count += 1
 
                 pbar.set_description(f"[Step {self.global_step}]")
-                pbar.set_postfix({"loss": self.total_loss_sum})
+                pbar.set_postfix({"loss": self.step_loss_sum})
                 pbar.update(1)
 
         self.endup()
@@ -100,22 +100,19 @@ class AbstractLoopHandler(ABC):
         for agent_id, agent in enumerate(self.agents):
             print(f"Agent {str(agent_id)}:")
             summary(model=agent.brain.network)
-            dummy_input = {
-                state_key: torch.randn(1, *state_value.shape, device=agent.brain.device)
-                for state_key, state_value in self.states[agent_id].items()
-            }
+            dummy_input = {}
+            for state_key, state_value in self.states[agent_id].items():
+                if isinstance(state_value, torch.Tensor):
+                    dummy_input[state_key] = torch.randn(
+                        1, *state_value.shape, device=agent.brain.device
+                    )
+                else:
+                    dummy_input[state_key] = state_value
 
-            if self.config.model.name in ["iqn", "da3_iqn"]:
-                taus = torch.rand(1, agent.brain.num_quantiles, device=agent.brain.device)
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input, taus,), verbose=False)],
-                    "%.3f",
-                )
-            else:
-                macs, params = clever_format(
-                    [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
-                    "%.3f",
-                )
+            macs, params = clever_format(
+                [*profile(agent.brain.network, inputs=(dummy_input,), verbose=False)],
+                "%.3f",
+            )
             network_table.add_data(
                 f"Agent {str(agent_id)}", f"{str(macs)}", f"{str(params)}"
             )
@@ -127,14 +124,9 @@ class AbstractLoopHandler(ABC):
                 idx=agent_id,
             )
             try:
-                if self.config.model.name in ["iqn", "da3_iqn"]:
-                    torch.onnx.export(
-                        agent.brain.network, (dummy_input, taus), f"agent_{str(agent_id)}.onnx"
-                    )
-                else:
-                    torch.onnx.export(
-                        agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
-                    )
+                torch.onnx.export(
+                    agent.brain.network, dummy_input, f"agent_{str(agent_id)}.onnx"
+                )
                 model_artifact.add_file(f"agent_{str(agent_id)}.onnx")
             except RuntimeError:
                 pass

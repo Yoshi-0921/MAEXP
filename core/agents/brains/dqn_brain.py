@@ -17,17 +17,6 @@ class DQNBrain(AbstractBrain):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
 
-    @torch.no_grad()
-    def get_action(self, state):
-        for state_key, state_value in state.items():
-            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
-
-        q_values = self.network(state)
-        _, action = torch.max(q_values, dim=1)
-        action = int(action.item())
-
-        return action
-
     def learn(self, states_ind, actions_ind, rewards_ind, dones_ind, next_states_ind):
         for states_key, states_value in states_ind.items():
             states_ind[states_key] = states_value.float().to(self.device)
@@ -57,4 +46,4 @@ class DQNBrain(AbstractBrain):
         nn.utils.clip_grad_norm_(self.network.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss.detach()
+        return {"total_loss": loss.detach().cpu()}
