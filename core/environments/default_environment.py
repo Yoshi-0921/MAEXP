@@ -52,12 +52,14 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_accumulated_agents_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
+        self.current_step = 0
 
     def reset(self):
         self.objects_generated = 0
         self.objects_completed = 0
         self.agents_collided = 0
         self.walls_collided = 0
+        self.current_step = 0
         self.world.map.reset()
         self.heatmap_agents = np.zeros(
             shape=(self.num_agents, self.world.map.SIZE_X, self.world.map.SIZE_Y),
@@ -152,6 +154,7 @@ class DefaultEnvironment(AbstractEnvironment):
 
         self.observation_handler.step(self.agents)
 
+        self.current_step += 1
         self.heatmap_objects_left += self.world.map.objects_matrix
 
         return reward_n, done_n, obs_n
@@ -212,8 +215,10 @@ class DefaultEnvironment(AbstractEnvironment):
         # for obj in self.world.objects:
         #     if all(agent.xy == obj.xy):
         #         return 1
+        if self.current_step == (self.config.max_episode_length - 1):
+            return True
 
-        return 0
+        return False
 
     def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
 

@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import torch
 import wandb
-from core.utils.buffer import Experience, ReplayBuffer
+from core.utils.buffer import Experience, generate_buffer
 from core.utils.dataset import RLDataset
 from omegaconf import DictConfig
 from typing import Dict, List
@@ -16,7 +16,7 @@ from ..abstract_loop_handler import AbstractLoopHandler
 class AbstractTrainer(AbstractLoopHandler, ABC):
     def __init__(self, config: DictConfig, environment):
         super().__init__(config=config, environment=environment)
-        self.buffer = ReplayBuffer(config.capacity)
+        self.buffer = generate_buffer(config=config)
         self.epsilon = config.epsilon_initial
         self.synchronize_frequency = config.synchronize_frequency
 
