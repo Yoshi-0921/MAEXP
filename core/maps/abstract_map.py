@@ -66,6 +66,9 @@ class AbstractMap(ABC):
         self.wall_matrix[np.array([0, self.SIZE_X - 1]), :] = 1
         self.wall_matrix[:, np.array([0, self.SIZE_Y - 1])] = 1
 
+    def step(self):
+        pass
+
     @abstractmethod
     def set_objects_area(self):
         raise NotImplementedError()
