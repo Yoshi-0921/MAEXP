@@ -17,6 +17,7 @@ from .dqn_brain import DQNBrain
 from .fqf_brain import FQFBrain
 from .iqn_brain import IQNBrain
 from .qr_dqn_brain import QRDQNBrain
+from .dra3_iqn_brain import DRA3_IQNBrain
 
 logger = initialize_logging(__name__)
 
@@ -25,6 +26,7 @@ __all__ = [
     "DQNBrain",
     "DA3Brain",
     "DA3BaselineBrain",
+    "DRA3_IQNBrain",
     "DA6Brain",
     "CategoricalDQNBrain",
     "QRDQNBrain",
@@ -48,6 +50,9 @@ def generate_brain(
 
     elif config.brain == "da3_baseline":
         brain = DA3BaselineBrain(config=config, obs_shape=obs_shape, act_size=act_size)
+    
+    elif config.brain == "dra3_iqn":
+        brain = DRA3_IQNBrain(config=config, obs_shape=obs_shape, act_size=act_size)
 
     elif config.brain == "da6":
         brain = DA6Brain(config=config, obs_shape=obs_shape, act_size=act_size)

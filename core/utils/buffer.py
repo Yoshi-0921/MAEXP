@@ -76,18 +76,34 @@ class RecurrentReplayBuffer(ReplayBuffer):
 
         for start, end in zip(start_indices, end_indices):
             # correct for sampling near beginning
-            final = [self.buffer[i] for i in range(max(start + 1, 0), end + 1)]
-
-            # correct for sampling across episodes
-            for i in range(len(final) - 2, -1, -1):
-                if final[i][3][0]:
-                    final = final[i + 1:]
-                    break
-
-            # pad beginning to account for corrections
-            while len(final) < self.seq_length:
-                final = Experience() + final
+            sequence_exp = list(map(list, zip(*[self.buffer[i] for i in range(max(start + 1, 0), end + 1)])))
+            final = self.transpose(sequence_exp)
 
             sampled_exp.append(final)
 
-        return tuple(zip(sampled_exp))
+        return tuple(zip(*sampled_exp))
+
+    def transpose(self, sequence_exp):
+        # correct for sampling across episodes
+        states, actions, rewards, dones, new_states = sequence_exp
+        sequence_len = 0
+        for sequence_len in range(len(dones) - 2, -1, -1):
+            if dones[sequence_len][0]:
+                sequence_len += 1
+                break
+
+        # pad beginning to account for corrections
+        padding_len = self.seq_length - len(dones)
+        states = [states[sequence_len] for _ in range(sequence_len + padding_len)] + states[sequence_len:]
+        actions = [actions[sequence_len] for _ in range(sequence_len + padding_len)] + actions[sequence_len:]
+        rewards = [rewards[sequence_len] for _ in range(sequence_len + padding_len)] + rewards[sequence_len:]
+        dones = [dones[sequence_len] for _ in range(sequence_len + padding_len)] + dones[sequence_len:]
+        new_states = [new_states[sequence_len] for _ in range(sequence_len + padding_len)] + new_states[sequence_len:]
+
+        transposed_states = tuple(zip(*states))
+        states_actions = tuple(zip(*actions))
+        states_rewards = tuple(zip(*rewards))
+        states_dones = tuple(zip(*dones))
+        states_new_states = tuple(zip(*new_states))
+
+        return (transposed_states, states_actions, states_rewards, states_dones, states_new_states)

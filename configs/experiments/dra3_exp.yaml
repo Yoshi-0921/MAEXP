@@ -1,11 +1,11 @@
 defaults:
-  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - model: dra3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, dra3_iqn
   - map: simple # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'ICMLA22-exp'
-name: 'delete'
+name: 'IQN'
 gpu: 0
 # ==================================================
 # configure environment
@@ -21,7 +21,7 @@ agent_tasks: ["0", "0", "0", "0"]
 # configure agent
 
 agent_type: 'attention' # default, attention
-brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+brain: 'dra3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, dra3_iqn
 num_agents: 4
 episode_hm_nrow: 4
 agents_color: ["blue", "green", "dodger_blue", "spring_green"]
@@ -57,7 +57,7 @@ max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
 buffer: 'recurrent' # default, recurrent
-sequence_length: 10
+sequence_length: 4
 capacity: 100000
 synchronize_frequency: 1
 gamma: 0.9
