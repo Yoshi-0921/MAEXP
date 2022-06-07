@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for attention agent class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
@@ -24,9 +22,6 @@ class AttentionAgent(AbstractAgent):
         return action, attns
 
     def get_action(self, state, epsilon):
-        action, _ = self.brain.get_action(state)
-
-        if random() < epsilon:
-            action = self.get_random_action()
+        action, _, = self.get_action_attns(state=state, epsilon=epsilon)
 
         return action
