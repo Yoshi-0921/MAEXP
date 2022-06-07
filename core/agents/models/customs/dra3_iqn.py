@@ -28,9 +28,9 @@ class DRA3_IQN(DA3_IQN):
 
         return q_values, hidden_vector
 
-    def forward_attn(self, state, external_taus: torch.Tensor = None):
+    def forward_attn(self, state, external_taus: torch.Tensor = None, hidden_vector: torch.Tensor = None):
         saliency_vector, attns, hidden_vector = self.get_saliency_vector(
-            state=state, output_attns=True
+            state=state, output_attns=True, hidden_vector=hidden_vector
         )
 
         q_values = self.drl_head(
@@ -44,7 +44,7 @@ class DRA3_IQN(DA3_IQN):
         out = self.patch_embed(x)
 
         if hidden_vector is None:
-            hidden_vector = torch.rand(out.shape[0], self.embedding_dim)
+            hidden_vector = torch.rand(size=(out.shape[0], self.embedding_dim), device=out.device)
         saliency_vector = self.saliency_vector.expand(out.shape[0], -1)
         saliency_vector = self.recurrent_module(saliency_vector, hidden_vector)
         saliency_vector = saliency_vector.unsqueeze(1).expand(out.shape[0], -1, -1)

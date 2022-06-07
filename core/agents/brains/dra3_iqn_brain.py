@@ -16,8 +16,10 @@ class DRA3_IQNBrain(DA3_IQNBrain):
         for state_key, state_value in state.items():
             if isinstance(state_value, torch.Tensor):
                 state[state_key] = state_value.unsqueeze(0).float().to(self.device)
+        if isinstance(hidden_vector, torch.Tensor):
+            hidden_vector = hidden_vector.to(self.device)
 
-        q_values, attns, hidden_vector = self.network.forward_attn(state, hidden_vector)
+        q_values, attns, hidden_vector = self.network.forward_attn(state, hidden_vector=hidden_vector)
 
         action = q_values.argmax(dim=1)
         action = int(action.item())
@@ -39,6 +41,8 @@ class DRA3_IQNBrain(DA3_IQNBrain):
                     next_states_ind[next_states_key] = next_states_value.float().to(
                         self.device
                     )
+            if isinstance(hidden_vector, torch.Tensor):
+                hidden_vector = hidden_vector.to(self.device)
 
             batch_size = dones_ind.shape[0]
             taus = torch.rand(batch_size, self.num_quantiles, device=self.device)
