@@ -1,11 +1,11 @@
 defaults:
   - model: dra3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, dra3_iqn
-  - map: simple # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
+  - map: four_rooms # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'ICMLA22-exp'
-name: 'IQN'
+name: 'DRA3-IQN'
 gpu: 0
 # ==================================================
 # configure environment
@@ -16,15 +16,15 @@ seed: 921
 num_objects: 40
 type_objects: 1
 objects_color: ["yellow"]
-agent_tasks: ["0", "0", "0", "0"]
+agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
 # ==================================================
 # configure agent
 
-agent_type: 'attention' # default, attention
+agent_type: 'recurrent_attention' # default, attention, recurrent_attention
 brain: 'dra3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, dra3_iqn
-num_agents: 4
-episode_hm_nrow: 4
-agents_color: ["blue", "green", "dodger_blue", "spring_green"]
+num_agents: 6
+episode_hm_nrow: 3
+agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "red"]
 init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
 shuffle_init_xys: True
 phase: 'training' # training, evaluation
@@ -49,7 +49,7 @@ past_step: 1
 # ==================================================
 # configure training
 
-trainer: 'attention' # default, attention
+trainer: 'recurrent_attention' # default, attention, recurrent_attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 
 max_epochs: 5000
