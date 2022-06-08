@@ -216,7 +216,7 @@ class DefaultEnvironment(AbstractEnvironment):
         # for obj in self.world.objects:
         #     if all(agent.xy == obj.xy):
         #         return 1
-        if self.current_step == (self.config.max_episode_length - 1):
+        if self.world.map.objects_matrix.sum() or self.current_step == (self.config.max_episode_length - 1):
             return True
 
         return False

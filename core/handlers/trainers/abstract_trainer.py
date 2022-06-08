@@ -81,7 +81,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
 
         self.states = new_states
 
-        return states, rewards
+        return states, rewards, dones
 
     def setup(self):
         # set dataloader

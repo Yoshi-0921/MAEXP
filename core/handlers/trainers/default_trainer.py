@@ -19,7 +19,7 @@ class DefaultTrainer(AbstractTrainer):
         if epoch == (self.max_epochs // 2):
             self.save_state_dict(epoch=epoch)
 
-    def loop_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int) -> bool:
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
@@ -34,7 +34,7 @@ class DefaultTrainer(AbstractTrainer):
             self.env.world.map.reset_destination_area()
 
         # execute in environment
-        states, rewards = self.play_step(self.epsilon)
+        states, rewards, dones = self.play_step(self.epsilon)
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
@@ -102,6 +102,8 @@ class DefaultTrainer(AbstractTrainer):
                 output_dict,
                 step=self.global_step,
             )
+
+        return dones[0]
 
     def loop_epoch_end(self):
         self.epsilon *= self.config.epsilon_decay
