@@ -33,16 +33,16 @@ class DynamicSimpleMap(SimpleMap):
             self.obstacles_pos
         ):
             if (
-                obstacle_pos_x == self.SIZE_X // 2 and obstacle_pos_y == self.SIZE_Y - 2
+                obstacle_pos_x == self.SIZE_X // 2 and obstacle_pos_y == self.SIZE_Y - 2 and obstacle_id == 0
             ) or (
-                obstacle_pos_x == self.SIZE_X - 2 and obstacle_pos_y == self.SIZE_Y // 2
+                obstacle_pos_x == self.SIZE_X - 2 and obstacle_pos_y == self.SIZE_Y // 2 and obstacle_id == 1
             ):
                 self.obstacles_homing_flag[obstacle_id] = True
 
             elif (
-                obstacle_pos_x == self.SIZE_X // 2 and obstacle_pos_y == 1
+                obstacle_pos_x == self.SIZE_X // 2 and obstacle_pos_y == 1 and obstacle_id == 0
             ) or (
-                obstacle_pos_x == self.SIZE_X // 2 and obstacle_pos_y == self.SIZE_Y // 2
+                obstacle_pos_x == 1 and obstacle_pos_y == self.SIZE_Y // 2 and obstacle_id == 1
             ):
                 self.obstacles_homing_flag[obstacle_id] = False
 
