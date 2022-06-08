@@ -52,4 +52,4 @@ class RecurrentAttentionTrainer(AttentionTrainer):
 
         self.states = new_states
 
-        return states, rewards, attention_maps
+        return states, rewards, dones, attention_maps
