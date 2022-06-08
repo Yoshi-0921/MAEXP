@@ -193,7 +193,8 @@ class DefaultEnvironment(AbstractEnvironment):
                 self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y] = 0
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
-                self.generate_objects(1, int(object_type))
+                if self.config.keep_objects_num:
+                    self.generate_objects(1, int(object_type))
 
         # negative reward for collision with other agents
         if agent.collide_agents:

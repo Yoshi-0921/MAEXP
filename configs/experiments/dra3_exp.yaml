@@ -5,7 +5,7 @@ defaults:
   - job_logging: disabled
 
 project_name: 'ICMLA22-exp'
-name: 'delete'
+name: 'DA3-IQN'
 gpu: 0
 # ==================================================
 # configure environment
@@ -13,7 +13,8 @@ gpu: 0
 world: 'default' # default
 environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
-num_objects: 40
+num_objects: 20
+keep_objects_num: False
 type_objects: 1
 objects_color: ["yellow"]
 agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
