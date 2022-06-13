@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Source code for dqn agent class.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
