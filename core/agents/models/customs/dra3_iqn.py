@@ -46,8 +46,8 @@ class DRA3_IQN(DA3_IQN):
         if hidden_vector is None:
             hidden_vector = torch.rand(size=(out.shape[0], self.embedding_dim), device=out.device)
         saliency_vector = self.saliency_vector.expand(out.shape[0], -1)
-        saliency_vector = self.recurrent_module(saliency_vector, hidden_vector)
-        saliency_vector = saliency_vector.unsqueeze(1).expand(out.shape[0], -1, -1)
+        hidden_vector = self.recurrent_module(saliency_vector, hidden_vector)
+        saliency_vector = hidden_vector.unsqueeze(1).expand(out.shape[0], -1, -1)
 
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.pos_embed
