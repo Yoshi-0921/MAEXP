@@ -8,9 +8,10 @@ from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
 from .abstract_trainer import AbstractTrainer
-from .default_trainer import DefaultTrainer
 from .attention_trainer import AttentionTrainer
+from .default_trainer import DefaultTrainer
 from .recurrent_attention_trainer import RecurrentAttentionTrainer
+from .recurrent_trainer import RecurrentTrainer
 
 logger = initialize_logging(__name__)
 
@@ -23,6 +24,9 @@ def generate_trainer(
 
     elif config.trainer == "attention":
         trainer = AttentionTrainer(config=config, environment=environment)
+
+    elif config.trainer == "recurrent":
+        trainer = RecurrentTrainer(config=config, environment=environment)
 
     elif config.trainer == "recurrent_attention":
         trainer = RecurrentAttentionTrainer(config=config, environment=environment)

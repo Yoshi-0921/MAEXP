@@ -68,6 +68,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
             if self.config.agent_tasks[int(agent_id)] == "-1":
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
+
             action = self.agents[agent_id].get_action(
                 deepcopy(states[agent_id]), epsilon
             )
@@ -78,6 +79,8 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         exp = Experience(self.states, actions, rewards, dones, new_states)
 
         self.buffer.append(exp)
+
+        del exp
 
         self.states = new_states
 
