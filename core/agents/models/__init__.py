@@ -13,6 +13,7 @@ from .customs.categorical_dqn import CategoricalDQN
 from .customs.conv_mlp import ConvMLP
 from .customs.da3 import DA3
 from .customs.da3_iqn import DA3_IQN, MergedDA3_IQN
+from .customs.dra3_dqn import DRA3_DQN
 from .customs.da6 import DA6
 from .customs.da6_iqn import DA6_IQN
 from .customs.da6_iqn_cond import DA6_IQN_Cond
@@ -71,6 +72,9 @@ def generate_network(
 
     elif config.model.name == "dra3_iqn":
         network = DRA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "dra3_dqn":
+        network = DRA3_DQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.model.name: {config.model.name}")

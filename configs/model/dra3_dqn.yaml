@@ -1,0 +1,9 @@
+model:
+  name: 'dra3_dqn'
+  attention: 'normal' # 'normal', 'hard'
+  af_lambd: 0.02
+  embed_dim: 64
+  patch_size: 1
+  block_loop: 1
+  num_heads: 4
+  mlp_ratio: 4
