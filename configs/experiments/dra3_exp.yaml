@@ -1,11 +1,11 @@
 defaults:
-  - model: da3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, dra3_iqn
+  - model: dra3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, dra3_iqn
   - map: dynamic_simple # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, dynamic_simple
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'ICMLA22-exp'
-name: 'DA3-IQN'
+name: 'DRA3-IQN-small_full'
 gpu: 0
 # ==================================================
 # configure environment
@@ -21,8 +21,8 @@ agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
 # ==================================================
 # configure agent
 
-agent_type: 'attention' # default, attention, recurrent_attention
-brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, dra3_iqn
+agent_type: 'recurrent_attention' # default, attention, recurrent_attention
+brain: 'dra3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, dra3_iqn
 num_agents: 6
 episode_hm_nrow: 3
 agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "red"]
@@ -41,7 +41,7 @@ reset_destination_period: 200
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
 observation_area_mask: 'local' # local, relative, merged
-observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
+observation_noise: "flip" # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
 std_distribution: [0.07, 0.05, 0.03]
@@ -50,15 +50,15 @@ past_step: 1
 # ==================================================
 # configure training
 
-trainer: 'attention' # default, attention, recurrent_attention
+trainer: 'recurrent_attention' # default, attention, recurrent_attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 
 max_epochs: 5000
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
-buffer: 'default' # default, recurrent
-sequence_length: 4
+buffer: 'recurrent' # default, recurrent
+sequence_length: 10
 capacity: 100000
 synchronize_frequency: 1
 gamma: 0.9

@@ -50,12 +50,12 @@ class DRA3_DQNBrain(DA3Brain):
             state_action_values = q_values.gather(1, actions_ind.unsqueeze(-1)).squeeze(-1)
             state_action_values_seq.append(state_action_values)
             with torch.no_grad():
-                out, target_hidden_vector = self.target_network(next_states_ind, target_hidden_vector)
+                out, _ = self.target_network(next_states_ind, hidden_vector.detach().clone())
                 next_state_values = out.max(1)[0]
                 next_state_values[dones_ind] = 0.0
                 next_state_values = next_state_values.detach()
             expected_state_action_values = (
-                rewards_ind + self.gamma * (1 - dones_ind) * next_state_values
+                rewards_ind + self.gamma * (1 - dones_ind.long()) * next_state_values
             )
             expected_state_action_values_seq.append(expected_state_action_values)
 

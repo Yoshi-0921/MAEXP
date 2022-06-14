@@ -5,13 +5,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
-from core.handlers.observations.observation_handler import ObservationHandler
 from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
 from .da3 import DA3
-from ..hard_shrink_attention import HardShrinkBlock
-from ..vit import Block, PatchEmbed
 
 logger = initialize_logging(__name__)
 
@@ -19,7 +16,7 @@ logger = initialize_logging(__name__)
 class DRA3_DQN(DA3):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__(config=config, input_shape=input_shape, output_size=output_size)
-        self.saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
+        self.saliency_vector = nn.Parameter(torch.zeros(1, self.embedding_dim))
         self.recurrent_module = nn.GRUCell(input_size=self.embedding_dim, hidden_size=self.embedding_dim)
 
     def forward(self, state, hidden_vector: torch.Tensor = None):

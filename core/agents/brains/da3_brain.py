@@ -61,7 +61,7 @@ class DA3Brain(AbstractBrain):
             next_state_values[dones_ind] = 0.0
             next_state_values = next_state_values.detach()
         expected_state_action_values = (
-            rewards_ind + self.gamma * (1 - dones_ind) * next_state_values
+            rewards_ind + self.gamma * (1 - dones_ind.long()) * next_state_values
         )
 
         self.network.train()
@@ -91,7 +91,6 @@ class DA3BaselineBrain(DA3Brain):
     @torch.no_grad()
     def get_action(self, state):
         for state_key, state_value in state.items():
-            state[state_key] = state_value.unsqueeze(0).float().to(self.device)
             if isinstance(state_value, torch.Tensor):
                 state[state_key] = state_value.unsqueeze(0).float().to(self.device)
 
