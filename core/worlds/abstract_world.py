@@ -35,6 +35,7 @@ class AbstractWorld(ABC):
         self.map.reset_all()
 
     def step(self, order):
+        self.map.step()
         force = [None] * len(self.agents)
         force = self.apply_action_force(force)
         for agent_id in order:

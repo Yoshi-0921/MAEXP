@@ -10,10 +10,12 @@ from omegaconf import DictConfig
 from .abstract_agent import AbstractAgent
 from .default_agent import DefaultAgent
 from .attention_agent import AttentionAgent
+from .recurrent_agent import RecurrentAgent
+from .recurrent_attention_agent import RecurrentAttentionAgent
 
 logger = initialize_logging(__name__)
 
-__all__ = ["AbstractAgent", "DefaultAgent", "AttentionAgent"]
+__all__ = ["AbstractAgent", "DefaultAgent", "AttentionAgent", "RecurrentAgent", "RecurrentAttentionAgent"]
 
 
 def generate_agents(
@@ -28,6 +30,18 @@ def generate_agents(
     elif config.agent_type == "attention":
         agents = [
             AttentionAgent(config, obs_shape, act_size)
+            for obs_shape, act_size in zip(observation_space, action_space)
+        ]
+    
+    elif config.agent_type == "RecurrentAgent":
+        agents = [
+            RecurrentAgent(config, obs_shape, act_size)
+            for obs_shape, act_size in zip(observation_space, action_space)
+        ]
+
+    elif config.agent_type == "recurrent_attention":
+        agents = [
+            RecurrentAttentionAgent(config, obs_shape, act_size)
             for obs_shape, act_size in zip(observation_space, action_space)
         ]
 

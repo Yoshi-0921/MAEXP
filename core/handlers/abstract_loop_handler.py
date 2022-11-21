@@ -63,7 +63,7 @@ class AbstractLoopHandler(ABC):
     def loop_epoch_end(self):
         pass
 
-    def loop_step(self, step: int):
+    def loop_step(self, step: int) -> bool:
         raise NotImplementedError()
 
     def run(self):
@@ -75,9 +75,11 @@ class AbstractLoopHandler(ABC):
                 for step in range(self.max_episode_length):
                     self.step_loss_sum = 0.0
                     self.step_loss_agents = torch.zeros(self.env.num_agents)
-                    self.loop_step(step, epoch)
+                    done = self.loop_step(step, epoch)
                     self.global_step += 1
                     self.episode_step += 1
+                    if done:
+                        break
                 self.loop_epoch_end()
                 self.episode_count += 1
 

@@ -7,11 +7,12 @@ from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
 from .abstract_map import AbstractMap
+from .central_room_map import CentralRoomMap
+from .dynamic_simple_map import DynamicSimpleMap
 from .four_rectangle import FourRectangleMap
 from .four_rooms_map import FourRoomsMap
 from .simple_map import SimpleMap
 from .three_rooms_map import ThreeRoomsMap
-from .central_room_map import CentralRoomMap
 from .two_central_rooms_map import TwoCentralRoomsMap
 
 logger = initialize_logging(__name__)
@@ -20,6 +21,9 @@ logger = initialize_logging(__name__)
 def generate_map(config: DictConfig) -> AbstractMap:
     if config.map.name == "simple":
         world_map = SimpleMap(config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y)
+    
+    elif config.map.name == "dynamic_simple":
+        world_map = DynamicSimpleMap(config=config, size_x=config.map.SIZE_X, size_y=config.map.SIZE_Y)
 
     elif config.map.name == "four_rooms":
         world_map = FourRoomsMap(config=config, size_x=24, size_y=24)

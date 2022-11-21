@@ -23,6 +23,7 @@ class DA3(nn.Module):
         patched_size_y = input_shape[2] // config.model.patch_size
         self.view_method = config.observation_area_mask
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
+        self.embedding_dim = config.model.embed_dim
 
         self.patch_embed = PatchEmbed(
             patch_size=config.model.patch_size,

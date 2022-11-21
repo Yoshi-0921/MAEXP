@@ -44,9 +44,9 @@ class AttentionTrainer(DefaultTrainer):
 
         self.states = new_states
 
-        return states, rewards, attention_maps
+        return states, rewards, dones, attention_maps
 
-    def loop_step(self, step: int, epoch: int):
+    def loop_step(self, step: int, epoch: int) -> bool:
         # train based on experiments
         for batch in self.dataloader:
             loss_list = self.loss_and_update(batch)
@@ -61,7 +61,7 @@ class AttentionTrainer(DefaultTrainer):
             self.env.world.map.reset_destination_area()
 
         # execute in environment
-        states, rewards, attention_maps = self.play_step(self.epsilon)
+        states, rewards, dones, attention_maps = self.play_step(self.epsilon)
         self.episode_reward_sum += np.sum(rewards)
         self.episode_reward_agents += np.asarray(rewards)
 
@@ -188,3 +188,5 @@ class AttentionTrainer(DefaultTrainer):
                 output_dict,
                 step=self.global_step,
             )
+
+        return dones[0]
