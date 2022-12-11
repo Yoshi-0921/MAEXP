@@ -38,9 +38,15 @@ class DA6_IQN(DA3_IQN):
         )  # config.model.local_patch_size
 
         self.objects_channel = config.objects_channel
+        self.agents_channel = config.agents_channel
+        in_chans = 1
+        if self.objects_channel:
+            in_chans += config.type_objects
+        if self.agents_channel:
+            in_chans += config.num_agents
         self.relative_patch_embed = PatchEmbed(
             patch_size=5,  # config.model.relative_patch_size,
-            in_chans=1 + config.type_objects if self.objects_channel else 1,
+            in_chans=in_chans,
             embed_dim=config.model.embed_dim,
         )
         self.local_patch_embed = PatchEmbed(
@@ -153,5 +159,11 @@ class DA6_IQN(DA3_IQN):
 
         if self.objects_channel:
             relative_x = torch.cat((relative_x, state["objects"]), dim=1)
+
+        if self.agents_channel:
+            agents_channel = ObservationHandler.decode_agents_channel(
+            state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+        )
+            relative_x = torch.cat((relative_x, agents_channel), dim=1)
 
         return local_x, relative_x

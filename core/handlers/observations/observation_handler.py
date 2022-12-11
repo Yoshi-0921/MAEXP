@@ -205,3 +205,37 @@ class ObservationHandler:
             raise ValueError()
 
         return decoded_state
+
+    @staticmethod
+    def decode_agents_channel(
+        state: Dict[str, Union[torch.Tensor, int]], observation_size: List[int]
+    ) -> torch.Tensor:
+        assert "agents" in state.keys()
+
+        if len(state["agents"].shape) == 2:
+            decoded_state = torch.zeros(
+                size=[state["agents"].shape[0], *observation_size],
+                device=state["agents"].device
+            )
+            for agent_id, coordinate in enumerate(state["agents"]):
+                decoded_state[agent_id, coordinate[0].int(), coordinate[1].int()] = 1
+
+        elif len(state["agents"].shape) == 3:
+            decoded_state = torch.zeros(
+                size=[*state["agents"].shape[:2], *observation_size],
+                device=state["agents"].device,
+            )
+
+            for batch_id, coordinates in enumerate(state["agents"]):
+                for agent_id, coordinate in enumerate(coordinates):
+                    decoded_state[
+                        batch_id, agent_id, coordinate[0].int(), coordinate[1].int()
+                    ] = 1
+
+        else:
+            logger.warn(
+                f"Unexpected state length is given. len(state['agents'].shape): {len(state['agents'].shape)}"
+            )
+            raise ValueError()
+
+        return decoded_state
