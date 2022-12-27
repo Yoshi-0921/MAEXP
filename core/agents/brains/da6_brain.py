@@ -62,7 +62,7 @@ class DA6Brain(AbstractBrain):
             next_state_values[dones_ind] = 0.0
             next_state_values = next_state_values.detach()
         expected_state_action_values = (
-            rewards_ind + self.gamma * (1 - dones_ind) * next_state_values
+            rewards_ind + self.gamma * next_state_values
         )
 
         self.network.train()

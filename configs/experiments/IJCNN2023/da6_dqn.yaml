@@ -1,0 +1,72 @@
+defaults:
+  - model: da6 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
+  - opt: rmsprop
+  - job_logging: disabled
+
+project_name: 'IJCNN23-exp'
+name: 'DA6-DQN (G_pos)'
+gpu: 0
+# ==================================================
+# configure environment
+
+world: 'default' # default
+environment: 'default' # default, shared_mean_reward, shared_max_reward, test
+seed: 921
+num_objects: 20
+keep_objects_num: True
+type_objects: 2
+objects_color: ["yellow", "orange"]
+agent_tasks: ["0", "0", "1", "1", "01", "01", "01", "01"]
+# ==================================================
+# configure agent
+
+agent_type: 'attention' # default, attention
+brain: 'da6' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+num_agents: 8
+episode_hm_nrow: 4
+agents_color: ["blue", "blue", "green", "green", "dodger_blue", "dodger_blue", "spring_green", "spring_green" ]
+init_xys: [[2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2], [0, -2], [2, -2]]
+shuffle_init_xys: True
+agents_channel: False
+phase: 'training' # training, evaluation
+# ==================================================
+# configure observation
+
+visible_range: 7 # currently only 5, 7, 9 are suppoeted
+transparent_observation: False
+output_destination_channel: False
+objects_channel: False
+reset_destination: False
+reset_destination_period: 200
+agent_view_method: 'individual' # default, self, simple, transition, individual
+object_view_method: 'object_types' # default, simple, object_types
+observation_area_mask: 'merged' # local, relative, merged
+observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
+noise_threshold_ratio: 0
+flip_noise_probabilities: [0.2, 0.1, 0.05]
+std_distribution: [0.07, 0.05, 0.03]
+past_step: 1
+
+# ==================================================
+# configure training
+
+trainer: 'attention' # default, attention
+evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
+max_epochs: 5000
+max_episode_length: 200
+batch_size: 32
+populate_steps: 1000
+buffer: 'default' # default, recurrent
+capacity: 100000
+synchronize_frequency: 1
+gamma: 0.9
+epsilon_decay: 0.998
+epsilon_initial: 1.0
+epsilon_end: 0.05
+# ==================================================
+# configre evaluation
+
+validate_epochs: 1000
+pretrained_weight_path: False
+save_pdf_figs: False
