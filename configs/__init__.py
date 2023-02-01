@@ -9,4 +9,7 @@ config_names = {
     "IJCNN2023_dqn": "experiments/IJCNN2023/dqn",
     "IJCNN2023_da3_dqn": "experiments/IJCNN2023/da3_dqn",
     "IJCNN2023_da6_dqn": "experiments/IJCNN2023/da6_dqn",
+    "IJCNN2023_da6_iqn_test": "experiments/IJCNN2023/da6_iqn_test",
+    "IJCNN2023_da6_dqn_test": "experiments/IJCNN2023/da6_dqn_test",
+    "IJCNN2023_da3_dqn_test": "experiments/IJCNN2023/da3_dqn_test",
 }
