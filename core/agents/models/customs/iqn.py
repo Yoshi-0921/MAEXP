@@ -50,12 +50,21 @@ class IQN(nn.Module):
         self.view_method = config.observation_area_mask
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
         self.num_actions = output_size
+
+        self.objects_channel = config.objects_channel
+        self.agents_channel = config.agents_channel
+        in_chans = input_shape[0]
+        if self.objects_channel:
+            in_chans += config.type_objects
+        if self.agents_channel:
+            in_chans += config.num_agents
+
         self.conv = Conv(
             config=config,
-            input_channel=input_shape[0],
+            input_channel=in_chans,
             output_channel=config.model.output_channel,
         )
-        self.embedding_dim: int = IQN.get_mlp_input_size(self.conv, input_shape)
+        self.embedding_dim: int = IQN.get_mlp_input_size(self.conv, [in_chans, *input_shape[1:]])
         self.num_quantiles: int = config.model.num_quantiles
         self.num_cosines: int = config.model.num_cosines
         self.state_embedder = MLP(
@@ -137,9 +146,17 @@ class IQN(nn.Module):
 
     def state_encoder(self, state):
         if self.view_method == "relative":
-            return ObservationHandler.decode_relative_state(
+            relative_x = ObservationHandler.decode_relative_state(
                 state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
             )
+            if self.objects_channel:
+                relative_x = torch.cat((relative_x, state["objects"]), dim=1)
+            if self.agents_channel:
+                agents_channel = ObservationHandler.decode_agents_channel(
+                    state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+                )
+                relative_x = torch.cat((relative_x, agents_channel), dim=1)
+            return relative_x
 
         return state[self.view_method]
 

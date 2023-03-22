@@ -1,11 +1,11 @@
 defaults:
-  - model: dra3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, dra3_iqn
-  - map: dynamic_simple # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, dynamic_simple
+  - model: da3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - map: central_room_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'ICMLA22-exp'
-name: 'DRA3-IQN-small_full'
+project_name: 'KES23-exp'
+name: 'DA3-IQN (G_pos+9destination)'
 gpu: 0
 # ==================================================
 # configure environment
@@ -14,20 +14,21 @@ world: 'default' # default
 environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
 num_objects: 20
-keep_objects_num: False
+keep_objects_num: True
 type_objects: 1
 objects_color: ["yellow"]
-agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
+agent_tasks: ["0", "0", "0", "0", "0", "0", "0", "0"]
 # ==================================================
 # configure agent
 
-agent_type: 'recurrent_attention' # default, attention, recurrent_attention
-brain: 'dra3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, dra3_iqn
-num_agents: 6
-episode_hm_nrow: 3
-agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "red"]
-init_xys: [[0, 5], [0, 2], [-5, 0], [-2, 0], [0, -2], [0, -5]]
-shuffle_init_xys: True
+agent_type: 'attention' # default, attention
+brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+num_agents: 8
+episode_hm_nrow: 4
+agents_color: ["blue", "green", "dodger_blue", "spring_green", "blue", "green", "dodger_blue", "spring_green" ]
+init_xys: [[2, 0], [0, 2], [-2, 0], [0, -2], [2, 2], [-2, 2], [-2, -2], [2, -2]]
+shuffle_init_xys: False
+agents_channel: False
 phase: 'training' # training, evaluation
 # ==================================================
 # configure observation
@@ -35,12 +36,12 @@ phase: 'training' # training, evaluation
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
 objects_channel: False
-destination_channel: False
-reset_destination_period: False
+destination_channel: True
+reset_destination_period: 200
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
-observation_area_mask: 'local' # local, relative, merged
-observation_noise: "flip" # False, sensing_dist, threshold_sensing_dist, flat, flip
+observation_area_mask: 'relative' # local, relative, merged
+observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
 std_distribution: [0.07, 0.05, 0.03]
@@ -49,15 +50,13 @@ past_step: 1
 # ==================================================
 # configure training
 
-trainer: 'recurrent_attention' # default, attention, recurrent_attention
+trainer: 'attention' # default, attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
-
 max_epochs: 5000
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
-buffer: 'recurrent' # default, recurrent
-sequence_length: 10
+buffer: 'default' # default, recurrent
 capacity: 100000
 synchronize_frequency: 1
 gamma: 0.9

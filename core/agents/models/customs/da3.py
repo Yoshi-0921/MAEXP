@@ -25,9 +25,13 @@ class DA3(nn.Module):
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
         self.embedding_dim = config.model.embed_dim
 
+        self.objects_channel = config.objects_channel
+        in_chans = input_shape[0]
+        if self.objects_channel:
+            in_chans += config.type_objects
         self.patch_embed = PatchEmbed(
             patch_size=config.model.patch_size,
-            in_chans=input_shape[0],
+            in_chans=in_chans,
             embed_dim=config.model.embed_dim,
         )
 
@@ -92,8 +96,12 @@ class DA3(nn.Module):
 
     def state_encoder(self, state):
         if self.view_method == "relative":
-            return ObservationHandler.decode_relative_state(
+            relative_x = ObservationHandler.decode_relative_state(
                 state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
             )
+            if self.objects_channel:
+                relative_x = torch.cat((relative_x, state["objects"]), dim=1)
+
+            return relative_x
 
         return state[self.view_method]

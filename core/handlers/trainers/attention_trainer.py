@@ -55,7 +55,7 @@ class AttentionTrainer(DefaultTrainer):
             )
 
         if (
-            self.config.reset_destination
+            self.config.reset_destination_period
             and self.episode_step % self.config.reset_destination_period == 0
         ):
             self.env.world.map.reset_destination_area()
@@ -72,7 +72,7 @@ class AttentionTrainer(DefaultTrainer):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
-                if self.config.output_destination_channel:
+                if self.config.destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,
@@ -93,9 +93,44 @@ class AttentionTrainer(DefaultTrainer):
 
                 images = self.env.observation_handler.render(states[agent_id])
 
+                if self.config.destination_channel:
+                    images["destination"] = None
+
                 for attention_map, (view_method, image) in zip(
                     attention_maps[agent_id], images.items()
                 ):
+                    if view_method == "destination":
+                        attention_map = (
+                            attention_map.mean(dim=0)[0, :, 0, 1:]
+                            .view(
+                                -1,
+                                getattr(agent.brain, "relative_patched_size_x"),
+                                getattr(agent.brain, "relative_patched_size_y"),
+                            )
+                            .cpu()
+                        )
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(attention_map.mean(dim=0)),
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                        )
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_attention_mean": [
+                                    wandb.Image(
+                                        data_or_path=fig,
+                                        caption=f"mean {view_method} attention heatmap",
+                                    )
+                                ]
+                            },
+                            step=self.global_step,
+                        )
+                        continue
+
                     attention_map = (
                         attention_map.mean(dim=0)[0, :, 0, 1:]
                         .view(

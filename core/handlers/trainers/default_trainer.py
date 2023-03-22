@@ -28,7 +28,7 @@ class DefaultTrainer(AbstractTrainer):
             )
 
         if (
-            self.config.reset_destination
+            self.config.reset_destination_period
             and self.episode_step % self.config.reset_destination_period == 0
         ):
             self.env.world.map.reset_destination_area()
@@ -46,7 +46,7 @@ class DefaultTrainer(AbstractTrainer):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
-                if self.config.output_destination_channel:
+                if self.config.destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,

@@ -30,7 +30,24 @@ class CentralRoomMap(AbstractMap):
             self.objects_area_matrix[0, 11:24, 11:24] = 1
             # Set objects area for object 1
             self.objects_area_matrix[1, 11:24, 1:14] = 1
-            self.objects_area_matrix[1, 1:14, 14:24] = 1
+            self.objects_area_matrix[1, 1:14, 11:24] = 1
 
             self.objects_area_matrix[0, 8:17, 8:17] = 0
             self.objects_area_matrix[1, 8:17, 8:17] = 0
+
+    def reset_destination_area(self):
+        self.destination_area_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+
+        # Agent A
+        self.destination_area_matrix[0:2, 1:14, 1:14] = 1
+        self.destination_area_matrix[0:2, 11:24, 11:24] = 1
+
+        # Agent B
+        self.destination_area_matrix[2:4, 11:24, 1:14] = 1
+        self.destination_area_matrix[2:4, 1:14, 11:24] = 1
+
+        # Agent C
+        self.destination_area_matrix[4:6, 1:24, 1:14] = 1
+
+        # Agent D
+        self.destination_area_matrix[6:8, 1:24, 11:24] = 1
