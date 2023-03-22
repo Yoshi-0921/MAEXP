@@ -92,6 +92,9 @@ class ObservationHandler:
             "agents": torch.stack([torch.from_numpy(self.world.map.coord2ind(agent_ind.xy)) for agent_ind in agents]),
             "objects": torch.from_numpy(
                 deepcopy(self.world.map.objects_matrix)
+            ),
+            "destination": torch.from_numpy(
+                deepcopy(self.world.map.destination_area_matrix[agent_id, :, :])
             )
         }
 

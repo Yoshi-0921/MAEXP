@@ -21,6 +21,7 @@ class AbstractMap(ABC):
         self.agents_matrix = np.zeros(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
         self.objects_area_matrix = np.zeros(shape=(self.type_objects, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
+        self.destination_area_matrix = np.ones(shape=(self.num_agents, self.SIZE_X, self.SIZE_Y), dtype=np.int8)
 
         self.reset_destination_area()
 

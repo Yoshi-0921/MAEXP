@@ -53,7 +53,7 @@ class AttentionWanderingEvaluator(DefaultEvaluator):
             log_step + 3,
         ]:
             for agent_id, agent in enumerate(self.agents):
-                if self.config.output_destination_channel:
+                if self.config.destination_channel:
                     fig = plt.figure()
                     sns.heatmap(
                         self.env.world.map.destination_area_matrix[agent_id].T,

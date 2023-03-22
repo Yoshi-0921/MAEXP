@@ -1,46 +1,46 @@
 defaults:
-  - model: da3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
-  - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
+  - model: da6_iqn_cond # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - map: central_room_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'IJCNN23-test'
-name: 'DA3-DQN (G_pos+O_pos)'
+project_name: 'KES23-exp'
+name: 'DA6-IQN (G_pos+9destination)'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'test' # default, shared_mean_reward, shared_max_reward, test
+environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
 num_objects: 20
 keep_objects_num: True
-type_objects: 2
-objects_color: ["yellow", "orange"]
-agent_tasks: ["0", "0", "1", "1", "01", "01", "01", "01"]
+type_objects: 1
+objects_color: ["yellow"]
+agent_tasks: ["0", "0", "0", "0", "0", "0", "0", "0"]
 # ==================================================
 # configure agent
 
 agent_type: 'attention' # default, attention
-brain: 'da3' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
 num_agents: 8
 episode_hm_nrow: 4
-agents_color: ["blue", "blue", "green", "green", "dodger_blue", "dodger_blue", "spring_green", "spring_green" ]
-init_xys: [[2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2], [0, -2], [2, -2]]
+agents_color: ["blue", "green", "dodger_blue", "spring_green", "blue", "green", "dodger_blue", "spring_green" ]
+init_xys: [[2, 0], [0, 2], [-2, 0], [0, -2], [2, 2], [-2, 2], [-2, -2], [2, -2]]
 shuffle_init_xys: False
 agents_channel: False
-phase: 'evaluation' # training, evaluation
+phase: 'training' # training, evaluation
 # ==================================================
 # configure observation
 
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
-objects_channel: True
-destination_channel: False
-reset_destination_period: False
+objects_channel: False
+destination_channel: True
+reset_destination_period: 200
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
-observation_area_mask: 'relative' # local, relative, merged
+observation_area_mask: 'merged' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
@@ -53,7 +53,7 @@ past_step: 1
 trainer: 'attention' # default, attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
-max_episode_length: 3
+max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
 buffer: 'default' # default, recurrent
@@ -66,9 +66,6 @@ epsilon_end: 0.05
 # ==================================================
 # configre evaluation
 
-validate_epochs: 1
-pretrained_weight_path: "yoshi-0921/IJCNN23-exp/nkgmje3l.pth:v1"
-save_pdf_figs: True
-
-# DA3-DQN (None): "yoshi-0921/IJCNN23-exp/252flwai.pth:v1"
-# DA3-DQN (G_pos+O_pos): "yoshi-0921/IJCNN23-exp/nkgmje3l.pth:v1"
+validate_epochs: 1000
+pretrained_weight_path: False
+save_pdf_figs: False

@@ -92,11 +92,14 @@ class DA3_IQN(nn.Module):
 
         self.objects_channel = config.objects_channel
         self.agents_channel = config.agents_channel
+        self.destination_channel = config.destination_channel
         in_chans = input_shape[0]
         if self.objects_channel:
             in_chans += config.type_objects
         if self.agents_channel:
             in_chans += config.num_agents
+        if self.destination_channel:
+            in_chans += 1
 
         self.patch_embed = PatchEmbed(
             patch_size=config.model.patch_size,
@@ -193,6 +196,8 @@ class DA3_IQN(nn.Module):
                     state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
                 )
                 relative_x = torch.cat((relative_x, agents_channel), dim=1)
+            if self.destination_channel:
+                relative_x = torch.cat((relative_x, state["destination"].unsqueeze(1)), dim=1)
             return relative_x
 
         return state[self.view_method]

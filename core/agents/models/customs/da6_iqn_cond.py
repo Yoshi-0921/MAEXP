@@ -43,9 +43,10 @@ class DA6_IQN_Cond(DA3_IQN):
             in_chans=1,
             embed_dim=config.model.embed_dim // 2,
         )
-        self.agents_embed = nn.Linear(
-            in_features=config.num_agents * 2,
-            out_features=config.model.embed_dim // 2
+        self.destination_embed = PatchEmbed(
+            patch_size=5,  # config.model.relative_patch_size,
+            in_chans=1,
+            embed_dim=config.model.embed_dim // 2,
         )
         self.local_patch_embed = PatchEmbed(
             patch_size=1,  # config.model.local_patch_size,
@@ -54,7 +55,7 @@ class DA6_IQN_Cond(DA3_IQN):
         )
 
         self.relative_saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim // 2))
-        self.agents_saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim // 2))
+        self.destination_saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim // 2))
         self.relative_pos_embed = nn.Parameter(
             torch.zeros(
                 1,
@@ -62,10 +63,10 @@ class DA6_IQN_Cond(DA3_IQN):
                 config.model.embed_dim // 2,
             )
         )
-        self.agents_pos_embed = nn.Parameter(
+        self.destination_pos_embed = nn.Parameter(
             torch.zeros(
                 1,
-                1 + 1,
+                relative_patched_size_x * relative_patched_size_y + 1,
                 config.model.embed_dim // 2
             )
         )
@@ -89,7 +90,7 @@ class DA6_IQN_Cond(DA3_IQN):
                 for _ in range(config.model.block_loop)
             ]
         )
-        self.agents_blocks = nn.ModuleList(
+        self.destination_blocks = nn.ModuleList(
             [
                 block(
                     dim=config.model.embed_dim // 2,
@@ -120,7 +121,7 @@ class DA6_IQN_Cond(DA3_IQN):
         )
 
     def forward_attn(self, state, external_taus: torch.Tensor = None):
-        saliency_vector, local_attns, relative_attns = self.get_saliency_vector(
+        saliency_vector, attns = self.get_saliency_vector(
             state=state, output_attns=True
         )
 
@@ -128,10 +129,10 @@ class DA6_IQN_Cond(DA3_IQN):
             state_embeddings=saliency_vector, external_taus=external_taus
         )
 
-        return q_values, [local_attns, relative_attns]
+        return q_values, attns
 
     def get_saliency_vector(self, state, output_attns: bool = False):
-        local_x, relative_x, agents_xy = self.state_encoder(state)
+        local_x, relative_x, destination_x = self.state_encoder(state)
 
         out = self.relative_patch_embed(relative_x)
         relative_saliency_vector = self.relative_saliency_vector.expand(out.shape[0], -1, -1)
@@ -146,18 +147,20 @@ class DA6_IQN_Cond(DA3_IQN):
         out = self.cond_norm(out)
         relative_saliency_vector = out[:, 0]
 
-        out = self.agents_embed(agents_xy).unsqueeze(1)
-        agents_saliency_vector = self.agents_saliency_vector.expand(out.shape[0], -1, -1)
-        out = torch.cat((agents_saliency_vector, out), dim=1)
-        out = out + self.agents_pos_embed
+        out = self.destination_embed(destination_x)
+        destination_saliency_vector = self.destination_saliency_vector.expand(out.shape[0], -1, -1)
+        out = torch.cat((destination_saliency_vector, out), dim=1)
+        out = out + self.destination_pos_embed
 
-        for blk in self.agents_blocks:
-            out = blk.forward(out)
+        destination_attns: List[npt.NDArray[np.float32]] = list()
+        for blk in self.destination_blocks:
+            out, attn = blk.forward_attn(out)
+            destination_attns.append(attn.detach())
 
         out = self.cond_norm(out)
-        agents_saliency_vector = out[:, 0]
+        destination_saliency_vector = out[:, 0]
 
-        saliency_vector = torch.cat([relative_saliency_vector, agents_saliency_vector], dim=1)
+        saliency_vector = torch.cat([relative_saliency_vector, destination_saliency_vector], dim=1)
         saliency_vector = self.fc1(saliency_vector)
 
         out = self.local_patch_embed(local_x)
@@ -175,7 +178,7 @@ class DA6_IQN_Cond(DA3_IQN):
         saliency_vector = out[:, 0]
 
         if output_attns:
-            return saliency_vector, local_attns, relative_attns
+            return saliency_vector, [local_attns, relative_attns, destination_attns]
 
         return saliency_vector
 
@@ -188,7 +191,6 @@ class DA6_IQN_Cond(DA3_IQN):
         relative_x = relative_x[:, -1:, ...]  # [1, 1, 25, 25]が欲しい
         relative_x += 1
 
-        agents_xy = state["agents"] / torch.tensor([self.map_SIZE_X, self.map_SIZE_Y], device=state["agents"].device)
-        agents_xy = agents_xy.view(state["agents"].shape[0], -1)
+        destination_x = state["destination"].unsqueeze(1)
 
-        return local_x, relative_x, agents_xy
+        return local_x, relative_x, destination_x

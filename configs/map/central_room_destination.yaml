@@ -1,0 +1,4 @@
+map:
+  name: 'central_room_destination'
+  SIZE_X: 25
+  SIZE_Y: 25
