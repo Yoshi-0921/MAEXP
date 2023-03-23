@@ -1,11 +1,11 @@
 defaults:
   - model: da6_iqn_cond # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
-  - map: central_room_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination
+  - map: central_room_large_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination, central_room_large, central_room_large_destination
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'KES23-exp'
-name: 'DA6-IQN (G_pos+9destination)'
+name: 'DA6-IQN (G_pos+4destination)'
 gpu: 0
 # ==================================================
 # configure environment
@@ -13,7 +13,7 @@ gpu: 0
 world: 'default' # default
 environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
-num_objects: 20
+num_objects: 80
 keep_objects_num: True
 type_objects: 1
 objects_color: ["yellow"]
@@ -26,7 +26,7 @@ brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da
 num_agents: 8
 episode_hm_nrow: 4
 agents_color: ["blue", "green", "dodger_blue", "spring_green", "blue", "green", "dodger_blue", "spring_green" ]
-init_xys: [[2, 0], [0, 2], [-2, 0], [0, -2], [2, 2], [-2, 2], [-2, -2], [2, -2]]
+init_xys: [[-2, 2], [0, 2], [2, 2], [-2, 0], [2, 0], [-2, -2], [0, -2], [2, -2]]
 shuffle_init_xys: False
 agents_channel: False
 phase: 'training' # training, evaluation
