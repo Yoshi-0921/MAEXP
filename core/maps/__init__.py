@@ -15,6 +15,8 @@ from .simple_map import SimpleMap
 from .three_rooms_map import ThreeRoomsMap
 from .two_central_rooms_map import TwoCentralRoomsMap
 from .central_room_destination_map import CentralRoomDestinationMap
+from .central_room_large_map import CentralRoomLargeMap
+from .central_room_large_destination_map import CentralRoomLargeDestinationMap
 
 logger = initialize_logging(__name__)
 
@@ -43,6 +45,12 @@ def generate_map(config: DictConfig) -> AbstractMap:
     
     elif config.map.name == "central_room_destination":
         world_map = CentralRoomDestinationMap(config=config, size_x=25, size_y=25)
+
+    elif config.map.name == "central_room_large":
+        world_map = CentralRoomLargeMap(config=config, size_x=49, size_y=25)
+
+    elif config.map.name == "central_room_large_destination":
+        world_map = CentralRoomLargeDestinationMap(config=config, size_x=49, size_y=25)
 
     else:
         logger.warn(f"Unexpected map is given. config.map.name: {config.map.name}")
