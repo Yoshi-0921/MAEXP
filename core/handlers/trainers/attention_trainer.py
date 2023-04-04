@@ -7,12 +7,15 @@ import seaborn as sns
 import torch
 import wandb
 from core.utils.buffer import Experience
+from core.utils.logging import initialize_logging
 
 from .default_trainer import DefaultTrainer
 
 plt.rcParams["figure.facecolor"] = "white"
 plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
+
+logger = initialize_logging(__name__)
 
 
 class AttentionTrainer(DefaultTrainer):
@@ -68,9 +71,34 @@ class AttentionTrainer(DefaultTrainer):
         if epoch % (self.max_epochs // 10) == 0 and step == (
             self.max_episode_length // 2
         ):
+            self.save_state_dict(epoch=epoch)
             for agent_id, agent in enumerate(self.agents):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
+
+                for ch_id, heatmap in enumerate(self.env.observation_stats[agent_id]):
+                    if ch_id == 7:
+                        heatmap = heatmap * -1
+                    fig = plt.figure()
+                    sns.heatmap(
+                        heatmap.T,
+                        square=True,
+                        # annot=True,
+                        # annot_kws={"fontsize": 6},
+                    )
+
+                    wandb.log(
+                        {
+                            f"agent_{str(agent_id)}/observation_stats_{str(ch_id)}": [
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"observation stats ({str(ch_id)})",
+                                )
+                            ]
+                        },
+                        step=self.global_step,
+                    )
+                    logger.info(f"global_step({self.global_step})/agent_id({agent_id})/ch_id({ch_id}): {heatmap}")
 
                 if self.config.destination_channel:
                     fig = plt.figure()

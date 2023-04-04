@@ -153,6 +153,7 @@ class DA3_IQN(nn.Module):
         x = self.state_encoder(state)
 
         out = self.patch_embed(x)
+        # out = torch.zeros_like(out, device=out.device)
         saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.pos_embed
