@@ -5,7 +5,7 @@ defaults:
   - job_logging: disabled
 
 project_name: 'KES23-exp'
-name: 'DA3-IQN (G_pos+4destination)'
+name: 'DA3-IQN (G_pos+4destination_half)'
 gpu: 0
 # ==================================================
 # configure environment
