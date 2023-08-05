@@ -18,5 +18,9 @@ config_names = {
     "KES2023_da6_dqn": "experiments/KES2023/da6_dqn",
     "KES2023_da3_dqn": "experiments/KES2023/da3_dqn",
     "KES2023_dqn": "experiments/KES2023/dqn",
-    "MDPI_da3_iqn": "experiments/MDPI/da3_iqn"
+    "MDPI_da3_iqn": "experiments/MDPI/da3_iqn",
+    "MDPI_da3_iqn_test": "experiments/MDPI/da3_iqn_test",
+    "MDPI_da3_dqn": "experiments/MDPI/da3_dqn",
+    "MDPI_iqn": "experiments/MDPI/iqn",
+    "MDPI_dqn": "experiments/MDPI/dqn"
 }

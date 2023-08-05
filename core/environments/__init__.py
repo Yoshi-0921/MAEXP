@@ -16,6 +16,7 @@ from .shared_reward_environment import (
     SharedMeanRewardEnvironment,
 )
 from .test_environment import TestEnvironment
+from .observation_stats_environment import ObservationStatsEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -43,6 +44,9 @@ def generate_environment(
 
     elif config.environment == 'test':
         env = TestEnvironment(config=config, world=world)
+
+    elif config.environment == "observation_stats":
+        env = ObservationStatsEnvironment(config=config, world=world)
 
     else:
         logger.warn(

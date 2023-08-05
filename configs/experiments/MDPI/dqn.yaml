@@ -1,17 +1,17 @@
 defaults:
-  - model: da3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - model: da3_baseline # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
   - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
   - job_logging: disabled
 
 project_name: 'MDPI-exp'
-name: 'DA3-IQN (relative)'
+name: 'DQN (relative)'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward, test, observation_stats
+environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
 num_objects: 40
 keep_objects_num: True
@@ -22,7 +22,7 @@ agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
 # configure agent
 
 agent_type: 'attention' # default, attention
-brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+brain: 'da3_baseline' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
 num_agents: 6
 episode_hm_nrow: 3
 agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "orange" ]
@@ -51,7 +51,7 @@ past_step: 1
 # configure training
 
 trainer: 'attention' # default, attention
-evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
+evaluator: 'default' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
 max_episode_length: 200
 batch_size: 32

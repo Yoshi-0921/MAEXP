@@ -11,7 +11,7 @@ gpu: 0
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward, test, observation_stats
+environment: 'test' # default, shared_mean_reward, shared_max_reward, test, observation_stats
 seed: 921
 num_objects: 40
 keep_objects_num: True
@@ -29,7 +29,7 @@ agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "orange" ]
 init_xys: [[-2, 2], [2, 2], [-2, -2], [2, -2], [0, 2], [0, -2]]
 shuffle_init_xys: False
 agents_channel: False
-phase: 'training' # training, evaluation
+phase: 'evaluation' # training, evaluation
 # ==================================================
 # configure observation
 
@@ -53,7 +53,7 @@ past_step: 1
 trainer: 'attention' # default, attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
-max_episode_length: 200
+max_episode_length: 1
 batch_size: 32
 populate_steps: 1000
 buffer: 'default' # default, recurrent
@@ -66,6 +66,6 @@ epsilon_end: 0.05
 # ==================================================
 # configre evaluation
 
-validate_epochs: 1000
-pretrained_weight_path: False
-save_pdf_figs: False
+validate_epochs: 1
+pretrained_weight_path: 'yoshi-0921/MDPI-exp/28m4opfi.pth:v11'
+save_pdf_figs: True
