@@ -4,11 +4,12 @@ from collections import OrderedDict
 import numpy as np
 import torch
 import wandb
-from core.agents import generate_agents
 from omegaconf import DictConfig
 from thop import clever_format, profile
 from torchinfo import summary
 from tqdm import tqdm
+
+from core.agents import generate_agents
 
 
 class AbstractLoopHandler(ABC):

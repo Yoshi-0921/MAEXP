@@ -7,8 +7,9 @@ import collections
 from typing import Tuple
 
 import numpy as np
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
+
+from core.utils.logging import initialize_logging
 
 logger = initialize_logging(__name__)
 

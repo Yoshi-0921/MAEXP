@@ -22,5 +22,6 @@ config_names = {
     "MDPI_da3_iqn_test": "experiments/MDPI/da3_iqn_test",
     "MDPI_da3_dqn": "experiments/MDPI/da3_dqn",
     "MDPI_iqn": "experiments/MDPI/iqn",
-    "MDPI_dqn": "experiments/MDPI/dqn"
+    "MDPI_dqn": "experiments/MDPI/dqn",
+    "PosNeg":"experiments/PosNeg"
 }

@@ -8,9 +8,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
+from omegaconf import DictConfig
+
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
-from omegaconf import DictConfig
 
 from .observation_handler import ObservationHandler
 

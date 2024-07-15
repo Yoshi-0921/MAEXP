@@ -9,8 +9,9 @@ import torch
 from omegaconf import DictConfig
 from torch import nn
 
-from .abstract_brain import AbstractBrain
 from core.agents.models.customs.categorical_dqn import ApplySoftmax
+
+from .abstract_brain import AbstractBrain
 
 
 class CategoricalDQNBrain(AbstractBrain):

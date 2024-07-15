@@ -7,10 +7,11 @@ import random
 from typing import List
 
 import numpy as np
+from omegaconf import DictConfig
+
 from core.handlers.observations import generate_observation_handler
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
-from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
 

@@ -9,10 +9,10 @@ from core.utils.logging import initialize_logging
 from core.worlds import AbstractWorld
 
 from .default_agent_observation import DefaultAgentObservationHandler
+from .individual_agent_observation import IndividualAgentObservationHandler
 from .self_agent_observation import SelfAgentObservationHandler
 from .simple_agent_observation import SimpleAgentObservationHandler
 from .transition_agent_observation import TransitionAgentObservationHandler
-from .individual_agent_observation import IndividualAgentObservationHandler
 
 logger = initialize_logging(__name__)
 

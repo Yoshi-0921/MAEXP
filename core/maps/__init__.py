@@ -3,10 +3,14 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
+from core.utils.logging import initialize_logging
+
 from .abstract_map import AbstractMap
+from .central_room_destination_map import CentralRoomDestinationMap
+from .central_room_large_destination_map import CentralRoomLargeDestinationMap
+from .central_room_large_map import CentralRoomLargeMap
 from .central_room_map import CentralRoomMap
 from .dynamic_simple_map import DynamicSimpleMap
 from .four_rectangle import FourRectangleMap
@@ -14,9 +18,6 @@ from .four_rooms_map import FourRoomsMap
 from .simple_map import SimpleMap
 from .three_rooms_map import ThreeRoomsMap
 from .two_central_rooms_map import TwoCentralRoomsMap
-from .central_room_destination_map import CentralRoomDestinationMap
-from .central_room_large_map import CentralRoomLargeMap
-from .central_room_large_destination_map import CentralRoomLargeDestinationMap
 
 logger = initialize_logging(__name__)
 

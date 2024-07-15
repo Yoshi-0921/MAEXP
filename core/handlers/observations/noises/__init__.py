@@ -7,15 +7,17 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from typing import List
 
-from core.utils.logging import initialize_logging
-from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
+from core.utils.logging import initialize_logging
+from core.worlds.abstract_world import AbstractWorld
+
 from .abstract_observation_noise import AbstractObservationNoise
-from .dist_observation_noise import DistObservatonNoise, ThresholdDistObservationNoise
+from .dist_observation_noise import (DistObservatonNoise,
+                                     ThresholdDistObservationNoise)
 from .flat_observation_noise import FlatObservatonNoise
-from .non_observation_noise import NonObservationNoise
 from .flip_observation_noise import FlipObservatonNoise
+from .non_observation_noise import NonObservationNoise
 
 logger = initialize_logging(__name__)
 

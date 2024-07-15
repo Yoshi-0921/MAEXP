@@ -4,12 +4,13 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 from typing import List
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 
+from core.utils.logging import initialize_logging
+
 from .abstract_agent import AbstractAgent
-from .default_agent import DefaultAgent
 from .attention_agent import AttentionAgent
+from .default_agent import DefaultAgent
 from .recurrent_agent import RecurrentAgent
 from .recurrent_attention_agent import RecurrentAttentionAgent
 

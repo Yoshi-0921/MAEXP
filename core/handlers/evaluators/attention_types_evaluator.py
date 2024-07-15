@@ -1,10 +1,11 @@
 import random
+from copy import deepcopy
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
 import wandb
-from copy import deepcopy
 
 from .default_evaluator import DefaultEvaluator
 

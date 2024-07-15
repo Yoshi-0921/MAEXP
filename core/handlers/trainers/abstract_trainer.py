@@ -1,14 +1,15 @@
 import random
 from abc import ABC
 from copy import deepcopy
+from typing import Dict, List
 
 import torch
 import wandb
+from omegaconf import DictConfig
+from torch.utils.data import DataLoader
+
 from core.utils.buffer import Experience, generate_buffer
 from core.utils.dataset import RLDataset
-from omegaconf import DictConfig
-from typing import Dict, List
-from torch.utils.data import DataLoader
 
 from ..abstract_loop_handler import AbstractLoopHandler
 
@@ -38,6 +39,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
                 config.agent_view_method + "_agent_view_method",
                 config.object_view_method + "_object_view_method",
             ],
+            mode="offline"
         )
 
     def loss_and_update(self, batch) -> List[Dict[str, torch.Tensor]]:

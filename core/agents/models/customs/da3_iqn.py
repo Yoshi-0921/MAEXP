@@ -6,11 +6,12 @@ from typing import List
 
 import numpy as np
 import torch
-from core.handlers.observations.observation_handler import ObservationHandler
-from core.utils.logging import initialize_logging
 from numpy import typing as npt
 from omegaconf import DictConfig
 from torch import nn
+
+from core.handlers.observations.observation_handler import ObservationHandler
+from core.utils.logging import initialize_logging
 
 from ..hard_shrink_attention import HardShrinkBlock
 from ..mlp import MLP

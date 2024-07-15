@@ -5,7 +5,6 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from collections import defaultdict
 
-
 RGB_COLORS = defaultdict(
     white=[1, 1, 1],
     black=[0, 0, 0],

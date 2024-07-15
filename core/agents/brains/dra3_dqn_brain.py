@@ -8,9 +8,9 @@ from typing import List
 import torch
 from omegaconf import DictConfig
 from torch import nn
-from .da3_brain import DA3Brain
 
 from .abstract_brain import AbstractBrain
+from .da3_brain import DA3Brain
 
 
 class DRA3_DQNBrain(DA3Brain):

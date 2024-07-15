@@ -5,18 +5,17 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from omegaconf import DictConfig
+
 from core.utils.logging import initialize_logging
 from core.worlds.abstract_world import AbstractWorld
-from omegaconf import DictConfig
 
 from .abstract_environment import AbstractEnvironment
 from .default_environment import DefaultEnvironment
-from .shared_reward_environment import (
-    SharedMaxRewardEnvironment,
-    SharedMeanRewardEnvironment,
-)
-from .test_environment import TestEnvironment
 from .observation_stats_environment import ObservationStatsEnvironment
+from .shared_reward_environment import (SharedMaxRewardEnvironment,
+                                        SharedMeanRewardEnvironment)
+from .test_environment import TestEnvironment
 
 logger = initialize_logging(__name__)
 

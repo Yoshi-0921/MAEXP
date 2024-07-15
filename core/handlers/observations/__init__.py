@@ -5,8 +5,9 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
+
+from core.worlds.abstract_world import AbstractWorld
 
 from .merged_observtion_handler import MergedObservationHandler
 from .observation_handler import ObservationHandler

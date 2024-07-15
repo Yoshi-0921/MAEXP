@@ -1,4 +1,4 @@
-"""Source code for distributed attentional actor architecture (DA3) model.
+"""Source code for contextual distributed attentional actor architecture (DA3) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -7,6 +7,7 @@ from typing import List
 import torch
 from omegaconf import DictConfig
 from torch import nn
+from torch.nn import functional as F
 
 from core.handlers.observations.observation_handler import ObservationHandler
 from core.utils.logging import initialize_logging
@@ -17,7 +18,7 @@ from ..vit import Block, PatchEmbed
 logger = initialize_logging(__name__)
 
 
-class DA3(nn.Module):
+class CDA3(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
         patched_size_x = input_shape[1] // config.model.patch_size
@@ -36,9 +37,10 @@ class DA3(nn.Module):
             embed_dim=config.model.embed_dim,
         )
 
-        self.saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
+        self.pos_saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
+        self.neg_saliency_vector = nn.Parameter(torch.zeros(1, 1, config.model.embed_dim))
         self.pos_embed = nn.Parameter(
-            torch.zeros(1, patched_size_x * patched_size_y + 1, config.model.embed_dim)
+            torch.zeros(1, patched_size_x * patched_size_y + 2, config.model.embed_dim)
         )
 
         block = HardShrinkBlock if config.model.attention == "hard" else Block
@@ -55,23 +57,28 @@ class DA3(nn.Module):
         )
 
         self.norm = nn.LayerNorm(config.model.embed_dim)
-        self.head = nn.Linear(config.model.embed_dim, output_size)
+        self.pos_head = nn.Linear(config.model.embed_dim, output_size)
+        self.neg_head = nn.Linear(config.model.embed_dim, output_size)
 
     def forward(self, state):
         x = self.state_encoder(state)
 
         out = self.patch_embed(x)
-        saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
-        out = torch.cat((saliency_vector, out), dim=1)
+        pos_saliency_vector = self.pos_saliency_vector.expand(out.shape[0], -1, -1)
+        neg_saliency_vector = self.neg_saliency_vector.expand(out.shape[0], -1, -1)
+        out = torch.cat((pos_saliency_vector, neg_saliency_vector, out), dim=1)
         out = out + self.pos_embed
 
         for blk in self.blocks:
             out = blk(out)
 
         out = self.norm(out)
-        out = out[:, 0]
+        pos_out = out[:, 0]
+        neg_out = out[:, 1]
 
-        out = self.head(out)
+        pos_out = F.relu(self.pos_head(pos_out))
+        neg_out = F.relu(self.neg_head(neg_out))
+        out = pos_out - neg_out
 
         return out
 
@@ -79,8 +86,9 @@ class DA3(nn.Module):
         x = self.state_encoder(state)
 
         out = self.patch_embed(x)
-        saliency_vector = self.saliency_vector.expand(out.shape[0], -1, -1)
-        out = torch.cat((saliency_vector, out), dim=1)
+        pos_saliency_vector = self.pos_saliency_vector.expand(out.shape[0], -1, -1)
+        neg_saliency_vector = self.neg_saliency_vector.expand(out.shape[0], -1, -1)
+        out = torch.cat((pos_saliency_vector, neg_saliency_vector, out), dim=1)
         out = out + self.pos_embed
 
         attns = list()
@@ -89,9 +97,12 @@ class DA3(nn.Module):
             attns.append(attn.detach())
 
         out = self.norm(out)
-        out = out[:, 0]
+        pos_out = out[:, 0]
+        neg_out = out[:, 1]
 
-        out = self.head(out)
+        pos_out = F.relu(self.pos_head(pos_out))
+        neg_out = F.relu(self.neg_head(neg_out))
+        out = pos_out - neg_out
 
         return out, [attns]
 

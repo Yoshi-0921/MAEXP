@@ -7,10 +7,11 @@ from copy import deepcopy
 from typing import Dict, List, Union
 
 import torch
+from omegaconf import DictConfig
+
 from core.utils.logging import initialize_logging
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
-from omegaconf import DictConfig
 
 from .agents import generate_observation_agent
 from .masks import (generate_observation_area_mask,

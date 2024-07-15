@@ -5,8 +5,9 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.utils.logging import initialize_logging
 from torch.nn import functional as F
+
+from core.utils.logging import initialize_logging
 
 logger = initialize_logging(__name__)
 

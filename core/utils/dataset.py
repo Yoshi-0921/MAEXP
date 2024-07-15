@@ -3,8 +3,9 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.utils.buffer import ReplayBuffer
 from torch.utils.data import IterableDataset
+
+from core.utils.buffer import ReplayBuffer
 
 
 class RLDataset(IterableDataset):

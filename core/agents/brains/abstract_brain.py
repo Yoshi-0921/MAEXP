@@ -6,11 +6,12 @@ from abc import ABC, abstractmethod
 from typing import List
 
 import torch
+from omegaconf import DictConfig
+
 from core.agents.criterions import generate_criterion
 from core.agents.models import generate_network
 from core.agents.optimizers import generate_optimizer
 from core.utils.logging import initialize_logging
-from omegaconf import DictConfig
 from core.utils.updates import hard_update
 
 logger = initialize_logging(__name__)

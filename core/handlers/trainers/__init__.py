@@ -3,9 +3,10 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from omegaconf import DictConfig
+
 from core.environments.abstract_environment import AbstractEnvironment
 from core.utils.logging import initialize_logging
-from omegaconf import DictConfig
 
 from .abstract_trainer import AbstractTrainer
 from .attention_trainer import AttentionTrainer

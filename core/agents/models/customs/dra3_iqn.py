@@ -5,9 +5,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
+
+from core.utils.logging import initialize_logging
 
 from .da3_iqn import DA3_IQN
 

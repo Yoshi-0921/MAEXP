@@ -1,9 +1,10 @@
 
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import wandb
-import os
 
 from .abstract_evaluator import AbstractEvaluator
 

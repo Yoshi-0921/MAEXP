@@ -7,10 +7,11 @@ from enum import IntEnum
 from typing import List
 
 import torch
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
 from torch.nn import functional as F
+
+from core.utils.logging import initialize_logging
 
 from ..convolution import Conv
 from ..mlp import MLP

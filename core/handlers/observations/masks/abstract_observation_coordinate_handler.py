@@ -8,8 +8,9 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
+
+from core.worlds.abstract_world import AbstractWorld
 
 
 class AbstractObservationCoordinateHandler(ABC):

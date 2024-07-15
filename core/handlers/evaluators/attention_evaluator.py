@@ -1,3 +1,4 @@
+import os
 import random
 from copy import deepcopy
 
@@ -6,7 +7,7 @@ import numpy as np
 import seaborn as sns
 import torch
 import wandb
-import os
+
 from .default_evaluator import DefaultEvaluator
 
 plt.rcParams["figure.facecolor"] = "white"

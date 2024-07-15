@@ -6,9 +6,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import numpy as np
-from core.worlds import AbstractWorld
 from omegaconf import DictConfig
+
 from core.handlers.observations.observation_handler import ObservationHandler
+from core.worlds import AbstractWorld
 
 from .default_environment import DefaultEnvironment
 

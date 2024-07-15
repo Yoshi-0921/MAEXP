@@ -7,6 +7,9 @@ import os
 import warnings
 
 import hydra
+import matplotlib.pyplot as plt
+import seaborn as sns
+import wandb
 from omegaconf import DictConfig
 
 from configs import config_names
@@ -18,9 +21,6 @@ from core.utils.logging import initialize_logging
 from core.utils.seed import set_seed
 from core.worlds import generate_world
 
-import wandb
-import matplotlib.pyplot as plt
-import seaborn as sns
 plt.rcParams["figure.facecolor"] = "white"
 plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
@@ -29,8 +29,7 @@ warnings.simplefilter("ignore")
 
 logger = initialize_logging(__name__)
 
-
-@hydra.main(config_path="configs", config_name=config_names["MDPI_da3_iqn"])
+@hydra.main(config_path="configs", config_name=config_names["PosNeg"])
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)

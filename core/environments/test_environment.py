@@ -1,7 +1,8 @@
 import numpy as np
+from omegaconf import DictConfig
+
 from core.environments.default_environment import DefaultEnvironment
 from core.worlds import AbstractWorld
-from omegaconf import DictConfig
 
 
 class TestEnvironment(DefaultEnvironment):

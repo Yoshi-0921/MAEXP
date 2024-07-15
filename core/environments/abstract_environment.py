@@ -9,9 +9,10 @@ from abc import ABC, abstractmethod
 from typing import List
 
 import numpy as np
+from omegaconf import DictConfig
+
 from core.worlds.abstract_world import AbstractWorld
 from core.worlds.entity import Agent
-from omegaconf import DictConfig
 
 
 class AbstractEnvironment(ABC):

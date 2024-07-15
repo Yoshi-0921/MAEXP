@@ -3,9 +3,10 @@ import numpy as np
 import seaborn as sns
 import torch
 import wandb
-from core.utils.color import RGB_COLORS
 from torch.nn import functional as F
 from torchvision.utils import make_grid
+
+from core.utils.color import RGB_COLORS
 
 from .abstract_trainer import AbstractTrainer
 

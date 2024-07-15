@@ -8,18 +8,17 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
-from core.utils.logging import initialize_logging
-from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 
-from .abstract_observation_coordinate_handler import (
-    AbstractObservationCoordinateHandler,
-)
-from .local_area_mask import LocalObservationCoordinateHandler, generate_local_area_mask
-from .relative_area_mask import (
-    RelativeObservationCoordinateHandler,
-    generate_relative_area_mask,
-)
+from core.utils.logging import initialize_logging
+from core.worlds.abstract_world import AbstractWorld
+
+from .abstract_observation_coordinate_handler import \
+    AbstractObservationCoordinateHandler
+from .local_area_mask import (LocalObservationCoordinateHandler,
+                              generate_local_area_mask)
+from .relative_area_mask import (RelativeObservationCoordinateHandler,
+                                 generate_relative_area_mask)
 
 logger = initialize_logging(__name__)
 

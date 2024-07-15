@@ -6,9 +6,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
-from core.agents.optimizers import generate_optimizer
 from omegaconf import DictConfig
 from torch import nn
+
+from core.agents.optimizers import generate_optimizer
 
 from .abstract_brain import AbstractBrain
 from .iqn_brain import calculate_quantile_huber_loss

@@ -5,9 +5,10 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
+from omegaconf import DictConfig
+
 from core.maps.abstract_map import AbstractMap
 from core.utils.logging import initialize_logging
-from omegaconf import DictConfig
 
 from .abstract_world import AbstractWorld
 from .default_world import DefaultWorld

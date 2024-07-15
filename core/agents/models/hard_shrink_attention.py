@@ -6,7 +6,8 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 import torch.nn as nn
-from .vit import Block, Attention
+
+from .vit import Attention, Block
 
 
 class HardShrinkBlock(Block):

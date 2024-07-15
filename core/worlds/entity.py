@@ -6,6 +6,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from abc import ABC
+
 import numpy as np
 
 
