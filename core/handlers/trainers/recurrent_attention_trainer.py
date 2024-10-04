@@ -4,8 +4,9 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
-from core.utils.buffer import Experience
 from omegaconf import DictConfig
+
+from core.utils.buffer import Experience
 
 from .attention_trainer import AttentionTrainer
 

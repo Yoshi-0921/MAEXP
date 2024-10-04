@@ -6,10 +6,11 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 from typing import Iterator
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import optim
 from torch.nn.parameter import Parameter
+
+from core.utils.logging import initialize_logging
 
 logger = initialize_logging(__name__)
 

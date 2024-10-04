@@ -6,10 +6,11 @@ Original code: https://github.com/ku2482/fqf-iqn-qrdqn.pytorch
 from typing import List
 
 import torch
-from core.handlers.observations.observation_handler import ObservationHandler
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
+
+from core.handlers.observations.observation_handler import ObservationHandler
+from core.utils.logging import initialize_logging
 
 from ..convolution import Conv
 from ..mlp import MLP

@@ -7,6 +7,7 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 import numpy as np
 import torch
+
 from core.utils.color import RGB_COLORS
 
 from ..abstract_observation_handler import AbstractObservationHandler

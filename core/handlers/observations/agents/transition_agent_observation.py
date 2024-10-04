@@ -7,9 +7,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 import numpy as np
 import torch
+from omegaconf import DictConfig
+
 from core.utils.color import RGB_COLORS
 from core.worlds import AbstractWorld
-from omegaconf import DictConfig
 
 from ..abstract_observation_handler import AbstractObservationHandler
 

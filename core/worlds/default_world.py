@@ -5,8 +5,9 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
-from core.maps.abstract_map import AbstractMap
 from omegaconf import DictConfig
+
+from core.maps.abstract_map import AbstractMap
 
 from .abstract_world import AbstractWorld
 from .entity import Agent

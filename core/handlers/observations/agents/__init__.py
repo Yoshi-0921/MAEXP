@@ -9,10 +9,12 @@ from core.utils.logging import initialize_logging
 from core.worlds import AbstractWorld
 
 from .default_agent_observation import DefaultAgentObservationHandler
+from .individual_agent_observation import IndividualAgentObservationHandler
+from .individual_transition_agent_observation import \
+    IndividualTransitionAgentObservationHandler
 from .self_agent_observation import SelfAgentObservationHandler
 from .simple_agent_observation import SimpleAgentObservationHandler
 from .transition_agent_observation import TransitionAgentObservationHandler
-from .individual_agent_observation import IndividualAgentObservationHandler
 
 logger = initialize_logging(__name__)
 
@@ -32,6 +34,9 @@ def generate_observation_agent(config, world: AbstractWorld):
 
     elif config.agent_view_method == "individual":
         observation_agent = IndividualAgentObservationHandler(config=config, world=world)
+
+    elif config.agent_view_method == "individual_transition":
+        observation_agent = IndividualTransitionAgentObservationHandler(config=config, world=world)
 
     else:
         logger.warn(

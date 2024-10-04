@@ -1,3 +1,4 @@
+import io
 import random
 
 import cv2
@@ -5,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
-import io
 from omegaconf import DictConfig
 
 from .default_evaluator import DefaultEvaluator

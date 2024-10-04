@@ -9,9 +9,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from typing import List
 
-from core.worlds.abstract_world import AbstractWorld
-from omegaconf import DictConfig
 import torch
+from omegaconf import DictConfig
+
+from core.worlds.abstract_world import AbstractWorld
 
 from .abstract_observation_noise import AbstractObservationNoise
 

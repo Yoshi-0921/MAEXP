@@ -9,9 +9,11 @@ from abc import ABC
 from typing import List
 
 import numpy as np
-from core.maps.abstract_map import AbstractMap
-from .entity import Agent
 from omegaconf import DictConfig
+
+from core.maps.abstract_map import AbstractMap
+
+from .entity import Agent
 
 
 class AbstractWorld(ABC):

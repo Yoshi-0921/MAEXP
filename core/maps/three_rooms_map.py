@@ -2,8 +2,10 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
-import numpy as np
 import random
+
+import numpy as np
+
 from .abstract_map import AbstractMap
 
 

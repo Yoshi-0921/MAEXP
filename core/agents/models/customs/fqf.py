@@ -7,9 +7,10 @@ from typing import List
 
 import torch
 import torch.nn.functional as F
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
+
+from core.utils.logging import initialize_logging
 
 from .iqn import IQN
 

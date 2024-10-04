@@ -5,10 +5,11 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 from typing import List
 
 import torch
-from core.handlers.observations.observation_handler import ObservationHandler
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
+
+from core.handlers.observations.observation_handler import ObservationHandler
+from core.utils.logging import initialize_logging
 
 from ..hard_shrink_attention import HardShrinkBlock
 from ..vit import Block, PatchEmbed

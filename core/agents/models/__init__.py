@@ -5,18 +5,22 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from typing import List
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
 from torch import nn
 
+from core.utils.logging import initialize_logging
+
+from .customs.ada3_iqn import ADA3_IQN, MergedADA3_IQN
 from .customs.categorical_dqn import CategoricalDQN
+from .customs.cda3 import CDA3
+from .customs.cda3_iqn import CDA3_IQN
 from .customs.conv_mlp import ConvMLP
 from .customs.da3 import DA3
 from .customs.da3_iqn import DA3_IQN, MergedDA3_IQN
-from .customs.dra3_dqn import DRA3_DQN
 from .customs.da6 import DA6
 from .customs.da6_iqn import DA6_IQN
 from .customs.da6_iqn_cond import DA6_IQN_Cond
+from .customs.dra3_dqn import DRA3_DQN
 from .customs.dra3_iqn import DRA3_IQN
 from .customs.fqf import FQF
 from .customs.iqn import IQN, MergedIQN
@@ -75,6 +79,18 @@ def generate_network(
 
     elif config.model.name == "dra3_dqn":
         network = DRA3_DQN(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "cda3":
+        network = CDA3(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "cda3_iqn":
+        network = CDA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "ada3_iqn":
+        if config.observation_area_mask == "merged":
+            network = MergedADA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)
+        else:
+            network = ADA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     else:
         logger.warn(f"Unexpected network is given. config.model.name: {config.model.name}")

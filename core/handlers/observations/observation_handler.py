@@ -7,10 +7,11 @@ from copy import deepcopy
 from typing import Dict, List, Union
 
 import torch
+from omegaconf import DictConfig
+
 from core.utils.logging import initialize_logging
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
-from omegaconf import DictConfig
 
 from .agents import generate_observation_agent
 from .masks import (generate_observation_area_mask,
@@ -50,13 +51,18 @@ class ObservationHandler:
         self.observation_mask_coordinate = generate_observation_mask_coordinate(
             config=config, world=world
         )
-
+    
     @property
-    def observation_space(self):
+    def get_channel(self):
         agent_ch = self.observation_agent.get_channel()
         object_ch = self.observation_object.get_channel()
 
-        return [agent_ch + object_ch + 1, *self.observation_size]
+        return agent_ch + object_ch + 1
+
+    @property
+    def observation_space(self):
+
+        return [self.get_channel, *self.observation_size]
 
     def observation_ind(
         self, agents: List[Agent], agent: Agent, agent_id: int

@@ -1,5 +1,6 @@
 import random
 from abc import ABC
+from copy import deepcopy
 
 import torch
 import wandb
@@ -38,15 +39,18 @@ class AbstractEvaluator(AbstractLoopHandler, ABC):
         actions = [[] for _ in range(self.env.num_agents)]
         random.shuffle(self.order)
 
+        states = self.states
         for agent_id in self.order:
             if self.config.agent_tasks[int(agent_id)] == "-1":
                 actions[agent_id] = self.agents[agent_id].get_random_action()
                 continue
 
             # normalize states [0, map.SIZE] -> [0, 1.0]
-            states = torch.tensor(self.states).float()
+            # states = torch.tensor(self.states).float()
 
-            action = self.agents[agent_id].get_action(states[agent_id], epsilon)
+            action = self.agents[agent_id].get_action(
+                deepcopy(states[agent_id]), epsilon
+            )
             actions[agent_id] = action
 
         rewards, _, new_states = self.env.step(actions, self.order)

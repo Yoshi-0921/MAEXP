@@ -1,3 +1,4 @@
+import os
 import random
 from copy import deepcopy
 
@@ -6,7 +7,7 @@ import numpy as np
 import seaborn as sns
 import torch
 import wandb
-import os
+
 from .default_evaluator import DefaultEvaluator
 
 plt.rcParams["figure.facecolor"] = "white"
@@ -46,7 +47,7 @@ class AttentionEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         log_step = self.max_episode_length // 2
-        if epoch % (self.max_epochs // 5 + 1) == 0 and step in [
+        if (epoch + 1) % max(1, self.max_epochs // 5) == 0 and step in [
             log_step - 3,
             log_step - 2,
             log_step - 1,
@@ -63,26 +64,7 @@ class AttentionEvaluator(DefaultEvaluator):
                         os.mkdir(f"agent_{str(agent_id)}")
                     os.mkdir(f"agent_{str(agent_id)}/step_{self.global_step}")
 
-                if self.config.destination_channel:
-                    fig = plt.figure()
-                    sns.heatmap(
-                        self.env.world.map.destination_area_matrix[agent_id].T,
-                        square=True,
-                    )
-                    if self.config.save_pdf_figs:
-                        plt.savefig(f'agent_{str(agent_id)}/step_{self.global_step}/destination_channel.pdf', dpi=300)
-
-                    wandb.log(
-                        {
-                            f"agent_{str(agent_id)}/destination_channel": [
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption="destination channel",
-                                )
-                            ]
-                        },
-                        step=self.global_step,
-                    )
+                self.log_destination_channel(agent_id)
 
                 images = self.env.observation_handler.render(states[agent_id])
 

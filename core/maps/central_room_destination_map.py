@@ -2,8 +2,10 @@
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
-import numpy as np
 import random
+
+import numpy as np
+
 from .central_room_map import CentralRoomMap
 
 

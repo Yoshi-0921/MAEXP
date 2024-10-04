@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 
 import torch
-from core.worlds import AbstractWorld
 from omegaconf import DictConfig
+
+from core.worlds import AbstractWorld
 
 
 class AbstractObservationHandler(ABC):

@@ -5,8 +5,9 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 from typing import List
 
-from core.utils.logging import initialize_logging
 from omegaconf import DictConfig
+
+from core.utils.logging import initialize_logging
 
 from .abstract_brain import AbstractBrain
 from .categorical_dqn_brain import CategoricalDQNBrain

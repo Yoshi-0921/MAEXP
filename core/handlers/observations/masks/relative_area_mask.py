@@ -7,13 +7,14 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 
 import numpy as np
 import torch
-from core.worlds.abstract_world import AbstractWorld
 from omegaconf import DictConfig
 from tqdm import tqdm
+
+from core.worlds.abstract_world import AbstractWorld
+
+from .abstract_observation_coordinate_handler import \
+    AbstractObservationCoordinateHandler
 from .local_area_mask import generate_each_mask
-from .abstract_observation_coordinate_handler import (
-    AbstractObservationCoordinateHandler,
-)
 
 
 class RelativeObservationCoordinateHandler(AbstractObservationCoordinateHandler):

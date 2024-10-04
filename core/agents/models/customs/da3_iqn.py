@@ -6,15 +6,17 @@ from typing import List
 
 import numpy as np
 import torch
-from core.handlers.observations.observation_handler import ObservationHandler
-from core.utils.logging import initialize_logging
 from numpy import typing as npt
 from omegaconf import DictConfig
 from torch import nn
 
+from core.handlers.observations.observation_handler import ObservationHandler
+from core.utils.logging import initialize_logging
+
 from ..hard_shrink_attention import HardShrinkBlock
 from ..mlp import MLP
 from ..vit import Block, PatchEmbed
+from ..aoa import AoABlock
 from .iqn import CosineEmbeddingNetwork
 
 logger = initialize_logging(__name__)
@@ -112,7 +114,11 @@ class DA3_IQN(nn.Module):
             torch.zeros(1, patched_size_x * patched_size_y + 1, self.embedding_dim)
         )
 
-        block = HardShrinkBlock if config.model.attention == "hard" else Block
+        block = Block
+        if config.model.attention == "hard":
+            block = HardShrinkBlock
+        elif config.model.attention == "aoa":
+            block = AoABlock
         self.blocks = nn.ModuleList(
             [
                 block(
