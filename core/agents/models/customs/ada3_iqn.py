@@ -1,4 +1,4 @@
-"""Source code for distributed attentional actor architecture (DA3) model.
+"""Source code for amplified distributed attentional actor architecture (ADA3) model.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
@@ -13,77 +13,14 @@ from torch import nn
 from core.handlers.observations.observation_handler import ObservationHandler
 from core.utils.logging import initialize_logging
 
-from ..hard_shrink_attention import HardShrinkBlock
-from ..mlp import MLP
-from ..vit import Block, PatchEmbed
-from ..aoa import AoABlock
-from .iqn import CosineEmbeddingNetwork
+from ..avit import ABlock
+from ..vit import PatchEmbed
+from .da3_iqn import IQN_Head
 
 logger = initialize_logging(__name__)
 
 
-class IQN_Head(nn.Module):
-    def __init__(self, config: DictConfig, embedding_dim: int, output_size: int):
-        super().__init__()
-        self.embedding_dim = embedding_dim
-        self.num_actions = output_size
-        self.num_quantiles: int = config.model.num_quantiles
-        self.num_cosines: int = config.model.num_cosines
-        self.cosine_net = CosineEmbeddingNetwork(
-            num_cosines=self.num_cosines, embedding_dim=self.embedding_dim
-        )
-        self.fc_V = MLP(config=config, input_size=self.embedding_dim, output_size=1)
-        self.fc_A = MLP(
-            config=config, input_size=self.embedding_dim, output_size=output_size
-        )
-
-    def forward(self, state_embeddings, external_taus):
-        taus = (
-            external_taus
-            if external_taus is not None
-            else self.get_taus(state_embeddings=state_embeddings)
-        )
-        quantiles = self.get_quantiles(state_embeddings=state_embeddings, taus=taus)
-        q_values = self.get_q_values(quantiles=quantiles)
-
-        return q_values
-
-    def get_taus(self, state_embeddings):
-        return torch.rand(1, self.num_quantiles, device=state_embeddings.device)
-
-    def get_quantiles(
-        self,
-        state_embeddings: torch.Tensor = None,
-        taus: torch.Tensor = None,
-    ):
-        tau_embeddings = self.cosine_net(taus)
-
-        # Reshape into (batch_size, 1, embedding_dim).
-        batch_size = state_embeddings.shape[0]
-        state_embeddings = state_embeddings.view(batch_size, 1, self.embedding_dim)
-
-        # Calculate embeddings of states and taus.
-        num_quantiles = tau_embeddings.shape[1]
-        embeddings = (state_embeddings * tau_embeddings).view(
-            batch_size * num_quantiles, self.embedding_dim
-        )
-
-        V = self.fc_V(embeddings)
-        A = self.fc_A(embeddings)
-
-        V = V.view(batch_size, num_quantiles, 1)  # .transpose(1, 2)
-        A = A.view(batch_size, num_quantiles, self.num_actions)  # .transpose(1, 2)
-
-        average_A = A.mean(2, keepdim=True)
-        quantiles = V.expand_as(A) + (A - average_A.expand_as(A))
-
-        return quantiles
-
-    def get_q_values(self, quantiles: torch.Tensor):
-        return quantiles.mean(dim=1)
-
-
-class DA3_IQN(nn.Module):
+class ADA3_IQN(nn.Module):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__()
         patched_size_x = input_shape[1] // config.model.patch_size
@@ -114,17 +51,13 @@ class DA3_IQN(nn.Module):
             torch.zeros(1, patched_size_x * patched_size_y + 1, self.embedding_dim)
         )
 
-        block = Block
-        if config.model.attention == "hard":
-            block = HardShrinkBlock
-        elif config.model.attention == "aoa":
-            block = AoABlock
         self.blocks = nn.ModuleList(
             [
-                block(
+                ABlock(
                     dim=self.embedding_dim,
                     num_heads=config.model.num_heads,
                     mlp_ratio=config.model.mlp_ratio,
+                    attention_pow=config.model.attention_pow,
                     **{"af_lambd": config.model.af_lambd}
                 )
                 for _ in range(config.model.block_loop)
@@ -210,7 +143,7 @@ class DA3_IQN(nn.Module):
         return state[self.view_method]
 
 
-class MergedDA3_IQN(DA3_IQN):
+class MergedADA3_IQN(ADA3_IQN):
     def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
         super().__init__(
             config=config, input_shape=input_shape, output_size=output_size
@@ -262,10 +195,9 @@ class MergedDA3_IQN(DA3_IQN):
             )
         )
 
-        block = HardShrinkBlock if config.model.attention == "hard" else Block
         self.relative_blocks = nn.ModuleList(
             [
-                block(
+                ABlock(
                     dim=config.model.embed_dim,
                     num_heads=config.model.num_heads,
                     mlp_ratio=config.model.mlp_ratio,
@@ -276,7 +208,7 @@ class MergedDA3_IQN(DA3_IQN):
         )
         self.local_blocks = nn.ModuleList(
             [
-                block(
+                ABlock(
                     dim=config.model.embed_dim,
                     num_heads=config.model.num_heads,
                     mlp_ratio=config.model.mlp_ratio,

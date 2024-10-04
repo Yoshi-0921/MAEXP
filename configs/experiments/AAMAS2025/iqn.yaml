@@ -1,33 +1,34 @@
 defaults:
-  - model: cda3 # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
+  - model: iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn
   - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
 #   - job_logging: disabled
 
-project_name: 'Dr-PosNeg-exp'
-name: 'CDA3-DQN (local)'
+project_name: 'Dr-sequential-tasks-exp'
+name: 'IQN (local) - individual'
+# name: 'Delete'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'default' # default, shared_mean_reward, shared_max_reward, test, observation_stats
+environment: 'sequential' # default, shared_mean_reward, shared_max_reward, test, sequential
 seed: 921
 num_objects: 40
 keep_objects_num: True
-type_objects: 1
-objects_color: ["yellow"]
-agent_tasks: ["0", "0", "0", "0", "-1", "-1"]
+type_objects: 3
+objects_color: ["yellow", "orange", "red"]
+agent_tasks: ["0", "0", "1", "1", "1", "2", "2", "2"]
 # ==================================================
 # configure agent
 
-agent_type: 'attention' # default, attention
-brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
-num_agents: 6
-episode_hm_nrow: 3
-agents_color: ["blue", "green", "dodger_blue", "spring_green", "red", "orange" ]
-init_xys: [[-2, 2], [2, 2], [-2, -2], [2, -2], [0, 2], [0, -2]]
-shuffle_init_xys: False
+agent_type: 'default' # default, attention
+brain: 'iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+num_agents: 8
+episode_hm_nrow: 4
+agents_color: ["blue", "blue", "green", "green", "green", "dodger_blue", "dodger_blue", "dodger_blue" ]
+init_xys: [[-2, 2], [2, 2], [-2, -2], [2, -2], [0, 2], [0, -2], [2, 0], [-2, 0]]
+shuffle_init_xys: True
 agents_channel: False
 phase: 'training' # training, evaluation
 # ==================================================
@@ -38,21 +39,21 @@ transparent_observation: False
 objects_channel: False
 destination_channel: False
 reset_destination_period: False
-agent_view_method: 'individual' # default, self, simple, transition, individual
+agent_view_method: 'individual_transition' # default, self, simple, transition, individual, individual_transition
 object_view_method: 'object_types' # default, simple, object_types
 observation_area_mask: 'local' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
 std_distribution: [0.07, 0.05, 0.03]
-past_step: 1
+past_step: 3 # used for transition view method
 
 # ==================================================
 # configure training
 
-trainer: 'attention' # default, attention
-evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
-max_epochs: 100
+trainer: 'default' # default, attention
+evaluator: 'default' # default, attention, da3_video, da3_wandering_video
+max_epochs: 5000
 max_episode_length: 200
 batch_size: 32
 populate_steps: 1000

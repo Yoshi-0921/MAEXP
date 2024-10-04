@@ -77,48 +77,7 @@ class AttentionTrainer(DefaultTrainer):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
-                for ch_id, heatmap in enumerate(self.env.observation_stats[agent_id]):
-                    if ch_id == 7:
-                        heatmap = heatmap * -1
-                    fig = plt.figure()
-                    sns.heatmap(
-                        heatmap.T,
-                        square=True,
-                        # annot=True,
-                        # annot_kws={"fontsize": 6},
-                    )
-
-                    wandb.log(
-                        {
-                            f"agent_{str(agent_id)}/observation_stats_{str(ch_id)}": [
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption=f"observation stats ({str(ch_id)})",
-                                )
-                            ]
-                        },
-                        step=self.global_step,
-                    )
-                    logger.info(f"global_step({self.global_step})/agent_id({agent_id})/ch_id({ch_id}): {heatmap}")
-
-                if self.config.destination_channel:
-                    fig = plt.figure()
-                    sns.heatmap(
-                        self.env.world.map.destination_area_matrix[agent_id].T,
-                        square=True,
-                    )
-
-                    wandb.log(
-                        {
-                            f"agent_{str(agent_id)}/destination_channel": [
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption="destination channel",
-                                )
-                            ]
-                        },
-                        step=self.global_step,
-                    )
+                self.log_destination_channel(agent_id)
 
                 images = self.env.observation_handler.render(states[agent_id])
 
@@ -153,6 +112,135 @@ class AttentionTrainer(DefaultTrainer):
                                     wandb.Image(
                                         data_or_path=fig,
                                         caption=f"mean {view_method} attention heatmap",
+                                    )
+                                ]
+                            },
+                            step=self.global_step,
+                        )
+                        continue
+
+                    # TODO Remove this code - cda3 exp
+                    if False:
+                        pos_attention_map = (
+                            attention_map.mean(dim=0)[0, :, 0, 2:]
+                            .view(
+                                -1,
+                                getattr(agent.brain, f"{view_method}_patched_size_x"),
+                                getattr(agent.brain, f"{view_method}_patched_size_y"),
+                            )
+                            .cpu()
+                        )
+
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(pos_attention_map.mean(dim=0)),
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                        )
+
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_pos_attention_mean": [
+                                    wandb.Image(
+                                        data_or_path=fig,
+                                        caption=f"mean {view_method} pos attention heatmap",
+                                    )
+                                ]
+                            },
+                            step=self.global_step,
+                        )
+
+                        fig_list = []
+                        for head_id, am in enumerate(pos_attention_map):
+                            fig = plt.figure()
+                            sns.heatmap(
+                                torch.t(am),
+                                vmin=0,
+                                square=True,
+                                annot=True,
+                                fmt=".3f",
+                                vmax=0.25,
+                            )
+                            fig_list.append(
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"{view_method} pos attention heatmap from head {str(head_id)}",
+                                )
+                            )
+
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_pos_attention_heads": fig_list
+                            },
+                            step=self.global_step,
+                        )
+
+                        neg_attention_map = (
+                            attention_map.mean(dim=0)[0, :, 1, 2:]
+                            .view(
+                                -1,
+                                getattr(agent.brain, f"{view_method}_patched_size_x"),
+                                getattr(agent.brain, f"{view_method}_patched_size_y"),
+                            )
+                            .cpu()
+                        )
+
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(neg_attention_map.mean(dim=0)),
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                        )
+
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_neg_attention_mean": [
+                                    wandb.Image(
+                                        data_or_path=fig,
+                                        caption=f"mean {view_method} neg attention heatmap",
+                                    )
+                                ]
+                            },
+                            step=self.global_step,
+                        )
+
+                        fig_list = []
+                        for head_id, am in enumerate(neg_attention_map):
+                            fig = plt.figure()
+                            sns.heatmap(
+                                torch.t(am),
+                                vmin=0,
+                                square=True,
+                                annot=True,
+                                fmt=".3f",
+                                vmax=0.25,
+                            )
+                            fig_list.append(
+                                wandb.Image(
+                                    data_or_path=fig,
+                                    caption=f"{view_method} neg attention heatmap from head {str(head_id)}",
+                                )
+                            )
+
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_neg_attention_heads": fig_list
+                            },
+                            step=self.global_step,
+                        )
+
+                        wandb.log(
+                            {
+                                f"agent_{str(agent_id)}/{view_method}_observation": [
+                                    wandb.Image(
+                                        data_or_path=image,
+                                        caption=f"{view_method} observation",
                                     )
                                 ]
                             },

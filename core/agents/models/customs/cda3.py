@@ -76,8 +76,10 @@ class CDA3(nn.Module):
         pos_out = out[:, 0]
         neg_out = out[:, 1]
 
-        pos_out = F.relu(self.pos_head(pos_out))
-        neg_out = F.relu(self.neg_head(neg_out))
+        # pos_out = F.relu(self.pos_head(pos_out))
+        # neg_out = F.relu(self.neg_head(neg_out))
+        pos_out = self.pos_head(pos_out)
+        neg_out = self.neg_head(neg_out)
         out = pos_out - neg_out
 
         return out
@@ -100,8 +102,10 @@ class CDA3(nn.Module):
         pos_out = out[:, 0]
         neg_out = out[:, 1]
 
-        pos_out = F.relu(self.pos_head(pos_out))
-        neg_out = F.relu(self.neg_head(neg_out))
+        # pos_out = F.relu(self.pos_head(pos_out))
+        # neg_out = F.relu(self.neg_head(neg_out))
+        pos_out = self.pos_head(pos_out)
+        neg_out = self.neg_head(neg_out)
         out = pos_out - neg_out
 
         return out, [attns]

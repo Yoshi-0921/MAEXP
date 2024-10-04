@@ -10,10 +10,12 @@ import numpy as np
 from omegaconf import DictConfig
 
 from core.handlers.observations import generate_observation_handler
+from core.handlers.observations.observation_handler import ObservationHandler
 from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 
 from .abstract_environment import AbstractEnvironment
+from .action import Action
 
 
 class DefaultEnvironment(AbstractEnvironment):
@@ -22,10 +24,11 @@ class DefaultEnvironment(AbstractEnvironment):
         self.observation_handler = generate_observation_handler(
             config=config, world=self.world
         )
-        self.action_space, self.observation_space = [], []
-        for _ in self.agents:
-            self.action_space.append(4)
-            self.observation_space.append(self.observation_handler.observation_space)
+        self.action_space = [4 for _ in self.agents]
+        self.observation_space = [self.observation_handler.observation_space for _ in self.agents]
+        self.view_method = config.observation_area_mask
+        self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
+
         self.init_xys = np.asarray(config.init_xys, dtype=np.int8)
         self.init_xys_order = [i for i in range(len(self.init_xys))]
         self.type_objects = config.type_objects
@@ -52,6 +55,9 @@ class DefaultEnvironment(AbstractEnvironment):
         )
         self.heatmap_accumulated_agents_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
+        )
+        self.heatmap_accumulated_observation = np.zeros(
+            shape=(self.num_agents, *self.observation_handler.observation_space), dtype=np.float32
         )
         self.current_step = 0
 
@@ -84,6 +90,9 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_agents_collision = np.zeros(
             shape=(self.world.map.SIZE_X, self.world.map.SIZE_Y), dtype=np.int32
         )
+        self.heatmap_observation = np.zeros(
+            shape=(self.num_agents, *self.observation_handler.observation_space), dtype=np.float32
+        )
 
         if self.config.shuffle_init_xys:
             random.shuffle(self.init_xys_order)
@@ -105,6 +114,11 @@ class DefaultEnvironment(AbstractEnvironment):
         obs_n = self.observation_handler.reset(self.agents)
 
         return obs_n
+
+    def generate_object_at(self, object_type: int, x: int, y: int):
+        self.world.map.objects_matrix[object_type, x, y] = 1
+        self.heatmap_objects[object_type, x, y] += 1
+        self.objects_generated += 1
 
     def generate_objects(self, num_objects: int = None, object_type: int = None):
         num_objects = num_objects or self.config.num_objects
@@ -164,17 +178,20 @@ class DefaultEnvironment(AbstractEnvironment):
         raise NotImplementedError()
 
     def action_ind(self, action: int, agent: Agent):
-        if action == 0:
+        if action == Action.RIGHT:
             agent.action = np.array([1, 0], dtype=np.int8)
 
-        elif action == 1:
+        elif action == Action.UP:
             agent.action = np.array([0, 1], dtype=np.int8)
 
-        elif action == 2:
+        elif action == Action.LEFT:
             agent.action = np.array([-1, 0], dtype=np.int8)
 
-        elif action == 3:
+        elif action == Action.DOWN:
             agent.action = np.array([0, -1], dtype=np.int8)
+
+        elif action == Action.STAY:
+            agent.action = np.array([0, 0], dtype=np.int8)
 
     def reward_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         a_pos_x, a_pos_y = self.world.map.coord2ind(agent.xy)
@@ -213,18 +230,22 @@ class DefaultEnvironment(AbstractEnvironment):
 
         return reward
 
-    def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
-        # for obj in self.world.objects:
-        #     if all(agent.xy == obj.xy):
-        #         return 1
+    def done_ind(self, agents: List[Agent], agent: Agent, agent_id: int) -> bool:
         if self.world.map.objects_matrix.sum() == 0 or self.current_step == (self.config.max_episode_length - 1):
             return True
 
         return False
 
     def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
-
-        return self.observation_handler.observation_ind(agents, agent, agent_id)
+        observation_ind = self.observation_handler.observation_ind(agents, agent, agent_id)
+        if self.view_method == "relative":
+            relative_x = ObservationHandler.decode_relative_state(
+                state=observation_ind, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+            )
+            self.heatmap_observation[agent_id] += relative_x.detach().numpy()
+        elif self.view_method == "local":
+            self.heatmap_observation[agent_id] += observation_ind["local"].detach().numpy()
+        return observation_ind
 
     def accumulate_heatmap(self):
         self.heatmap_accumulated_agents += self.heatmap_agents
@@ -233,3 +254,4 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_accumulated_objects_left += self.heatmap_objects_left
         self.heatmap_accumulated_wall_collision += self.heatmap_wall_collision
         self.heatmap_accumulated_agents_collision += self.heatmap_agents_collision
+        self.heatmap_accumulated_observation += self.heatmap_observation

@@ -39,7 +39,7 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
                 config.agent_view_method + "_agent_view_method",
                 config.object_view_method + "_object_view_method",
             ],
-            mode="offline"
+            mode="online"
         )
 
     def loss_and_update(self, batch) -> List[Dict[str, torch.Tensor]]:

@@ -23,5 +23,35 @@ config_names = {
     "MDPI_da3_dqn": "experiments/MDPI/da3_dqn",
     "MDPI_iqn": "experiments/MDPI/iqn",
     "MDPI_dqn": "experiments/MDPI/dqn",
-    "PosNeg":"experiments/PosNeg"
+    "PosNeg":"experiments/PosNeg",
+    "ada3":"experiments/ada3",
+    "AAMAS2025_hda3_iqn":"experiments/AAMAS2025/hda3",
+    "AAMAS2025_hda3_iqn_test":"experiments/AAMAS2025/hda3_test",
+    "AAMAS2025_iqn":"experiments/AAMAS2025/iqn",
+    "AAMAS2025_iqn_test":"experiments/AAMAS2025/iqn_test",
+    "AAMAS2025_iqn_2":"experiments/AAMAS2025/iqn_2",
+    "AAMAS2025_iqn_2_test":"experiments/AAMAS2025/iqn_2_test",
+    "AAMAS2025_hda3_iqn_2":"experiments/AAMAS2025/hda3_2",
+    "AAMAS2025_hda3_iqn_2_test":"experiments/AAMAS2025/hda3_2_test",
+    "AAMAS2025_hda6_iqn":"experiments/AAMAS2025/da6_iqn",
+
+    "IJCNN2025_none_dqn":"experiments/IJCNN2025/exp1/none/dqn",
+    "IJCNN2025_none_eda3_dqn":"experiments/IJCNN2025/exp1/none/eda3_dqn",
+    "IJCNN2025_none_iqn":"experiments/IJCNN2025/exp1/none/iqn",
+    "IJCNN2025_none_eda3_iqn":"experiments/IJCNN2025/exp1/none/eda3_iqn",
+
+    "IJCNN2025_gpos_dqn":"experiments/IJCNN2025/exp1/gpos/dqn",
+    "IJCNN2025_gpos_eda3_dqn":"experiments/IJCNN2025/exp1/gpos/eda3_dqn",
+    "IJCNN2025_gpos_eda6_dqn":"experiments/IJCNN2025/exp1/gpos/eda6_dqn",
+    "IJCNN2025_gpos_iqn":"experiments/IJCNN2025/exp1/gpos/iqn",
+    "IJCNN2025_gpos_eda3_iqn":"experiments/IJCNN2025/exp1/gpos/eda3_iqn",
+    "IJCNN2025_gpos_eda6_iqn":"experiments/IJCNN2025/exp1/gpos/eda6_iqn",
+
+    "IJCNN2025_goapos_dqn":"experiments/IJCNN2025/exp1/goapos/dqn",
+    "IJCNN2025_goapos_eda3_dqn":"experiments/IJCNN2025/exp1/goapos/eda3_dqn",
+    "IJCNN2025_goapos_eda6_dqn":"experiments/IJCNN2025/exp1/goapos/eda6_dqn",
+    "IJCNN2025_goapos_iqn":"experiments/IJCNN2025/exp1/goapos/iqn",
+    "IJCNN2025_goapos_eda3_iqn":"experiments/IJCNN2025/exp1/goapos/eda3_iqn",
+    "IJCNN2025_goapos_eda6_iqn":"experiments/IJCNN2025/exp1/goapos/eda6_iqn",
+
 }

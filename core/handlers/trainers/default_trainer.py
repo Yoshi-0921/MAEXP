@@ -1,12 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import torch
 import wandb
-from torch.nn import functional as F
-from torchvision.utils import make_grid
-
-from core.utils.color import RGB_COLORS
 
 from .abstract_trainer import AbstractTrainer
 
@@ -47,24 +42,7 @@ class DefaultTrainer(AbstractTrainer):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue
 
-                if self.config.destination_channel:
-                    fig = plt.figure()
-                    sns.heatmap(
-                        self.env.world.map.destination_area_matrix[agent_id].T,
-                        square=True,
-                    )
-
-                    wandb.log(
-                        {
-                            f"agent_{str(agent_id)}/destination_channel": [
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption="destination channel",
-                                )
-                            ]
-                        },
-                        step=self.global_step,
-                    )
+                self.log_destination_channel(agent_id)
 
                 images = self.env.observation_handler.render(states[agent_id])
                 for view_method, image in images.items():
@@ -114,82 +92,8 @@ class DefaultTrainer(AbstractTrainer):
             for agent in self.agents:
                 agent.synchronize_brain()
 
+        self.env.accumulate_heatmap()
         self.log_scalar()
-        if self.episode_count % (self.max_epochs // 10) == 0:
+        if (self.episode_count + 1) % max(1, self.max_epochs // 10) == 0:
             self.log_heatmap()
         self.reset()
-
-    def log_scalar(self):
-        wandb.log(
-            {
-                "episode/episode_reward": self.episode_reward_sum,
-                "episode/episode_step": self.episode_step,
-                "episode/global_step": self.global_step,
-                "episode/objects_left": self.env.objects_generated
-                - self.env.objects_completed,
-                "episode/objects_completed": self.env.objects_completed,
-                "episode/agents_collided": self.env.agents_collided,
-                "episode/walls_collided": self.env.walls_collided,
-            },
-            step=self.global_step - 1,
-        )
-
-        for agent_id, reward in enumerate(self.episode_reward_agents):
-            wandb.log(
-                {
-                    f"agent_{str(agent_id)}/episode_reward": reward,
-                },
-                step=self.global_step - 1,
-            )
-
-    def log_heatmap(self):
-        heatmap = torch.zeros(
-            self.env.num_agents, 3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y
-        )
-
-        for agent_id, color in enumerate(self.config.agents_color):
-            # add agent path information
-            heatmap_agents = (
-                0.5
-                * self.env.heatmap_agents[agent_id, ...]
-                / max(np.max(self.env.heatmap_agents[agent_id, ...]), 1)
-            )
-            heatmap_agents = np.where(
-                heatmap_agents > 0, heatmap_agents + 0.5, heatmap_agents
-            )
-            rgb = RGB_COLORS[color]
-            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
-            heatmap[agent_id] += torch.from_numpy(heatmap_agents) * rgb
-
-        # add wall information
-        heatmap[:, :, ...] += torch.from_numpy(self.env.world.map.wall_matrix)
-
-        # add objects information
-        heatmap_objects = (
-            0.8 * self.env.heatmap_objects / np.max(self.env.heatmap_objects)
-        )
-        heatmap_objects = np.where(
-            heatmap_objects > 0, heatmap_objects + 0.2, heatmap_objects
-        )
-        for heatmap_object, color in zip(heatmap_objects, self.config.objects_color):
-            rgb = RGB_COLORS[color]
-            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
-            heatmap[:, ...] += torch.from_numpy(heatmap_object) * rgb
-
-        heatmap = F.interpolate(
-            heatmap,
-            size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
-        )
-        heatmap = torch.transpose(heatmap, 2, 3)
-        heatmap = make_grid(heatmap, nrow=self.config.episode_hm_nrow)
-        wandb.log(
-            {
-                "episode/heatmap": [
-                    wandb.Image(
-                        data_or_path=heatmap,
-                        caption="Episode heatmap",
-                    )
-                ]
-            },
-            step=self.global_step - 1,
-        )
