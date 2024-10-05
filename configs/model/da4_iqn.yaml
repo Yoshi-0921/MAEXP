@@ -1,6 +1,6 @@
 model:
   name: 'da3_iqn'
-  attention: 'aoa' # 'normal', 'hard'
+  attention: 'aoa' # 'normal', 'hard', 'aoa'
   af_lambd: 0.02
   embed_dim: 64
   patch_size: 1

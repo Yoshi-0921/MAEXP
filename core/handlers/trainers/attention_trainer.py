@@ -12,6 +12,7 @@ from core.utils.logging import initialize_logging
 
 from .default_trainer import DefaultTrainer
 
+# plt.use('Agg')
 plt.rcParams["figure.facecolor"] = "white"
 plt.rcParams["savefig.facecolor"] = "white"
 sns.set()

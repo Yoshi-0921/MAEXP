@@ -5,7 +5,7 @@ defaults:
 #   - job_logging: disabled
 
 project_name: 'IJCNN25-exp'
-name: 'eDA3-IQN (local)'
+name: 'eDA4-IQN (local)'
 # name: 'Delete'
 gpu: 0
 # ==================================================
