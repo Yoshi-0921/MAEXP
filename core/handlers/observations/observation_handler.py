@@ -51,7 +51,7 @@ class ObservationHandler:
         self.observation_mask_coordinate = generate_observation_mask_coordinate(
             config=config, world=world
         )
-    
+
     @property
     def get_channel(self):
         agent_ch = self.observation_agent.get_channel()

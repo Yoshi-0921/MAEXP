@@ -31,6 +31,10 @@ class MergedObservationHandler:
         config.observation_area_mask = 'merged'
 
     @property
+    def get_channel(self):
+        return self.local_view_observation_handler.get_channel
+
+    @property
     def observation_space(self):
         return [self.local_view_observation_handler.observation_space[0], *self.relative_view_observation_handler.observation_space[1:]]
 

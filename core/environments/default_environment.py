@@ -238,7 +238,7 @@ class DefaultEnvironment(AbstractEnvironment):
 
     def observation_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
         observation_ind = self.observation_handler.observation_ind(agents, agent, agent_id)
-        if self.view_method == "relative":
+        if self.view_method in ["relative", "merged"]:
             relative_x = ObservationHandler.decode_relative_state(
                 state=observation_ind, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
             )

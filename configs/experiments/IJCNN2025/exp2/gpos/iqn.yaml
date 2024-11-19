@@ -5,19 +5,19 @@ defaults:
 #   - job_logging: disabled
 
 project_name: 'IJCNN25-exp-final'
-name: 'IQN-exp1'
+name: 'IQN-exp2'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'sequential' # default, shared_mean_reward, shared_max_reward, test, sequential
+environment: 'junctional' # default, shared_mean_reward, shared_max_reward, test, sequential, junctional
 seed: 921
 num_objects: 40
 keep_objects_num: True
-type_objects: 3
-objects_color: ["yellow", "orange", "red"]
-agent_tasks: ["0", "0", "1", "1", "1", "2", "2", "2"]
+type_objects: 5
+objects_color: ["yellow", "orange", "pink", "red", "magenta"]
+agent_tasks: ["0", "0", "12", "12", "13", "13", "4", "4"]
 # ==================================================
 # configure agent
 

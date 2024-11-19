@@ -17,16 +17,31 @@ class DA3Brain(AbstractBrain):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
         self.gamma = config.gamma
         self.observation_area_mask = config.observation_area_mask
-        setattr(
-            self,
-            f"{config.observation_area_mask}_patched_size_x",
-            obs_shape[1] // config.model.patch_size,
-        )
-        setattr(
-            self,
-            f"{config.observation_area_mask}_patched_size_y",
-            obs_shape[2] // config.model.patch_size,
-        )
+        if config.observation_area_mask == "merged":
+            self.local_patched_size_x = (
+                config.visible_range // 1  # config.model.local_patch_size
+            )
+            self.local_patched_size_y = (
+                config.visible_range // 1  # config.model.local_patch_size
+            )
+            self.relative_patched_size_x = (
+                config.map.SIZE_X // 5  # config.model.relative_patch_size
+            )
+            self.relative_patched_size_y = (
+                config.map.SIZE_Y // 5  # config.model.relative_patch_size
+            )
+
+        else:
+            setattr(
+                self,
+                f"{config.observation_area_mask}_patched_size_x",
+                obs_shape[1] // config.model.patch_size,
+            )
+            setattr(
+                self,
+                f"{config.observation_area_mask}_patched_size_y",
+                obs_shape[2] // config.model.patch_size,
+            )
 
     @torch.no_grad()
     def get_action(self, state):
@@ -77,11 +92,18 @@ class DA3Brain(AbstractBrain):
 class DA3BaselineBrain(DA3Brain):
     def __init__(self, config: DictConfig, obs_shape: List[int], act_size: int):
         super().__init__(config=config, obs_shape=obs_shape, act_size=act_size)
-        attn_size = (
-            getattr(self, f"{config.observation_area_mask}_patched_size_x")
-            * getattr(self, f"{config.observation_area_mask}_patched_size_y")
-            + 1
-        )
+        if config.observation_area_mask == "merged":
+            attn_size = (
+                getattr(self, f"local_patched_size_x")
+                * getattr(self, f"local_patched_size_y")
+                + 1
+            )
+        else:
+            attn_size = (
+                getattr(self, f"{config.observation_area_mask}_patched_size_x")
+                * getattr(self, f"{config.observation_area_mask}_patched_size_y")
+                + 1
+            )
         self.attns = [
             torch.zeros(
                 config.batch_size, config.model.num_heads, attn_size, attn_size

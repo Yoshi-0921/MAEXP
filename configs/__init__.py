@@ -54,4 +54,11 @@ config_names = {
     "IJCNN2025_goapos_eda3_iqn":"experiments/IJCNN2025/exp1/goapos/eda3_iqn",
     "IJCNN2025_goapos_eda6_iqn":"experiments/IJCNN2025/exp1/goapos/eda6_iqn",
 
+    "IJCNN2025_exp2_gpos_dqn":"experiments/IJCNN2025/exp2/gpos/dqn",
+    "IJCNN2025_exp2_gpos_eda3_dqn":"experiments/IJCNN2025/exp2/gpos/eda3_dqn",
+    "IJCNN2025_exp2_gpos_eda6_dqn":"experiments/IJCNN2025/exp2/gpos/eda6_dqn",
+    "IJCNN2025_exp2_gpos_iqn":"experiments/IJCNN2025/exp2/gpos/iqn",
+    "IJCNN2025_exp2_gpos_eda3_iqn":"experiments/IJCNN2025/exp2/gpos/eda3_iqn",
+    "IJCNN2025_exp2_gpos_eda6_iqn":"experiments/IJCNN2025/exp2/gpos/eda6_iqn",
+
 }

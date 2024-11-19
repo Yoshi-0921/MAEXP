@@ -14,8 +14,8 @@ from .customs.ada3_iqn import ADA3_IQN, MergedADA3_IQN
 from .customs.categorical_dqn import CategoricalDQN
 from .customs.cda3 import CDA3
 from .customs.cda3_iqn import CDA3_IQN
-from .customs.conv_mlp import ConvMLP
-from .customs.da3 import DA3
+from .customs.conv_mlp import ConvMLP, MergedConvMLP
+from .customs.da3 import DA3, MergedDA3
 from .customs.da3_iqn import DA3_IQN, MergedDA3_IQN
 from .customs.da6 import DA6
 from .customs.da6_iqn import DA6_IQN
@@ -37,10 +37,15 @@ def generate_network(
         network = MLP(config=config, input_size=obs_shape[0], output_size=act_size)
 
     elif config.model.name in ["conv_mlp", "da3_baseline"]:
-        network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
-
+        if config.observation_area_mask == "merged":
+            network = MergedConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
+        else:
+            network = ConvMLP(config=config, input_shape=obs_shape, output_size=act_size)
     elif config.model.name == "da3":
-        network = DA3(config=config, input_shape=obs_shape, output_size=act_size)
+        if config.observation_area_mask == "merged":
+            network = MergedDA3(config=config, input_shape=obs_shape, output_size=act_size)
+        else:
+            network = DA3(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "da3_iqn":
         if config.observation_area_mask == "merged":

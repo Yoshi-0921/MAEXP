@@ -31,7 +31,7 @@ class ConvMLP(nn.Module):
             input_channel=in_chans,
             output_channel=config.model.output_channel,
         )
-        input_size = self.get_mlp_input_size([in_chans, *input_shape[1:]])
+        input_size = ConvMLP.get_mlp_input_size(self.conv, [in_chans, *input_shape[1:]])
         self.mlp = MLP(config=config, input_size=input_size, output_size=output_size)
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
 
@@ -46,9 +46,10 @@ class ConvMLP(nn.Module):
 
         return outputs
 
-    def get_mlp_input_size(self, input_shape: List[int]):
+    @staticmethod
+    def get_mlp_input_size(conv, input_shape: List[int]) -> int:
         random_input = torch.randn(size=input_shape).unsqueeze(0)
-        outputs = self.conv(random_input)
+        outputs = conv(random_input)
 
         return outputs.view(-1).shape[0]
 
@@ -63,3 +64,45 @@ class ConvMLP(nn.Module):
             return relative_x
 
         return state[self.view_method]
+
+
+class MergedConvMLP(ConvMLP):
+    def __init__(self, config: DictConfig, input_shape: List[int], output_size: int):
+        super().__init__(config=config, input_shape=input_shape, output_size=output_size)
+        
+        self.local_conv = Conv(
+            config=config,
+            input_channel=input_shape[0],
+            output_channel=config.model.output_channel,
+        )
+        self.relative_conv = Conv(
+            config=config,
+            input_channel=1,
+            output_channel=config.model.output_channel,
+        )
+        local_embedding_dim: int = MergedConvMLP.get_mlp_input_size(self.local_conv, [input_shape[0], config.visible_range, config.visible_range])
+        relative_embedding_dim: int = MergedConvMLP.get_mlp_input_size(self.relative_conv, [1, *input_shape[1:]])
+        self.mlp = MLP(config=config, input_size=local_embedding_dim+relative_embedding_dim, output_size=output_size)
+
+    def forward(self, state):
+        local_x, relative_x = self.state_encoder(state)
+
+        relative_out = self.relative_conv(relative_x)
+        relative_state_embeddings = relative_out.view(relative_out.shape[0],-1)
+        local_out = self.local_conv(local_x)
+        local_state_embeddings = local_out.view(local_out.shape[0],-1)
+        state_embeddings = torch.cat((relative_state_embeddings, local_state_embeddings), dim=1)
+
+        outputs = self.mlp(state_embeddings)
+
+        return outputs
+
+    def state_encoder(self, state):
+        local_x = state["local"]
+        # x.shape: [1, 4, 25, 25]
+        relative_x = ObservationHandler.decode_relative_state(
+            state=state, observation_size=[self.map_SIZE_X, self.map_SIZE_Y]
+        )
+        relative_x = relative_x[:, -1:, ...]  # [1, 1, 25, 25]が欲しい
+        relative_x += 1
+        return local_x, relative_x

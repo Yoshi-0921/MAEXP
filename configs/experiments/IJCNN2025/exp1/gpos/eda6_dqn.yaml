@@ -4,8 +4,8 @@ defaults:
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'IJCNN25-exp'
-name: 'eDA6-DQN (G_pos)'
+project_name: 'IJCNN25-exp-final'
+name: 'eDA6-DQN-exp1'
 gpu: 0
 # ==================================================
 # configure environment

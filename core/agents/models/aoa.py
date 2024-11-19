@@ -42,6 +42,8 @@ class AoABlock(nn.Module):
             act_layer=act_layer,
             drop=drop,
         )
+        self.norm3 = norm_layer(dim)
+        self.norm4 = norm_layer(dim)
 
     def forward(self, x):
         # Attention section
@@ -55,7 +57,8 @@ class AoABlock(nn.Module):
 
         # Main section
         out = self.attn(x, q, k, v)
-        out = self.aoa_layer(torch.cat([out, q], -1))
+        x = x + out
+        out = self.aoa_layer(torch.cat([self.norm3(x), q], -1))
         x = x + out
         x = x + self.mlp(self.norm2(x))
         return x
@@ -72,9 +75,10 @@ class AoABlock(nn.Module):
 
         # Main section
         out, attn = self.attn.forward_attn(x, q, k, v)
+        x = x + out
 
         q = q.transpose(1, 2).reshape(B, N, C)
-        out = self.aoa_layer(torch.cat([out, q], -1))
+        out = self.aoa_layer(torch.cat([self.norm3(out), q], -1))
 
         x = x + out
         x = x + self.mlp(self.norm2(x))
