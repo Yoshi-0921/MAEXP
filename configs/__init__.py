@@ -61,4 +61,6 @@ config_names = {
     "IJCNN2025_exp2_gpos_eda3_iqn":"experiments/IJCNN2025/exp2/gpos/eda3_iqn",
     "IJCNN2025_exp2_gpos_eda6_iqn":"experiments/IJCNN2025/exp2/gpos/eda6_iqn",
 
+    "IJCNN2025_gpos_eda6_iqn_eval":"experiments/IJCNN2025/exp1/gpos/eda6_iqn_eval",
+    "IJCNN2025_exp2_gpos_eda6_iqn_eval":"experiments/IJCNN2025/exp2/gpos/eda6_iqn_eval",
 }
