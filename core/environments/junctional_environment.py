@@ -41,10 +41,6 @@ class JunctionalEnvironment(DefaultEnvironment):
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
 
-                if int(object_type) == 0:
-                    if self.config.keep_objects_num:
-                        self.generate_objects(1, 0)
-
                 if int(object_type) == 1:
                     if agent_id in [2, 3]:
                         self.generate_object_at(3, a_pos_x, a_pos_y)
