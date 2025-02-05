@@ -14,9 +14,11 @@ from .abstract_environment import AbstractEnvironment
 from .default_environment import DefaultEnvironment
 from .observation_stats_environment import ObservationStatsEnvironment
 from .sequential_environment import SequentialEnvironment
+from .junctional_environment import JunctionalEnvironment
 from .shared_reward_environment import (SharedMaxRewardEnvironment,
                                         SharedMeanRewardEnvironment)
 from .test_environment import TestEnvironment
+from .test_sequential_environment import TestSequentialEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -27,7 +29,8 @@ __all__ = [
     "SharedMeanRewardEnvironment",
     "TypesEnvironment",
     "TestEnvironment",
-    "SequentialEnvironment"
+    "SequentialEnvironment",
+    "JunctionalEnvironment"
 ]
 
 
@@ -51,6 +54,12 @@ def generate_environment(
 
     elif config.environment == "sequential":
         env = SequentialEnvironment(config=config, world=world)
+
+    elif config.environment == "junctional":
+        env = JunctionalEnvironment(config=config, world=world)
+
+    elif config.environment == "sequential_test":
+        env = TestSequentialEnvironment(config=config, world=world)
 
     else:
         logger.warn(

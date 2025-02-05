@@ -4,8 +4,8 @@ defaults:
   - opt: rmsprop
   - job_logging: disabled
 
-project_name: 'IJCNN25-exp'
-name: 'DQN (Gpos)'
+project_name: 'IJCNN25-exp-final'
+name: 'DQN-exp1'
 gpu: 0
 # ==================================================
 # configure environment
@@ -40,7 +40,7 @@ destination_channel: False
 reset_destination_period: False
 agent_view_method: 'individual' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
-observation_area_mask: 'relative' # local, relative, merged
+observation_area_mask: 'merged' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]

@@ -17,7 +17,7 @@ from .abstract_environment import AbstractEnvironment
 from .default_environment import DefaultEnvironment
 
 
-class SequentialEnvironment(DefaultEnvironment):
+class JunctionalEnvironment(DefaultEnvironment):
     def generate_objects(self, num_objects: int = None, object_type: int = None):
         num_objects = num_objects or self.config.num_objects
         self._generate_objects(num_objects)
@@ -41,7 +41,14 @@ class SequentialEnvironment(DefaultEnvironment):
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
 
-                if int(object_type) < self.config.type_objects - 1:
+                if int(object_type) == 1:
+                    if agent_id in [2, 3]:
+                        self.generate_object_at(3, a_pos_x, a_pos_y)
+                    if agent_id in [4, 5]:
+                        self.generate_object_at(2, a_pos_x, a_pos_y)
+                elif int(object_type) == 2:
+                    self.generate_object_at(4, a_pos_x, a_pos_y)
+                elif int(object_type) < self.config.type_objects - 1:
                     self.generate_object_at(int(object_type)+1, a_pos_x, a_pos_y)
                 elif int(object_type) == self.config.type_objects - 1:
                     if self.config.keep_objects_num:

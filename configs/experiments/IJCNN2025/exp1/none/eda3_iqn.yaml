@@ -5,7 +5,7 @@ defaults:
 #   - job_logging: disabled
 
 project_name: 'IJCNN25-exp'
-name: 'eDA3-IQN (local)'
+name: 'eDA3-IQN (local)-20'
 # name: 'Delete'
 gpu: 0
 # ==================================================
@@ -14,7 +14,7 @@ gpu: 0
 world: 'default' # default
 environment: 'sequential' # default, shared_mean_reward, shared_max_reward, test, observation_stats, sequential
 seed: 921
-num_objects: 40
+num_objects: 20
 keep_objects_num: True
 type_objects: 3
 objects_color: ["yellow", "orange", "red"]

@@ -16,6 +16,7 @@ from core.utils.logging import initialize_logging
 from ..hard_shrink_attention import HardShrinkBlock
 from ..vit import Block, PatchEmbed
 from .da3_iqn import DA3_IQN, IQN_Head
+from ..aoa import AoABlock
 
 logger = initialize_logging(__name__)
 
@@ -72,7 +73,11 @@ class DA6_IQN(DA3_IQN):
             )
         )
 
-        block = HardShrinkBlock if config.model.attention == "hard" else Block
+        block = Block
+        if config.model.attention == "hard":
+            block = HardShrinkBlock
+        elif config.model.attention == "aoa":
+            block = AoABlock
         self.relative_blocks = nn.ModuleList(
             [
                 block(
@@ -131,6 +136,7 @@ class DA6_IQN(DA3_IQN):
         saliency_vector = self.fc1(saliency_vector)
 
         out = self.local_patch_embed(local_x)
+        # out = torch.zeros_like(self.local_patch_embed(local_x))
         saliency_vector = saliency_vector.unsqueeze(1)
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.local_pos_embed

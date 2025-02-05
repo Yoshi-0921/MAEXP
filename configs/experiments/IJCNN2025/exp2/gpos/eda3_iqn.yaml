@@ -1,28 +1,28 @@
 defaults:
-  - model: iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn
+  - model: da3_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn
   - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
 #   - job_logging: disabled
 
 project_name: 'IJCNN25-exp-final'
-name: 'IQN-exp1'
+name: 'eDA3-IQN-exp2'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'sequential' # default, shared_mean_reward, shared_max_reward, test, sequential
+environment: 'junctional' # default, shared_mean_reward, shared_max_reward, test, observation_stats, sequential, junctional
 seed: 921
 num_objects: 40
 keep_objects_num: True
-type_objects: 3
-objects_color: ["yellow", "orange", "red"]
-agent_tasks: ["0", "0", "1", "1", "1", "2", "2", "2"]
+type_objects: 5
+objects_color: ["yellow", "orange", "pink", "red", "magenta"]
+agent_tasks: ["0", "0", "12", "12", "13", "13", "4", "4"]
 # ==================================================
 # configure agent
 
-agent_type: 'default' # default, attention
-brain: 'iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+agent_type: 'attention' # default, attention
+brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
 num_agents: 8
 episode_hm_nrow: 4
 agents_color: ["blue", "blue", "green", "green", "green", "dodger_blue", "dodger_blue", "dodger_blue" ]
@@ -50,8 +50,8 @@ past_step: 3 # used for transition view method
 # ==================================================
 # configure training
 
-trainer: 'default' # default, attention
-evaluator: 'default' # default, attention, da3_video, da3_wandering_video
+trainer: 'attention' # default, attention
+evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
 max_episode_length: 200
 batch_size: 32

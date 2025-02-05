@@ -12,6 +12,7 @@ from core.utils.logging import initialize_logging
 
 from .default_trainer import DefaultTrainer
 
+# plt.use('Agg')
 plt.rcParams["figure.facecolor"] = "white"
 plt.rcParams["savefig.facecolor"] = "white"
 sns.set()
@@ -118,136 +119,9 @@ class AttentionTrainer(DefaultTrainer):
                             step=self.global_step,
                         )
                         continue
-
-                    # TODO Remove this code - cda3 exp
-                    if False:
-                        pos_attention_map = (
-                            attention_map.mean(dim=0)[0, :, 0, 2:]
-                            .view(
-                                -1,
-                                getattr(agent.brain, f"{view_method}_patched_size_x"),
-                                getattr(agent.brain, f"{view_method}_patched_size_y"),
-                            )
-                            .cpu()
-                        )
-
-                        fig = plt.figure()
-                        sns.heatmap(
-                            torch.t(pos_attention_map.mean(dim=0)),
-                            vmin=0,
-                            square=True,
-                            annot=True,
-                            fmt=".3f",
-                            vmax=0.25,
-                        )
-
-                        wandb.log(
-                            {
-                                f"agent_{str(agent_id)}/{view_method}_pos_attention_mean": [
-                                    wandb.Image(
-                                        data_or_path=fig,
-                                        caption=f"mean {view_method} pos attention heatmap",
-                                    )
-                                ]
-                            },
-                            step=self.global_step,
-                        )
-
-                        fig_list = []
-                        for head_id, am in enumerate(pos_attention_map):
-                            fig = plt.figure()
-                            sns.heatmap(
-                                torch.t(am),
-                                vmin=0,
-                                square=True,
-                                annot=True,
-                                fmt=".3f",
-                                vmax=0.25,
-                            )
-                            fig_list.append(
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption=f"{view_method} pos attention heatmap from head {str(head_id)}",
-                                )
-                            )
-
-                        wandb.log(
-                            {
-                                f"agent_{str(agent_id)}/{view_method}_pos_attention_heads": fig_list
-                            },
-                            step=self.global_step,
-                        )
-
-                        neg_attention_map = (
-                            attention_map.mean(dim=0)[0, :, 1, 2:]
-                            .view(
-                                -1,
-                                getattr(agent.brain, f"{view_method}_patched_size_x"),
-                                getattr(agent.brain, f"{view_method}_patched_size_y"),
-                            )
-                            .cpu()
-                        )
-
-                        fig = plt.figure()
-                        sns.heatmap(
-                            torch.t(neg_attention_map.mean(dim=0)),
-                            vmin=0,
-                            square=True,
-                            annot=True,
-                            fmt=".3f",
-                            vmax=0.25,
-                        )
-
-                        wandb.log(
-                            {
-                                f"agent_{str(agent_id)}/{view_method}_neg_attention_mean": [
-                                    wandb.Image(
-                                        data_or_path=fig,
-                                        caption=f"mean {view_method} neg attention heatmap",
-                                    )
-                                ]
-                            },
-                            step=self.global_step,
-                        )
-
-                        fig_list = []
-                        for head_id, am in enumerate(neg_attention_map):
-                            fig = plt.figure()
-                            sns.heatmap(
-                                torch.t(am),
-                                vmin=0,
-                                square=True,
-                                annot=True,
-                                fmt=".3f",
-                                vmax=0.25,
-                            )
-                            fig_list.append(
-                                wandb.Image(
-                                    data_or_path=fig,
-                                    caption=f"{view_method} neg attention heatmap from head {str(head_id)}",
-                                )
-                            )
-
-                        wandb.log(
-                            {
-                                f"agent_{str(agent_id)}/{view_method}_neg_attention_heads": fig_list
-                            },
-                            step=self.global_step,
-                        )
-
-                        wandb.log(
-                            {
-                                f"agent_{str(agent_id)}/{view_method}_observation": [
-                                    wandb.Image(
-                                        data_or_path=image,
-                                        caption=f"{view_method} observation",
-                                    )
-                                ]
-                            },
-                            step=self.global_step,
-                        )
+                    
+                    if view_method=="relative":
                         continue
-
                     attention_map = (
                         attention_map.mean(dim=0)[0, :, 0, 1:]
                         .view(

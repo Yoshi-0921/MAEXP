@@ -1,17 +1,17 @@
 defaults:
-  - model: iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn
+  - model: da6_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn
   - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
 #   - job_logging: disabled
 
 project_name: 'IJCNN25-exp-final'
-name: 'IQN-exp1'
+name: 'eDA6-IQN-exp1-class-agent'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'sequential' # default, shared_mean_reward, shared_max_reward, test, sequential
+environment: 'sequential_test' # default, shared_mean_reward, shared_max_reward, test, observation_stats, sequential, sequential_test
 seed: 921
 num_objects: 40
 keep_objects_num: True
@@ -21,15 +21,15 @@ agent_tasks: ["0", "0", "1", "1", "1", "2", "2", "2"]
 # ==================================================
 # configure agent
 
-agent_type: 'default' # default, attention
-brain: 'iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
+agent_type: 'attention' # default, attention
+brain: 'da3_iqn' # dqn, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf
 num_agents: 8
 episode_hm_nrow: 4
 agents_color: ["blue", "blue", "green", "green", "green", "dodger_blue", "dodger_blue", "dodger_blue" ]
 init_xys: [[-2, 2], [2, 2], [-2, -2], [2, -2], [0, 2], [0, -2], [2, 0], [-2, 0]]
-shuffle_init_xys: True
+shuffle_init_xys: False
 agents_channel: False
-phase: 'training' # training, evaluation
+phase: 'evaluation' # training, evaluation
 # ==================================================
 # configure observation
 
@@ -45,15 +45,15 @@ observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, fl
 noise_threshold_ratio: 0
 flip_noise_probabilities: [0.2, 0.1, 0.05]
 std_distribution: [0.07, 0.05, 0.03]
-past_step: 3 # used for transition view method
+past_step: 3
 
 # ==================================================
 # configure training
 
-trainer: 'default' # default, attention
-evaluator: 'default' # default, attention, da3_video, da3_wandering_video
+trainer: 'attention' # default, attention
+evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
-max_episode_length: 200
+max_episode_length: 1
 batch_size: 32
 populate_steps: 1000
 buffer: 'default' # default, recurrent
@@ -66,6 +66,6 @@ epsilon_end: 0.05
 # ==================================================
 # configre evaluation
 
-validate_epochs: 1000
-pretrained_weight_path: False
-save_pdf_figs: False
+validate_epochs: 1
+pretrained_weight_path: "yoshi-0921/IJCNN25-exp-final/2xip7cas.pth:v11"
+save_pdf_figs: True

@@ -18,6 +18,7 @@ from ..mlp import MLP
 from ..vit import Block, PatchEmbed
 from ..aoa import AoABlock
 from .iqn import CosineEmbeddingNetwork
+from ..convolution import Conv
 
 logger = initialize_logging(__name__)
 
@@ -216,12 +217,6 @@ class MergedDA3_IQN(DA3_IQN):
             config=config, input_shape=input_shape, output_size=output_size
         )
         self.visible_range = config.visible_range
-        relative_patched_size_x = (
-            input_shape[1] // 5
-        )  # config.model.relative_patch_size
-        relative_patched_size_y = (
-            input_shape[2] // 5
-        )  # config.model.relative_patch_size
         local_patched_size_x = (
             config.visible_range // 1
         )  # config.model.local_patch_size
@@ -230,29 +225,14 @@ class MergedDA3_IQN(DA3_IQN):
         )  # config.model.local_patch_size
         self.map_SIZE_X, self.map_SIZE_Y = config.map.SIZE_X, config.map.SIZE_Y
 
-        self.relative_patch_embed = PatchEmbed(
-            patch_size=5,  # config.model.relative_patch_size,
-            in_chans=1,
-            embed_dim=config.model.embed_dim,
-        )
         self.local_patch_embed = PatchEmbed(
             patch_size=1,  # config.model.local_patch_size,
             in_chans=input_shape[0],
             embed_dim=config.model.embed_dim,
         )
 
-        self.relative_saliency_vector = nn.Parameter(
-            torch.zeros(1, 1, config.model.embed_dim)
-        )
         self.local_saliency_vector = nn.Parameter(
             torch.zeros(1, 1, config.model.embed_dim)
-        )
-        self.relative_pos_embed = nn.Parameter(
-            torch.zeros(
-                1,
-                relative_patched_size_x * relative_patched_size_y + 1,
-                config.model.embed_dim,
-            )
         )
         self.local_pos_embed = nn.Parameter(
             torch.zeros(
@@ -263,17 +243,6 @@ class MergedDA3_IQN(DA3_IQN):
         )
 
         block = HardShrinkBlock if config.model.attention == "hard" else Block
-        self.relative_blocks = nn.ModuleList(
-            [
-                block(
-                    dim=config.model.embed_dim,
-                    num_heads=config.model.num_heads,
-                    mlp_ratio=config.model.mlp_ratio,
-                    **{"af_lambd": config.model.af_lambd}
-                )
-                for _ in range(config.model.block_loop)
-            ]
-        )
         self.local_blocks = nn.ModuleList(
             [
                 block(
@@ -287,9 +256,26 @@ class MergedDA3_IQN(DA3_IQN):
         )
 
         self.norm = nn.LayerNorm(config.model.embed_dim)
-        self.drl_head = IQN_Head(
-            config=config, embedding_dim=self.embedding_dim * 2, output_size=output_size
+
+        self.relative_conv = Conv(
+            config=config,
+            input_channel=1,
+            output_channel=config.model.output_channel,
         )
+        relative_embedding_dim: int = MergedDA3_IQN.get_mlp_input_size(self.relative_conv, [1, *input_shape[1:]])
+        self.relative_state_embedder = MLP(
+            config=config, input_size=relative_embedding_dim, output_size=relative_embedding_dim
+        )
+        self.drl_head = IQN_Head(
+            config=config, embedding_dim=self.embedding_dim+relative_embedding_dim, output_size=output_size
+        )
+
+    @staticmethod
+    def get_mlp_input_size(conv, input_shape: List[int]) -> int:
+        random_input = torch.randn(size=input_shape).unsqueeze(0)
+        outputs = conv(random_input)
+
+        return outputs.view(-1).shape[0]
 
     def forward_attn(self, state, external_taus: torch.Tensor = None):
         saliency_vector, local_attns, relative_attns = self.get_saliency_vector(
@@ -305,20 +291,9 @@ class MergedDA3_IQN(DA3_IQN):
     def get_saliency_vector(self, state, output_attns: bool = False):
         local_x, relative_x = self.state_encoder(state)
 
-        out = self.relative_patch_embed(relative_x)
-        relative_saliency_vector = self.relative_saliency_vector.expand(
-            out.shape[0], -1, -1
-        )
-        out = torch.cat((relative_saliency_vector, out), dim=1)
-        out = out + self.relative_pos_embed
-
-        relative_attns: List[npt.NDArray[np.float32]] = list()
-        for blk in self.relative_blocks:
-            out, attn = blk.forward_attn(out)
-            relative_attns.append(attn.detach())
-
-        out = self.norm(out)
-        relative_saliency_vector = out[:, 0]
+        relative_out = self.relative_conv(relative_x)
+        relative_out = relative_out.view(relative_out.shape[0], -1)
+        relative_saliency_vector = self.relative_state_embedder(relative_out)
 
         out = self.local_patch_embed(local_x)
         local_saliency_vector = self.local_saliency_vector.expand(out.shape[0], -1, -1)
@@ -339,7 +314,8 @@ class MergedDA3_IQN(DA3_IQN):
         )
 
         if output_attns:
-            return saliency_vector, local_attns, relative_attns
+            # return saliency_vector, local_attns, relative_attns
+            return saliency_vector, local_attns, local_attns
 
         return saliency_vector
 

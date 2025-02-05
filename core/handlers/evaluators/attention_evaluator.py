@@ -48,13 +48,13 @@ class AttentionEvaluator(DefaultEvaluator):
 
         log_step = self.max_episode_length // 2
         if (epoch + 1) % max(1, self.max_epochs // 5) == 0 and step in [
-            log_step - 3,
-            log_step - 2,
-            log_step - 1,
+            # log_step - 3,
+            # log_step - 2,
+            # log_step - 1,
             log_step,
-            log_step + 1,
-            log_step + 2,
-            log_step + 3,
+            # log_step + 1,
+            # log_step + 2,
+            # log_step + 3,
         ]:
             for agent_id, agent in enumerate(self.agents):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
