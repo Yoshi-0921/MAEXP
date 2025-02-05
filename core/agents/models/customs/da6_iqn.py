@@ -136,6 +136,7 @@ class DA6_IQN(DA3_IQN):
         saliency_vector = self.fc1(saliency_vector)
 
         out = self.local_patch_embed(local_x)
+        # out = torch.zeros_like(self.local_patch_embed(local_x))
         saliency_vector = saliency_vector.unsqueeze(1)
         out = torch.cat((saliency_vector, out), dim=1)
         out = out + self.local_pos_embed

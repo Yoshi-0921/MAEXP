@@ -18,6 +18,7 @@ from .junctional_environment import JunctionalEnvironment
 from .shared_reward_environment import (SharedMaxRewardEnvironment,
                                         SharedMeanRewardEnvironment)
 from .test_environment import TestEnvironment
+from .test_sequential_environment import TestSequentialEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -56,6 +57,9 @@ def generate_environment(
 
     elif config.environment == "junctional":
         env = JunctionalEnvironment(config=config, world=world)
+
+    elif config.environment == "sequential_test":
+        env = TestSequentialEnvironment(config=config, world=world)
 
     else:
         logger.warn(
