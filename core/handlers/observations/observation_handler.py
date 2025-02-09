@@ -104,7 +104,8 @@ class ObservationHandler:
             ),
         }
         if agent.status != {}:
-            obs_res.update({f"status_{key}":torch.stack([agent_ind.status[key] for agent_ind in agents]) for key in agent.status.keys()})
+            obs_res.update({f"status_{key}":torch.Tensor(deepcopy([agent_ind.status[key] for agent_ind in agents])) for key in agent.status.keys()})
+        
         return obs_res
 
     def observation_area_fill(self, agents, agent, agent_id, area_mask, coordinates):

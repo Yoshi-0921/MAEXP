@@ -63,4 +63,7 @@ config_names = {
 
     "Elservier_eda6_iqn":"experiments/Elservier/exp1/eda6_iqn",
     "Elservier_eda6_iqn_eval":"experiments/Elservier/exp1/eda6_iqn_eval",
+
+    "Elservier_exp2_eda6_iqn":"experiments/Elservier/exp2/eda6_iqn",
+    "Elservier_exp2_eda6_iqn_eval":"experiments/Elservier/exp2/eda6_iqn_eval",
 }
