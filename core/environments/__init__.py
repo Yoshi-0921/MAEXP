@@ -17,6 +17,8 @@ from .sequential_environment import SequentialEnvironment
 from .junctional_environment import JunctionalEnvironment
 from .shared_reward_environment import (SharedMaxRewardEnvironment,
                                         SharedMeanRewardEnvironment)
+from .observer_environment import ObserverEnvironment
+from .healer_environment import HealerEnvironment
 from .test_environment import TestEnvironment
 from .test_sequential_environment import TestSequentialEnvironment
 
@@ -30,7 +32,9 @@ __all__ = [
     "TypesEnvironment",
     "TestEnvironment",
     "SequentialEnvironment",
-    "JunctionalEnvironment"
+    "JunctionalEnvironment",
+    "ObserverEnvironment",
+    "HealerEnvironment"
 ]
 
 
@@ -60,6 +64,12 @@ def generate_environment(
 
     elif config.environment == "sequential_test":
         env = TestSequentialEnvironment(config=config, world=world)
+
+    elif config.environment == "observer":
+        env = ObserverEnvironment(config=config, world=world)
+
+    elif config.environment == "healer":
+        env = HealerEnvironment(config=config, world=world)
 
     else:
         logger.warn(
