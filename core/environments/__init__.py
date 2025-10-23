@@ -21,6 +21,7 @@ from .observer_environment import ObserverEnvironment
 from .healer_environment import HealerEnvironment
 from .test_environment import TestEnvironment
 from .test_sequential_environment import TestSequentialEnvironment
+from .test_healer_environment import TestHealerEnvironment
 
 logger = initialize_logging(__name__)
 
@@ -34,7 +35,8 @@ __all__ = [
     "SequentialEnvironment",
     "JunctionalEnvironment",
     "ObserverEnvironment",
-    "HealerEnvironment"
+    "HealerEnvironment",
+    "TestHealerEnvironment"
 ]
 
 
@@ -70,6 +72,9 @@ def generate_environment(
 
     elif config.environment == "healer":
         env = HealerEnvironment(config=config, world=world)
+    
+    elif config.environment == "healer_test":
+        env = TestHealerEnvironment(config=config, world=world)
 
     else:
         logger.warn(

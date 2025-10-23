@@ -5,7 +5,7 @@ defaults:
 #   - job_logging: disabled
 
 project_name: 'Elservier-exp'
-name: 'eDA6-IQN-exp1'
+name: 'eDA6-IQN-exp1-AposOPos-fixed'
 gpu: 0
 # ==================================================
 # configure environment
@@ -35,7 +35,7 @@ phase: 'training' # training, evaluation
 
 visible_range: 7 # currently only 5, 7, 9 are suppoeted
 transparent_observation: False
-objects_channel: False
+objects_channel: True
 destination_channel: False
 reset_destination_period: False
 agent_view_method: 'individual' # default, self, simple, transition, individual, individual_transition

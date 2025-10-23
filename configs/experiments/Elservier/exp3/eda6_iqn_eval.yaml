@@ -1,17 +1,17 @@
 defaults:
-  - model: da6_iqn_status # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn, da6_iqn_status
+  - model: da6_iqn # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond, cda3, cda3_iqn, da6_iqn_status
   - map: central_room # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms
   - opt: rmsprop
 #   - job_logging: disabled
 
 project_name: 'Elservier-exp'
-name: 'eDA6-IQN-exp2-Agent2'
+name: 'eDA6-IQN-exp3'
 gpu: 0
 # ==================================================
 # configure environment
 
 world: 'default' # default
-environment: 'healer_test' # default, shared_mean_reward, shared_max_reward, test, observation_stats, sequential
+environment: 'healer' # default, shared_mean_reward, shared_max_reward, test, observation_stats, sequential
 seed: 921
 num_objects: 40
 keep_objects_num: True
@@ -53,7 +53,7 @@ past_step: 3
 trainer: 'attention' # default, attention
 evaluator: 'attention' # default, attention, da3_video, da3_wandering_video
 max_epochs: 5000
-max_episode_length: 7
+max_episode_length: 200
 batch_size: 32
 populate_steps: 1000
 buffer: 'default' # default, recurrent
@@ -66,6 +66,6 @@ epsilon_end: 0.05
 # ==================================================
 # configre evaluation
 
-validate_epochs: 1
-pretrained_weight_path: "yoshi-0921/Elservier-exp/mso9g6bt.pth:v11"
+validate_epochs: 1000
+pretrained_weight_path: ""
 save_pdf_figs: True
