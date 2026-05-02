@@ -39,29 +39,19 @@ class DestinationAreaHandler(ABC):
 
 class StandardDestinationHandler(DestinationAreaHandler):
     """Handler for standard 3D destination matrix (num_agents, SIZE_X, SIZE_Y)."""
-    
-    def __init__(self, config: DictConfig, world: AbstractWorld):
-        super().__init__(config, world)
-        self.matrix = world.map.destination_area_matrix
-    
     def get_destination(self, agent_id: int) -> torch.Tensor:
         """Get destination from standard matrix format."""
         return torch.from_numpy(
-            deepcopy(self.matrix[agent_id, :, :])
+            deepcopy(self.world.map.destination_area_matrix[agent_id, :, :])
         )
 
 
 class TensorDestinationHandler(DestinationAreaHandler):
     """Handler for tensor-based destination matrix (num_agents, tensor_features)."""
-    
-    def __init__(self, config: DictConfig, world: AbstractWorld):
-        super().__init__(config, world)
-        self.matrix = world.map.destination_area_matrix2
-    
     def get_destination(self, agent_id: int) -> torch.Tensor:
         """Get destination from tensor-based matrix format."""
         return torch.from_numpy(
-            deepcopy(self.matrix[agent_id, :])
+            deepcopy(self.world.map.destination_area_vector[agent_id, :])
         )
 
 
@@ -77,8 +67,7 @@ def generate_destination_handler(
     Returns:
         DestinationAreaHandler: Appropriate handler for the destination matrix type
     """
-    # Check if the map has destination_area_matrix2 (tensor-based)
-    if hasattr(world.map, 'destination_area_matrix2') and world.map.destination_area_matrix2 is not None:
+    if hasattr(world.map, 'destination_area_vector') and world.map.destination_area_vector is not None:
         handler = TensorDestinationHandler(config, world)
         logger.info("Using TensorDestinationHandler for destination areas")
     else:

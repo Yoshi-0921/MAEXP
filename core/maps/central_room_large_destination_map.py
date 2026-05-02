@@ -12,7 +12,9 @@ from .central_room_large_map import CentralRoomLargeMap
 
 class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
     def __init__(self, config: DictConfig, size_x: int, size_y: int):
-        self.destination_area_matrix2 = np.zeros(shape=(8, 384))
+        self.destination_area_vector = np.zeros(shape=(config.num_agents, 384))
+        self.specified_object_types = ["0" for _ in range(config.num_agents)]
+        self.type_objects = config.type_objects
         root_dir = "/home/motokawa/projects/MAEXP/configs/experiments/TextStrat/tensors/"
         top_tensors = torch.load(root_dir + "top_tensor")
         bottom_tensors = torch.load(root_dir + "bottom_tensor")
@@ -30,5 +32,7 @@ class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
 
         for agent_id in range(self.num_agents):
             area_id = random.choice(range(len(destination_area)))
+            object_type = random.choice(range(self.type_objects))  # Randomly assign object type
             self.destination_area_matrix[agent_id] = destination_area[area_id]
-            self.destination_area_matrix2[agent_id] = random.choice(self.tensors[area_id])
+            self.destination_area_vector[agent_id] = random.choice(self.tensors[area_id])
+            self.specified_object_types[agent_id] = str(object_type)

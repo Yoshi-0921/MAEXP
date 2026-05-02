@@ -198,10 +198,16 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_agents[agent_id, a_pos_x, a_pos_y] += 1
 
         reward = 0.0
-        if self.agent_tasks[agent_id] == "-1":
+
+        if hasattr(self.world.map, 'specified_object_types'):
+            agent_tasks = self.world.map.specified_object_types[agent_id]
+        else:
+            agent_tasks = self.agent_tasks[agent_id]
+
+        if agent_tasks == "-1":
             return reward
 
-        for object_type in self.agent_tasks[agent_id]:
+        for object_type in agent_tasks:
             if (
                 self.world.map.objects_matrix[int(object_type), a_pos_x, a_pos_y]
                 == self.world.map.destination_area_matrix[agent_id][a_pos_x, a_pos_y]
