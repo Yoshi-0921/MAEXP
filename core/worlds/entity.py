@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 """Source code for Entity object.
 
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from abc import ABC
-
+from typing import Dict, Any
 import numpy as np
 
 
@@ -50,3 +48,4 @@ class Agent(Entity):
         self.collide_walls: bool = False
         self.collide_agents: bool = False
         self.action = np.zeros(2, dtype=np.int8)
+        self.status: Dict[str: Any] = dict()

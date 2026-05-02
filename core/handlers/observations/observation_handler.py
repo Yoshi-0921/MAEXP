@@ -14,6 +14,7 @@ from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 
 from .agents import generate_observation_agent
+from .destination_handler import generate_destination_handler
 from .masks import (generate_observation_area_mask,
                     generate_observation_mask_coordinate)
 from .noises import generate_observation_noise
@@ -49,6 +50,9 @@ class ObservationHandler:
             config=config, world=world, observation_space=self.observation_space
         )
         self.observation_mask_coordinate = generate_observation_mask_coordinate(
+            config=config, world=world
+        )
+        self.destination_handler = generate_destination_handler(
             config=config, world=world
         )
 
@@ -92,17 +96,19 @@ class ObservationHandler:
         # add observation noise
         obs = self.fill_obs_noise(obs, agent, agent_id)
 
-        return {
+        obs_res = {
             self.view_method: obs,
             "coordinates": coordinates,
             "agents": torch.stack([torch.from_numpy(self.world.map.coord2ind(agent_ind.xy)) for agent_ind in agents]),
             "objects": torch.from_numpy(
                 deepcopy(self.world.map.objects_matrix)
             ),
-            "destination": torch.from_numpy(
-                deepcopy(self.world.map.destination_area_matrix[agent_id, :, :])
-            )
+            "destination": self.destination_handler.get_destination(agent_id),
         }
+        if agent.status != {}:
+            obs_res.update({f"status_{key}":torch.Tensor(deepcopy([agent_ind.status[key] for agent_ind in agents])) for key in agent.status.keys()})
+        
+        return obs_res
 
     def observation_area_fill(self, agents, agent, agent_id, area_mask, coordinates):
         return torch.from_numpy(area_mask).unsqueeze(0).float() - 1

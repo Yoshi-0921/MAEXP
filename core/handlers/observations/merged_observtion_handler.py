@@ -49,7 +49,17 @@ class MergedObservationHandler:
     def render(self, state: torch.Tensor) -> torch.Tensor:
         local_image = self.local_view_observation_handler.render(state)
         relative_image = self.relative_view_observation_handler.render(state)
-        return {**local_image, **relative_image}
+
+
+        images = {**local_image, **relative_image}
+
+        # output status image here
+        for obs_key in state.keys():
+            if "status_" in obs_key:
+                obs = state[obs_key].view(1, 3, 3)
+                images[obs_key] = torch.clamp(obs / 10, min=0., max=1.)
+
+        return images
 
     def reset(self, agents: List[Agent]) -> torch.Tensor:
         local_obs_n = self.local_view_observation_handler.reset(agents)

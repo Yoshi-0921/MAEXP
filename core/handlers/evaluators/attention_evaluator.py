@@ -48,13 +48,13 @@ class AttentionEvaluator(DefaultEvaluator):
 
         log_step = self.max_episode_length // 2
         if (epoch + 1) % max(1, self.max_epochs // 5) == 0 and step in [
-            # log_step - 3,
-            # log_step - 2,
-            # log_step - 1,
+            log_step - 3,
+            log_step - 2,
+            log_step - 1,
             log_step,
-            # log_step + 1,
-            # log_step + 2,
-            # log_step + 3,
+            log_step + 1,
+            log_step + 2,
+            log_step + 3,
         ]:
             for agent_id, agent in enumerate(self.agents):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
@@ -106,15 +106,41 @@ class AttentionEvaluator(DefaultEvaluator):
                         )
                         continue
 
-                    attention_map = (
-                        attention_map.mean(dim=0)[0, :, 0, 1:]
-                        .view(
-                            -1,
-                            getattr(agent.brain, f"{view_method}_patched_size_x"),
-                            getattr(agent.brain, f"{view_method}_patched_size_y"),
+                    elif view_method == "status_remains":
+                        attention_map = (
+                            attention_map.mean(dim=0)[0, :, 0, 1:]
+                            .view(
+                                -1,
+                                3,
+                                3,
+                            )
+                            .cpu()
                         )
-                        .cpu()
-                    )
+                        fig = plt.figure()
+                        sns.heatmap(
+                            torch.t(image.mean(dim=0)),
+                            cmap='PuBu',
+                            linecolor='black',
+                            linewidths=.1,
+                            vmin=0,
+                            square=True,
+                            annot=True,
+                            fmt=".3f",
+                            vmax=0.25,
+                            annot_kws={"fontsize": 12},
+                        )
+                        image = fig
+
+                    else:
+                        attention_map = (
+                            attention_map.mean(dim=0)[0, :, 0, 1:]
+                            .view(
+                                -1,
+                                getattr(agent.brain, f"{view_method}_patched_size_x"),
+                                getattr(agent.brain, f"{view_method}_patched_size_y"),
+                            )
+                            .cpu()
+                        )
                     fig = plt.figure()
                     sns.heatmap(
                         torch.t(attention_map.mean(dim=0)),
