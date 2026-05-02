@@ -66,4 +66,7 @@ config_names = {
     "Elservier_exp2_eda6_iqn_eval":"experiments/Elservier/exp2/eda6_iqn_eval",
     "Elservier_exp3_eda6_iqn":"experiments/Elservier/exp3/eda6_iqn",
     "Elservier_exp3_eda6_iqn_eval":"experiments/Elservier/exp3/eda6_iqn_eval",
+
+    "TextStrat_da6_iqn":"experiments/TextStrat/new_da6_iqn",
+    "TextStrat_da6_iqn_eval":"experiments/TextStrat/new_da6_iqn_eval"
 }

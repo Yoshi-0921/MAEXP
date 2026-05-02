@@ -20,6 +20,7 @@ from .customs.da3_iqn import DA3_IQN, MergedDA3_IQN
 from .customs.da6 import DA6
 from .customs.da6_iqn import DA6_IQN
 from .customs.da6_iqn_cond import DA6_IQN_Cond
+from .customs.da6_iqn_textStrat import DA6_IQN_TextStrat
 from .customs.dra3_dqn import DRA3_DQN
 from .customs.dra3_iqn import DRA3_IQN
 from .customs.fqf import FQF
@@ -79,6 +80,9 @@ def generate_network(
 
     elif config.model.name == "da6_iqn_cond":
         network = DA6_IQN_Cond(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "da6_iqn_textStrat":
+        network = DA6_IQN_TextStrat(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "dra3_iqn":
         network = DRA3_IQN(config=config, input_shape=obs_shape, output_size=act_size)

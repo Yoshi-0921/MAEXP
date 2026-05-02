@@ -73,6 +73,7 @@ class AttentionTrainer(DefaultTrainer):
         if epoch % (self.max_epochs // 10) == 0 and step == (
             self.max_episode_length // 2
         ):
+            self.log_world()
             self.save_state_dict(epoch=epoch)
             for agent_id, agent in enumerate(self.agents):
                 if self.config.agent_tasks[int(agent_id)] == "-1":

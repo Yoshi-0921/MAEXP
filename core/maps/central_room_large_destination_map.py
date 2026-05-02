@@ -3,128 +3,32 @@
 Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 import random
-
+import torch
 import numpy as np
+from omegaconf import DictConfig
 
 from .central_room_large_map import CentralRoomLargeMap
 
 
 class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
+    def __init__(self, config: DictConfig, size_x: int, size_y: int):
+        self.destination_area_matrix2 = np.zeros(shape=(8, 384))
+        root_dir = "/home/motokawa/projects/MAEXP/configs/experiments/TextStrat/tensors/"
+        top_tensors = torch.load(root_dir + "top_tensor")
+        bottom_tensors = torch.load(root_dir + "bottom_tensor")
+        right_tensors = torch.load(root_dir + "right_tensor")
+        left_tensors = torch.load(root_dir + "left_tensor")
+        self.tensors = [left_tensors,right_tensors,top_tensors,bottom_tensors]
+        super().__init__(config=config,size_x=size_x,size_y=size_y)
+
     def reset_destination_area(self):
         destination_area = [np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8) for _ in range(4)]
-        destination_area[0][: self.SIZE_X // 2, :] = 1
-        destination_area[1][self.SIZE_X // 2:, :] = 1
-        destination_area[2][:, : self.SIZE_Y // 2] = 1
-        destination_area[3][:, self.SIZE_Y // 2:] = 1
-        # destination_area[0][: self.SIZE_X // 2, : self.SIZE_Y // 2] = 1
-        # destination_area[1][self.SIZE_X // 2:, : self.SIZE_Y // 2] = 1
-        # destination_area[2][: self.SIZE_X // 2, self.SIZE_Y // 2:] = 1
-        # destination_area[3][self.SIZE_X // 2:, self.SIZE_Y // 2:] = 1
-        random.shuffle(destination_area)
+        destination_area[0][: self.SIZE_X // 2, :] = 1  # left half
+        destination_area[1][self.SIZE_X // 2:, :] = 1  # right half
+        destination_area[2][:, : self.SIZE_Y // 2] = 1  # top half
+        destination_area[3][:, self.SIZE_Y // 2:] = 1  # bottom half
 
         for agent_id in range(self.num_agents):
-            self.destination_area_matrix[agent_id] = random.choice(destination_area)
-
-        # half 1
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[: self.SIZE_X // 2, :] = 1
-        # self.destination_area_matrix[0] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :] = 1
-        # self.destination_area_matrix[1] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, : self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[2] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[3] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[: self.SIZE_X // 2, :] = 1
-        # self.destination_area_matrix[4] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :] = 1
-        # self.destination_area_matrix[5] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, : self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[6] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[7] = destination_area
-
-        # half 2
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :] = 1
-        # self.destination_area_matrix[0] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[: self.SIZE_X // 2, :] = 1
-        # self.destination_area_matrix[1] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[2] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, : self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[3] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :] = 1
-        # self.destination_area_matrix[4] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[: self.SIZE_X // 2, :] = 1
-        # self.destination_area_matrix[5] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[6] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:, : self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[7] = destination_area
-
-        # quarter 1
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[0] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[1] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[2] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[3] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[4] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[5] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[6] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[7] = destination_area
-
-        # quarter 2
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[0] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[1] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[2] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[3] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, :self.SIZE_Y // 2] = 1
-        # self.destination_area_matrix[4] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[5] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[:self.SIZE_X // 2, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[6] = destination_area
-        # destination_area = np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8)
-        # destination_area[self.SIZE_X // 2:, self.SIZE_Y // 2:] = 1
-        # self.destination_area_matrix[7] = destination_area
+            area_id = random.choice(range(len(destination_area)))
+            self.destination_area_matrix[agent_id] = destination_area[area_id]
+            self.destination_area_matrix2[agent_id] = random.choice(self.tensors[area_id])

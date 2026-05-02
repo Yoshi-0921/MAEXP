@@ -543,3 +543,38 @@ class AbstractLoopHandler(ABC):
         )
         logger.info(f"agents_observation/agents_correlation:")
         logger.info(agents_correlation)
+
+    def log_world(self):
+        image = torch.zeros(3, self.env.world.map.SIZE_X, self.env.world.map.SIZE_Y)
+
+        # add agent information
+        for agent_id, color in enumerate(self.config.agents_color):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            image += torch.from_numpy(self.env.world.map.agents_matrix[agent_id]) * rgb
+
+        # add wall information
+        image += torch.from_numpy(self.env.world.map.wall_matrix)
+
+        # add objects information
+        for object_id, color in enumerate(self.config.objects_color):
+            rgb = RGB_COLORS[color]
+            rgb = np.expand_dims(np.asarray(rgb), axis=(1, 2))
+            image+= torch.from_numpy(self.env.world.map.objects_matrix[object_id]) * rgb
+
+        image = F.interpolate(
+            image.unsqueeze(0),
+            size=(self.env.world.map.SIZE_X * 10, self.env.world.map.SIZE_Y * 10),
+        )
+        image = torch.transpose(image, 2, 3)
+        wandb.log(
+            {
+                "training_step/world": [
+                    wandb.Image(
+                        data_or_path=image,
+                        caption="World",
+                    )
+                ]
+            },
+            step=self.global_step,
+        )
