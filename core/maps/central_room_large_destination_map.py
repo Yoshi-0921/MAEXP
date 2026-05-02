@@ -15,11 +15,10 @@ class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
         self.destination_area_vector = np.zeros(shape=(config.num_agents, 384))
         self.specified_object_types = ["0" for _ in range(config.num_agents)]
         self.type_objects = config.type_objects
-        root_dir = "/home/motokawa/projects/MAEXP/configs/experiments/TextStrat/tensors/"
-        top_tensors = torch.load(root_dir + "top_tensor")
-        bottom_tensors = torch.load(root_dir + "bottom_tensor")
-        right_tensors = torch.load(root_dir + "right_tensor")
-        left_tensors = torch.load(root_dir + "left_tensor")
+        top_tensors = torch.load(config.root_dir + "top_tensor")
+        bottom_tensors = torch.load(config.root_dir + "bottom_tensor")
+        right_tensors = torch.load(config.root_dir + "right_tensor")
+        left_tensors = torch.load(config.root_dir + "left_tensor")
         self.tensors = [left_tensors,right_tensors,top_tensors,bottom_tensors]
         super().__init__(config=config,size_x=size_x,size_y=size_y)
 
