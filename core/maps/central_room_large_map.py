@@ -19,5 +19,6 @@ class CentralRoomLargeMap(AbstractMap):
         self.wall_matrix[np.array([20, 28]), 11:14] = 0
 
     def set_objects_area(self):
-        self.objects_area_matrix[0, 1:48, 1:24] = 1
-        self.objects_area_matrix[0, 20:29, 8:17] = 0
+        for object_type in range(self.type_objects):
+            self.objects_area_matrix[object_type, 1:48, 1:24] = 1
+            self.objects_area_matrix[object_type, 20:29, 8:17] = 0

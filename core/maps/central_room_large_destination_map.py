@@ -13,13 +13,18 @@ from .central_room_large_map import CentralRoomLargeMap
 class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
     def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.destination_area_vector = np.zeros(shape=(config.num_agents, 384))
-        self.specified_object_types = ["0" for _ in range(config.num_agents)]
+        self.specified_object_types = ["-1" for _ in range(config.num_agents)]
         self.type_objects = config.type_objects
-        top_tensors = torch.load(config.root_dir + "top_tensor")
-        bottom_tensors = torch.load(config.root_dir + "bottom_tensor")
-        right_tensors = torch.load(config.root_dir + "right_tensor")
-        left_tensors = torch.load(config.root_dir + "left_tensor")
-        self.tensors = [left_tensors,right_tensors,top_tensors,bottom_tensors]
+        type0_top_tensors = torch.load(config.map.root_dir + "type0_top_tensor")
+        type0_bottom_tensors = torch.load(config.map.root_dir + "type0_bottom_tensor")
+        type0_right_tensors = torch.load(config.map.root_dir + "type0_right_tensor")
+        type0_left_tensors = torch.load(config.map.root_dir + "type0_left_tensor")
+        type1_top_tensors = torch.load(config.map.root_dir + "type1_top_tensor")
+        type1_bottom_tensors = torch.load(config.map.root_dir + "type1_bottom_tensor")
+        type1_right_tensors = torch.load(config.map.root_dir + "type1_right_tensor")
+        type1_left_tensors = torch.load(config.map.root_dir + "type1_left_tensor")
+        self.tensors = [[type0_left_tensors,type0_right_tensors,type0_top_tensors,type0_bottom_tensors],
+                        [type1_left_tensors,type1_right_tensors,type1_top_tensors,type1_bottom_tensors]]
         super().__init__(config=config,size_x=size_x,size_y=size_y)
 
     def reset_destination_area(self):
@@ -31,7 +36,7 @@ class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
 
         for agent_id in range(self.num_agents):
             area_id = random.choice(range(len(destination_area)))
-            object_type = random.choice(range(self.type_objects))  # Randomly assign object type
+            object_type = random.choice(range(self.type_objects))
             self.destination_area_matrix[agent_id] = destination_area[area_id]
-            self.destination_area_vector[agent_id] = random.choice(self.tensors[area_id])
+            self.destination_area_vector[agent_id] = random.choice(self.tensors[object_type][area_id])
             self.specified_object_types[agent_id] = str(object_type)
