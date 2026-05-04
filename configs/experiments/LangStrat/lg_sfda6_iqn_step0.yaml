@@ -27,7 +27,7 @@ num_agents: 8
 episode_hm_nrow: 4
 agents_color: ["blue", "green", "dodger_blue", "spring_green", "blue", "green", "dodger_blue", "spring_green" ]
 init_xys: [[-2, 2], [0, 2], [2, 2], [-2, 0], [2, 0], [-2, -2], [0, -2], [2, -2]]
-shuffle_init_xys: False
+shuffle_init_xys: True
 agents_channel: False
 phase: 'training' # training, evaluation
 # ==================================================
