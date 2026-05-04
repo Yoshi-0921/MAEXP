@@ -68,5 +68,7 @@ config_names = {
     "Elservier_exp3_eda6_iqn_eval":"experiments/Elservier/exp3/eda6_iqn_eval",
     "TextStrat_da6_iqn":"experiments/COMPSAC2026/new_da6_iqn",
     "TextStrat_da6_iqn_eval":"experiments/COMPSAC2026/new_da6_iqn_eval",
-    "LangStrat_da6_iqn":"experiments/LangStrat/new_da6_iqn"
+    "LangStrat_lgsfda6_iqn_step0":"experiments/LangStrat/lg_sfda6_iqn_step0",
+    "LangStrat_lgsfda6_iqn_step1":"experiments/LangStrat/lg_sfda6_iqn_step1",
+    "LangStrat_sfda6_iqn":"experiments/LangStrat/sfda6_iqn"
 }

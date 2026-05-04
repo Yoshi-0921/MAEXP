@@ -5,10 +5,10 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 import random
 import numpy as np
 
-from .central_room_large_map import CentralRoomLargeMap
+from .central_room_complex_large_map import CentralRoomComplexLargeMap
 
 
-class CentralRoomLargeDestinationMap(CentralRoomLargeMap):
+class CentralRoomComplexLargeDestinationMap(CentralRoomComplexLargeMap):
     def reset_destination_area(self):
         destination_area = [np.zeros(shape=(self.SIZE_X, self.SIZE_Y), dtype=np.int8) for _ in range(4)]
         destination_area[0][: self.SIZE_X // 2, :] = 1  # left half

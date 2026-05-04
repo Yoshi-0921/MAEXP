@@ -1,0 +1,5 @@
+map:
+  name: 'central_room_large_lang_destination'
+  SIZE_X: 49
+  SIZE_Y: 25
+  root_dir: "/home/motokawa/projects/MAEXP/configs/experiments/COMPSAC2026/tensors/"
