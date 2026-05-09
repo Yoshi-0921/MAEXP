@@ -13,7 +13,7 @@ from .central_room_complex_large_map import CentralRoomComplexLargeMap
 class CentralRoomComplexLargeLangDestinationMap(CentralRoomComplexLargeMap):
     def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.destination_area_vector = np.zeros(shape=(config.num_agents, 384))
-        self.specified_object_types = ["-1" for _ in range(config.num_agents)]
+        self.specified_object_types = ["0" for _ in range(config.num_agents)]
         self.type_objects = config.type_objects
         type0_top_tensors = torch.load(config.map.root_dir + "type0_top_tensor")
         type0_bottom_tensors = torch.load(config.map.root_dir + "type0_bottom_tensor")

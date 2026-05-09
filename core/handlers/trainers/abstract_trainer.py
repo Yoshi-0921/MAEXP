@@ -10,9 +10,11 @@ from torch.utils.data import DataLoader
 
 from core.utils.buffer import Experience, generate_buffer
 from core.utils.dataset import RLDataset
+from core.utils.logging import initialize_logging
 
 from ..abstract_loop_handler import AbstractLoopHandler
 
+logger = initialize_logging(__name__)
 
 class AbstractTrainer(AbstractLoopHandler, ABC):
     def __init__(self, config: DictConfig, environment):
@@ -99,6 +101,10 @@ class AbstractTrainer(AbstractLoopHandler, ABC):
         # populate buffer
         self.populate(self.config.populate_steps)
         self.reset()
+
+        if self.config.pretrained_weight_path:
+            logger.info(f"Loading pretrained weights from {self.config.pretrained_weight_path}")
+            self.load_state_dict()
 
         # log brain networks of agents
         self.log_models()

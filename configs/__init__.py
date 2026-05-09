@@ -70,5 +70,8 @@ config_names = {
     "TextStrat_da6_iqn_eval":"experiments/COMPSAC2026/new_da6_iqn_eval",
     "LangStrat_lgsfda6_iqn_step0":"experiments/LangStrat/lg_sfda6_iqn_step0",
     "LangStrat_lgsfda6_iqn_step1":"experiments/LangStrat/lg_sfda6_iqn_step1",
-    "LangStrat_sfda6_iqn":"experiments/LangStrat/sfda6_iqn"
+    "LangStrat_sfda6_iqn":"experiments/LangStrat/sfda6_iqn",
+    "LangStrat_sfda6_iqn_exp1":"experiments/LangStrat/exp1/sfda6_iqn",
+    "LangStrat_lgsfda6_iqn_exp1":"experiments/LangStrat/exp1/lg_sfda6_iqn",
+    "LangStrat_lgsfda6_iqn_exp2":"experiments/LangStrat/exp2/lg_sfda6_iqn"
 }

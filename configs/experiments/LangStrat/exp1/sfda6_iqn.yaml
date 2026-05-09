@@ -5,7 +5,7 @@ defaults:
   - job_logging: disabled
 
 project_name: 'LangStrat-exp'
-name: 'sfDA6-IQN (G_pos+4half_destination_1object_type)'
+name: 'sfDA6-IQN exp1'
 gpu: 0
 # ==================================================
 # configure environment
@@ -13,10 +13,10 @@ gpu: 0
 world: 'default' # default
 environment: 'default' # default, shared_mean_reward, shared_max_reward, test
 seed: 921
-num_objects: 80
+num_objects: 64
 keep_objects_num: True
-type_objects: 1
-objects_color: ["yellow"]
+type_objects: 2
+objects_color: ["yellow", "orange"]
 agent_tasks: ["0", "0", "0", "0", "0", "0", "0", "0"]
 # ==================================================
 # configure agent
@@ -27,7 +27,7 @@ num_agents: 8
 episode_hm_nrow: 4
 agents_color: ["blue", "green", "dodger_blue", "spring_green", "blue", "green", "dodger_blue", "spring_green" ]
 init_xys: [[-2, 2], [0, 2], [2, 2], [-2, 0], [2, 0], [-2, -2], [0, -2], [2, -2]]
-shuffle_init_xys: False
+shuffle_init_xys: True
 agents_channel: False
 phase: 'training' # training, evaluation
 # ==================================================
@@ -60,7 +60,7 @@ buffer: 'default' # default, recurrent
 capacity: 100000
 synchronize_frequency: 1
 gamma: 0.9
-epsilon_decay: 0.998
+epsilon_decay: 0.999
 epsilon_initial: 1.0
 epsilon_end: 0.05
 # ==================================================
