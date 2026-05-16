@@ -14,6 +14,9 @@ from .central_room_large_lang_destination_map import CentralRoomLargeLangDestina
 from .central_room_complex_large_map import CentralRoomComplexLargeMap
 from .central_room_complex_large_destination_map import CentralRoomComplexLargeDestinationMap
 from .central_room_complex_large_lang_destination_map import CentralRoomComplexLargeLangDestinationMap
+from .central_room_complex_large_fixed_lang_destination_map import CentralRoomComplexLargeFixedLangDestinationMap
+from .central_room_complex_large_unseen_fixed_lang_destination_map import CentralRoomComplexLargeUnseenFixedLangDestinationMap
+from .central_room_complex_large_unseen_lang_destination_map import CentralRoomComplexLargeUnseenLangDestinationMap
 from .central_room_complex_large_single_lang_destination_map import CentralRoomComplexLargeSingleLangDestinationMap
 from .central_room_large_map import CentralRoomLargeMap
 from .central_room_map import CentralRoomMap
@@ -72,6 +75,15 @@ def generate_map(config: DictConfig) -> AbstractMap:
 
     elif config.map.name == "central_room_complex_large_single_lang_destination":
         world_map = CentralRoomComplexLargeSingleLangDestinationMap(config=config, size_x=49, size_y=25)
+
+    elif config.map.name == "central_room_complex_large_unseen_lang_destination":
+        world_map = CentralRoomComplexLargeUnseenLangDestinationMap(config=config, size_x=49, size_y=25)
+    
+    elif config.map.name == "central_room_complex_large_fixed_lang_destination":
+        world_map = CentralRoomComplexLargeFixedLangDestinationMap(config=config, size_x=49, size_y=25)
+
+    elif config.map.name == "central_room_complex_large_unseen_fixed_lang_destination":
+        world_map = CentralRoomComplexLargeUnseenFixedLangDestinationMap(config=config, size_x=49, size_y=25)
 
     else:
         logger.warn(f"Unexpected map is given. config.map.name: {config.map.name}")

@@ -47,7 +47,7 @@ class AttentionEvaluator(DefaultEvaluator):
         self.episode_reward_agents += np.asarray(rewards)
 
         log_step = self.max_episode_length // 2
-        if (epoch + 1) % max(1, self.max_epochs // 5) == 0 and step in [
+        if (epoch + 1) % max(1, self.max_epochs // 10) == 0 and step in [
             log_step - 3,
             log_step - 2,
             log_step - 1,
@@ -56,6 +56,7 @@ class AttentionEvaluator(DefaultEvaluator):
             log_step + 2,
             log_step + 3,
         ]:
+            self.log_world()
             for agent_id, agent in enumerate(self.agents):
                 if self.config.agent_tasks[int(agent_id)] == "-1":
                     continue

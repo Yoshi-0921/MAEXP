@@ -418,6 +418,14 @@ class AbstractLoopHandler(ABC):
             },
             step=self.global_step - 1,
         )
+        if hasattr(self.env, "objects_completed_successfully"):
+            wandb.log(
+                {
+                    "episode/objects_completed_successfully": self.env.objects_completed_successfully,
+                    "episode/objects_completed_precision": self.env.objects_completed_successfully / max(self.env.objects_completed, 1)
+                },
+                step=self.global_step - 1,
+            )
 
         for agent_id, reward in enumerate(self.episode_reward_agents):
             wandb.log(

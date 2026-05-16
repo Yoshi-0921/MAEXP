@@ -1,0 +1,5 @@
+map:
+  name: 'central_room_complex_large_unseen_fixed_lang_destination'
+  SIZE_X: 49
+  SIZE_Y: 25
+  root_dir: "/home/motokawa/projects/MAEXP/configs/experiments/LangStrat/tensors/"

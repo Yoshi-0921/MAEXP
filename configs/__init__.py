@@ -73,5 +73,11 @@ config_names = {
     "LangStrat_sfda6_iqn":"experiments/LangStrat/sfda6_iqn",
     "LangStrat_sfda6_iqn_exp1":"experiments/LangStrat/exp1/sfda6_iqn",
     "LangStrat_lgsfda6_iqn_exp1":"experiments/LangStrat/exp1/lg_sfda6_iqn",
-    "LangStrat_lgsfda6_iqn_exp2":"experiments/LangStrat/exp2/lg_sfda6_iqn"
+    "LangStrat_lgsfda6_iqn_exp2":"experiments/LangStrat/exp2/lg_sfda6_iqn",
+    "LangStrat_lgsfda6_iqn_exp1_eval":"experiments/LangStrat/exp1_eval/lg_sfda6_iqn",
+    "LangStrat_sfda6_iqn_exp1_eval":"experiments/LangStrat/exp1_eval/sfda6_iqn",
+    "LangStrat_lgsfda6_iqn_exp2_eval":"experiments/LangStrat/exp2_eval/lg_sfda6_iqn",
+    "LangStrat_lgsfda6_iqn_exp2_unseen_eval":"experiments/LangStrat/exp2_eval/lg_sfda6_iqn_unseen",
+    "LangStrat_lgsfda6_iqn_exp2_fixed_eval":"experiments/LangStrat/exp2_eval/lg_sfda6_iqn_fixed",
+    "LangStrat_lgsfda6_iqn_exp2_unseen_fixed_eval":"experiments/LangStrat/exp2_eval/lg_sfda6_iqn_unseen_fixed"
 }
