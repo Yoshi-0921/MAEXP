@@ -28,7 +28,7 @@ warnings.simplefilter("ignore")
 
 logger = initialize_logging(__name__)
 
-@hydra.main(config_path="configs", config_name=config_names["LangStrat_lgsfda6_iqn_exp2_eval"])
+@hydra.main(config_path="configs", config_name=config_names["LangStrat_lgsfda6_iqn_exp2_fixed_eval"])
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu)
     set_seed(seed=config.seed)

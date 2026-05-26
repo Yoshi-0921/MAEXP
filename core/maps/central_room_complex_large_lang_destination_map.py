@@ -41,6 +41,7 @@ class CentralRoomComplexLargeLangDestinationMap(CentralRoomComplexLargeMap):
             self.destination_area_matrix[agent_id] = destination_area[area_id]
             if area_id == 4:
                 self.destination_area_vector[agent_id] = torch.normal(0,0.05,size=(1,384))[0]
+                self.specified_object_types[agent_id] = "01"
             else:
                 self.destination_area_vector[agent_id] = random.choice(self.tensors[object_type][area_id])
-            self.specified_object_types[agent_id] = str(object_type)
+                self.specified_object_types[agent_id] = str(object_type)
