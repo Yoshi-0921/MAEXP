@@ -38,7 +38,7 @@ transparent_observation: False
 objects_channel: False
 destination_channel: True
 reset_destination_period: 200
-agent_view_method: 'individual' # default, self, simple, transition, individual
+agent_view_method: 'default' # default, self, simple, transition, individual
 object_view_method: 'object_types' # default, simple, object_types
 observation_area_mask: 'merged' # local, relative, merged
 observation_noise: False # False, sensing_dist, threshold_sensing_dist, flat, flip
@@ -67,5 +67,5 @@ epsilon_end: 0.05
 # configre evaluation
 
 validate_epochs: 1000
-pretrained_weight_path: "yoshi-0921/LangStrat-exp/770w6wkd.pth:v11"
+pretrained_weight_path: "yoshi-0921/LangStrat-exp/1adr04sv.pth:v11"
 save_pdf_figs: False
