@@ -66,6 +66,6 @@ epsilon_end: 0.05
 # ==================================================
 # configre evaluation
 
-validate_epochs: 1000
+validate_epochs: 1
 pretrained_weight_path: "yoshi-0921/LangStrat-exp/1adr04sv.pth:v11"
-save_pdf_figs: True
+save_pdf_figs: False
