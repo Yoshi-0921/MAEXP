@@ -74,7 +74,7 @@ def generate_network(
             network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "iqn_cond":
-        network = IQN_Cond(config=config, input_shape=obs_shape, output_size=act_size, target=target)
+        network = IQN_Cond(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "fqf":
         network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)
