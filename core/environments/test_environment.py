@@ -10,6 +10,21 @@ from core.worlds.entity import Agent
 import numpy as np
 
 class TestEnvironment(DefaultEnvironment):
+    def __init__(self, config):
+        super().__init__(config=config)
+        self.acc_objects_completed_individually = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
+        self.acc_objects_completed_correctly_type = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
+        self.acc_objects_completed_correctly_area = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
+
     def reset(self):
         obs_n = super().reset()
         self.objects_completed_successfully = 0
@@ -76,3 +91,9 @@ class TestEnvironment(DefaultEnvironment):
             self.walls_collided += 1
 
         return reward
+
+    def accumulate_heatmap(self):
+        super().accumulate_heatmap()
+        self.acc_objects_completed_individually += self.objects_completed_individually
+        self.acc_objects_completed_correctly_type += self.objects_completed_correctly_type
+        self.acc_objects_completed_correctly_area += self.objects_completed_correctly_area

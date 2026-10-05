@@ -61,19 +61,6 @@ class DefaultEnvironment(AbstractEnvironment):
         )
         self.current_step = 0
 
-        self.acc_objects_completed_individually = np.zeros(
-            shape=(self.num_agents),
-            dtype=np.int32,
-        )
-        self.acc_objects_completed_correctly_type = np.zeros(
-            shape=(self.num_agents),
-            dtype=np.int32,
-        )
-        self.acc_objects_completed_correctly_area = np.zeros(
-            shape=(self.num_agents),
-            dtype=np.int32,
-        )
-
     def reset(self):
         self.objects_generated = 0
         self.objects_completed = 0
@@ -274,7 +261,3 @@ class DefaultEnvironment(AbstractEnvironment):
         self.heatmap_accumulated_wall_collision += self.heatmap_wall_collision
         self.heatmap_accumulated_agents_collision += self.heatmap_agents_collision
         self.heatmap_accumulated_observation += self.heatmap_observation
-
-        self.acc_objects_completed_individually += self.objects_completed_individually
-        self.acc_objects_completed_correctly_type += self.objects_completed_correctly_type
-        self.acc_objects_completed_correctly_area += self.objects_completed_correctly_area
