@@ -7,12 +7,24 @@ from typing import List
 
 from core.environments.default_environment import DefaultEnvironment
 from core.worlds.entity import Agent
-
+import numpy as np
 
 class TestEnvironment(DefaultEnvironment):
     def reset(self):
         obs_n = super().reset()
         self.objects_completed_successfully = 0
+        self.objects_completed_individually = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
+        self.objects_completed_correctly_type = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
+        self.objects_completed_correctly_area = np.zeros(
+            shape=(self.num_agents),
+            dtype=np.int32,
+        )
         return obs_n
 
     def reward_ind(self, agents: List[Agent], agent: Agent, agent_id: int):
@@ -35,13 +47,17 @@ class TestEnvironment(DefaultEnvironment):
                 == 1
             ):
                 if (
-                    self.world.map.destination_area_matrix[agent_id][a_pos_x, a_pos_y] == 1 and str(object_type) in agent_tasks
+                    self.world.map.destination_area_matrix[agent_id][a_pos_x, a_pos_y] == 1
                 ):
-                    reward = 1.0
-                    self.objects_completed_successfully += 1
+                    self.objects_completed_correctly_area[agent_id] += 1
+                    if str(object_type) in agent_tasks:
+                        reward = 1.0
+                        self.objects_completed_successfully += 1
+                        self.objects_completed_correctly_type[agent_id] += 1
                 self.world.map.objects_matrix[object_type, a_pos_x, a_pos_y] = 0
                 self.objects_completed += 1
                 self.heatmap_complete[agent_id, a_pos_x, a_pos_y] += 1
+                self.objects_completed_individually[agent_id] += 1
                 if self.config.keep_objects_num:
                     self.generate_objects(1, object_type)
 

@@ -50,4 +50,13 @@ class DefaultEvaluator(AbstractEvaluator):
         self.log_scalar()
         if (self.episode_count + 1) % max(1, self.max_epochs // 10) == 0:
             self.log_heatmap()
+            for agent_id in range(self.env.num_agents):
+                if agent_id < 4:
+                    print(f"Agent {agent_id} - left half sum: {self.env.heatmap_accumulated_agents[agent_id][: 49 // 2, :].sum()} out of {self.env.heatmap_accumulated_agents[agent_id].sum()}")
+                else:
+                    print(f"Agent {agent_id} - right half sum: {self.env.heatmap_accumulated_agents[agent_id][49 // 2:, :].sum()} out of {self.env.heatmap_accumulated_agents[agent_id].sum()}")
+                print(f"Agent {agent_id} - objects completed individually: {self.env.acc_objects_completed_individually[agent_id]}")
+                print(f"Agent {agent_id} - objects completed correctly type: {self.env.acc_objects_completed_correctly_type[agent_id]}")
+                print(f"Agent {agent_id} - objects completed correctly area: {self.env.acc_objects_completed_correctly_area[agent_id]}")
+
         self.reset()

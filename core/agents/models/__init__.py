@@ -28,6 +28,7 @@ from .customs.iqn import IQN, MergedIQN
 from .customs.qr_dqn import QRDQN
 from .customs.da6_iqn_status import DA6_IQN_Status
 from .mlp import MLP
+from .customs.iqn_cond import IQN_Cond
 
 logger = initialize_logging(__name__)
 
@@ -71,6 +72,9 @@ def generate_network(
             network = MergedIQN(config=config, input_shape=obs_shape, output_size=act_size)
         else:
             network = IQN(config=config, input_shape=obs_shape, output_size=act_size)
+
+    elif config.model.name == "iqn_cond":
+        network = IQN_Cond(config=config, input_shape=obs_shape, output_size=act_size, target=target)
 
     elif config.model.name == "fqf":
         network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)
