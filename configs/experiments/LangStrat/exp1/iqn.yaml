@@ -5,7 +5,7 @@ defaults:
   - job_logging: disabled
 
 project_name: 'LangStrat-exp'
-name: 'IQN exp1 (delete this one)'
+name: 'IQN exp1'
 gpu: 0
 # ==================================================
 # configure environment

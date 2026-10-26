@@ -25,6 +25,7 @@ from .customs.dra3_dqn import DRA3_DQN
 from .customs.dra3_iqn import DRA3_IQN
 from .customs.fqf import FQF
 from .customs.iqn import IQN, MergedIQN
+from .customs.iqn_textStrat import IQN_TextStrat
 from .customs.qr_dqn import QRDQN
 from .customs.da6_iqn_status import DA6_IQN_Status
 from .mlp import MLP
@@ -75,6 +76,9 @@ def generate_network(
 
     elif config.model.name == "iqn_cond":
         network = IQN_Cond(config=config, input_shape=obs_shape, output_size=act_size)
+    
+    elif config.model.name == "iqn_textStrat":
+        network = IQN_TextStrat(config=config, input_shape=obs_shape, output_size=act_size)
 
     elif config.model.name == "fqf":
         network = FQF(config=config, input_shape=obs_shape, output_size=act_size, target=target)

@@ -1,6 +1,6 @@
 defaults:
   - model: da6_iqn_textStrat # mlp, conv_mlp, da3, da3_baseline, da6, categorical_dqn, qr_dqn, iqn, da3_iqn, fqf, da6_iqn, da6_iqn_cond
-  - map: central_room_complex_large_single_lang_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination, central_room_large, central_room_large_destination, central_room_large_lang_destination, central_room_complex_large, central_room_complex_large_destination, central_room_complex_large_lang_destination, central_room_complex_large_single_lang_destination
+  - map: central_room_complex_large_single_type_lang_destination # simple, four_rooms, four_rectangle, three_rooms, central_room, two_central_rooms, central_room_destination, central_room_large, central_room_large_destination, central_room_large_lang_destination, central_room_complex_large, central_room_complex_large_destination, central_room_complex_large_lang_destination, central_room_complex_large_single_type_lang_destination
   - opt: rmsprop
   - job_logging: disabled
 

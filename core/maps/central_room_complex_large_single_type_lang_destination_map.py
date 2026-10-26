@@ -10,7 +10,7 @@ from omegaconf import DictConfig
 from .central_room_complex_large_map import CentralRoomComplexLargeMap
 
 
-class CentralRoomComplexLargeSingleLangDestinationMap(CentralRoomComplexLargeMap):
+class CentralRoomComplexLargeSingleTypeLangDestinationMap(CentralRoomComplexLargeMap):
     def __init__(self, config: DictConfig, size_x: int, size_y: int):
         self.destination_area_vector = np.zeros(shape=(config.num_agents, 384))
         self.specified_object_types = ["0" for _ in range(config.num_agents)]
