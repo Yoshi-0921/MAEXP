@@ -4,14 +4,16 @@ Author: Yoshinari Motokawa <yoshinari.moto@fuji.waseda.jp>
 """
 
 from typing import List
+from omegaconf import DictConfig
 
 from core.environments.default_environment import DefaultEnvironment
+from core.worlds import AbstractWorld
 from core.worlds.entity import Agent
 import numpy as np
 
 class TestEnvironment(DefaultEnvironment):
-    def __init__(self, config):
-        super().__init__(config=config)
+    def __init__(self, config: DictConfig, world: AbstractWorld):
+        super().__init__(config=config, world=world)
         self.acc_objects_completed_individually = np.zeros(
             shape=(self.num_agents),
             dtype=np.int32,
