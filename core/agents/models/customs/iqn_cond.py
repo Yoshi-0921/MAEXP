@@ -34,7 +34,7 @@ class IQN_Cond(IQN):
         self.destination_conv = Conv(
             config=config,
             input_channel=1,
-            output_channel=config.model.output_channel // 2,
+            output_channel=config.model.output_channel // 16,
         )
 
         local_embedding_dim: int = IQN_Cond.get_mlp_input_size(self.local_conv, [input_shape[0], config.visible_range, config.visible_range])
@@ -49,7 +49,7 @@ class IQN_Cond(IQN):
             config=config, input_size=relative_embedding_dim, output_size=relative_embedding_dim
         )
         self.destination_state_embedder = MLP(
-            config=config, input_size=relative_embedding_dim, output_size=relative_embedding_dim
+            config=config, input_size=destination_embedding_dim, output_size=destination_embedding_dim
         )
         self.cosine_net = CosineEmbeddingNetwork(
             num_cosines=self.num_cosines, embedding_dim=self.embedding_dim
